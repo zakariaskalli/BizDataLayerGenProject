@@ -125,6 +125,7 @@ namespace BizDataLayerGen
             // Test NameTables
 
             // Thank you commit
+            // Thanks commmit 2
             if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show("Created Success");
             else
