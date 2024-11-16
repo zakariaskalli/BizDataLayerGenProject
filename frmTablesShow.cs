@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using BizDataLayerGen.GeneralClasses;
+using System.Data;
+using GymDB_DataAccess;
 namespace BizDataLayerGen
 {
     public partial class frmTablesShow : Form
@@ -124,8 +126,13 @@ namespace BizDataLayerGen
 
             // Test NameTables
 
-            // Thank you commit
-            // Thanks commmit 2
+            /*
+            clsPeopleData.AddNewPeople("Khalid","Arzaz", "Malki", "Mohmadi", "Arzaz@gmail.com",
+                                    "0625251456", DateTime.Now, true,"Fes",125, DateTime.Now,DateTime.Now,
+                                    "", 1);
+            */
+
+
             if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show("Created Success");
             else

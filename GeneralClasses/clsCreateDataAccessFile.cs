@@ -24,18 +24,62 @@ namespace BizDataLayerGen.GeneralClasses
             this._DataTypes = DataTypes;
         }
 
-        
-        public static string ReferencesCode(string[] Columns, string[] DataTypes)
+        public static string ParameterCode(string[] Columns, string[] DataTypes,int StartBy)
         {
-            var referencesCodeBuilder = new StringBuilder();
+            var parameterCodeBuilder = new StringBuilder();
 
-            foreach (var (column, dataType) in Columns.Skip(1).Zip(DataTypes.Skip(1), (col, dt) => (col, dt)))
+            foreach (var (column, dataType) in Columns.Skip(StartBy).Zip(DataTypes.Skip(StartBy), (col, dt) => (col, dt)))
             {
-                referencesCodeBuilder.Append($", ref {dataType} {column}");
+                parameterCodeBuilder.Append($"{dataType} {column.Replace(" ", "")}, ");
             }
 
-            return referencesCodeBuilder.ToString();
+            // Remove the trailing comma and space
+            if (parameterCodeBuilder.Length > 0)
+            {
+                parameterCodeBuilder.Length -= 2;
+            }
+
+            return parameterCodeBuilder.ToString();
         }
+        
+        public static string parameterForInsertQueryBuilder(string[] Columns)
+        {
+            var parameterForInsertQueryBuilder = new StringBuilder();
+
+            for (int i = 1; i < Columns.Length; i++)
+            {
+                parameterForInsertQueryBuilder.Append($"[{Columns[i]}]");
+
+                if (i < Columns.Length - 1)
+                {
+                    parameterForInsertQueryBuilder.Append(',');
+                }
+            }
+
+            return parameterForInsertQueryBuilder.ToString();
+        }
+
+        public static string parameterForInsertQueryBuilderValue(string[] Columns)
+        {
+            var parameterForInsertQueryBuilderValue = new StringBuilder();
+
+            for (int i = 1; i < Columns.Length; i++)
+            {
+                // إزالة المسافات الداخلية وإضافة @ قبل العمود
+                string formattedColumn = "@" + Columns[i].Replace(" ", "");
+
+                parameterForInsertQueryBuilderValue.Append(formattedColumn);
+
+                // إضافة فاصلة فقط إذا لم يكن العنصر الأخير
+                if (i < Columns.Length - 1)
+                {
+                    parameterForInsertQueryBuilderValue.Append(',');
+                }
+            }
+
+            return parameterForInsertQueryBuilderValue.ToString();
+        }
+
 
         private string AddDataReaderToVariables()
         {
@@ -43,7 +87,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             foreach (var (column, dataType) in _Columns.Skip(1).Zip(_DataTypes.Skip(1), (col, dt) => (col, dt)))
             {
-                dataReaderCodeBuilder.AppendLine($"{column} = ({dataType})reader[\"{column}\"];");
+                dataReaderCodeBuilder.AppendLine($"                                {column.Replace(" ", "")} = ({dataType})reader[\"{column}\"];");
             }
 
             return dataReaderCodeBuilder.ToString();
@@ -72,7 +116,7 @@ namespace BizDataLayerGen.GeneralClasses
                                 // The record was found
                                 isFound = true;
 
-                                {AddDataReaderToVariables()}
+{AddDataReaderToVariables()}
 
 
                             }}
@@ -86,6 +130,76 @@ namespace BizDataLayerGen.GeneralClasses
 
             return GetTableByIDCode;
         }
+
+        public string AddGetAllDataMethod()
+        {
+            string GetTableByIDCode = @$"public static DataTable GetAll{_TableName}()
+{{
+    DataTable dt = new DataTable();
+
+    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    {{
+        string query = ""SELECT * FROM {_TableName}"";
+
+        using (SqlCommand command = new SqlCommand(query, connection))
+        {{
+
+            connection.Open();
+
+            using (SqlDataReader reader = command.ExecuteReader())
+            {{
+                if (reader.HasRows)
+                    dt.Load(reader);
+            }}
+        }}
+    }}
+    return dt;
+
+}}";
+
+            return GetTableByIDCode;
+        }
+
+
+
+        public string AddAddingNewRecordMethod()
+        {
+
+
+            string GetTableByIDCode = @$" public static int AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, 1)})
+        {{
+            int {_Columns[0]} = -1;
+
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {{
+                string query = @""Insert Into {_TableName} ({parameterForInsertQueryBuilder(_Columns)})
+                            Values ({parameterForInsertQueryBuilderValue(_Columns)})
+                            SELECT SCOPE_IDENTITY();"";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {{
+{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns)}
+
+                    connection.Open();
+
+                    object result = command.ExecuteScalar();
+
+                    if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                    {{
+                        {_Columns[0]} = insertedID;
+                    }}
+                }}
+
+            }}
+            return {_Columns[0]};
+
+        }}
+";
+
+            return GetTableByIDCode;
+        }
+
+
 
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
         {
@@ -114,7 +228,12 @@ namespace {clsGlobal.DataBaseName}_DataAccess
 {{
     public class cls{_TableName}Data
     {{
+
         {AddGetTableInfoByIDMethod()}
+
+        {AddGetAllDataMethod()}
+
+        {AddAddingNewRecordMethod()}
 
     }}
 }}

@@ -14,10 +14,29 @@ namespace BizDataLayerGen.GeneralClasses
 
             foreach (var (column, dataType) in Columns.Skip(1).Zip(DataTypes.Skip(1), (col, dt) => (col, dt)))
             {
-                referencesCodeBuilder.Append($", ref {dataType} {column}");
+                referencesCodeBuilder.Append($", ref {dataType} {column.Replace(" ", "")}");
             }
 
             return referencesCodeBuilder.ToString();
+        }
+
+        public static string CreatingCommandParameter(string[] Columns)
+        {
+            var parameterCommandsBuilder = new StringBuilder();
+
+            for (int i = 1; i < Columns.Length; i++) // Start With Second Item
+            {
+                // Remove Spaces to Add @
+                string cleanedColumn = Columns[i].Replace(" ", "");
+
+                
+                parameterCommandsBuilder.AppendLine(
+                    $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {cleanedColumn});"
+                );
+            }
+
+            return parameterCommandsBuilder.ToString();
+
         }
 
         public static string[] ConvertSqlDataTypesToCSharp(string[] sqlDataTypes)
@@ -36,37 +55,38 @@ namespace BizDataLayerGen.GeneralClasses
         // Helper method to map SQL data types to C# data types
         public static string MapSqlTypeToCSharpType(string sqlDataType)
         {
-            return sqlDataType.ToLower() switch
+            switch (sqlDataType.ToLower())
             {
-                "int" => "int",
-                "bigint" => "long",
-                "smallint" => "short",
-                "tinyint" => "byte",
-                "bit" => "bool",
-                "decimal" => "decimal",
-                "numeric" => "decimal",
-                "float" => "double",
-                "real" => "float",
-                "money" => "decimal",
-                "smallmoney" => "decimal",
-                "char" => "string",
-                "varchar" => "string",
-                "text" => "string",
-                "nchar" => "string",
-                "nvarchar" => "string",
-                "ntext" => "string",
-                "date" => "DateTime",
-                "datetime" => "DateTime",
-                "datetime2" => "DateTime",
-                "smalldatetime" => "DateTime",
-                "time" => "TimeSpan",
-                "timestamp" => "byte[]",
-                "binary" => "byte[]",
-                "varbinary" => "byte[]",
-                "uniqueidentifier" => "Guid"
-                // Default for unrecognized types
-            };
+                case "int": return "int";
+                case "bigint": return "long";
+                case "smallint": return "short";
+                case "tinyint": return "byte";
+                case "bit": return "bool";
+                case "decimal":
+                case "numeric":
+                case "money":
+                case "smallmoney": return "decimal";
+                case "float": return "double";
+                case "real": return "float";
+                case "char":
+                case "varchar":
+                case "text":
+                case "nchar":
+                case "nvarchar":
+                case "ntext": return "string";
+                case "date":
+                case "datetime":
+                case "datetime2":
+                case "smalldatetime": return "DateTime";
+                case "time": return "TimeSpan";
+                case "timestamp":
+                case "binary":
+                case "varbinary": return "byte[]";
+                case "uniqueidentifier": return "Guid";
+                default: return "text";
+            }
         }
+
 
     }
 }

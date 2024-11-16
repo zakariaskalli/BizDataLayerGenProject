@@ -20,6 +20,9 @@ namespace BizDataLayerGen
             //
             if (clsGeneralWithData.TestDatabaseConnection())
             {
+                clsGlobal.UserId = clsDataAccessSettings.UserId;
+                clsGlobal.Password = clsDataAccessSettings.Password;
+
                 Application.Run(new CodeGenratorForm());
             }
             else
