@@ -15,22 +15,25 @@ namespace BizDataLayerGen.GeneralClasses
         private string _TableName;
         private string[] _Columns;
         private string[] _DataTypes;
-
-        public clsCreateDataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes) 
+        private bool[] _NullibietyColumns;
+        public clsCreateDataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns) 
         {
             this._filePath = filePath;
             this._TableName = TableName;
             this._Columns = Columns;
             this._DataTypes = DataTypes;
+            this._NullibietyColumns = NullibietyColumns;
         }
 
-        public static string ParameterCode(string[] Columns, string[] DataTypes,int StartBy)
+        public static string ParameterCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, int StartBy)
         {
             var parameterCodeBuilder = new StringBuilder();
 
-            foreach (var (column, dataType) in Columns.Skip(StartBy).Zip(DataTypes.Skip(StartBy), (col, dt) => (col, dt)))
+            for (int i = StartBy; i < Columns.Length; i++)
             {
-                parameterCodeBuilder.Append($"{dataType} {column.Replace(" ", "")}, ");
+                // Add "?" if the column is nullable
+                string nullableIndicator = NullibietyColumns[i] ? "?" : "";
+                parameterCodeBuilder.Append($"{DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "")}, ");
             }
 
             // Remove the trailing comma and space
@@ -41,7 +44,8 @@ namespace BizDataLayerGen.GeneralClasses
 
             return parameterCodeBuilder.ToString();
         }
-        
+
+
         public static string parameterForInsertQueryBuilder(string[] Columns)
         {
             var parameterForInsertQueryBuilder = new StringBuilder();
@@ -80,22 +84,33 @@ namespace BizDataLayerGen.GeneralClasses
             return parameterForInsertQueryBuilderValue.ToString();
         }
 
-
         private string AddDataReaderToVariables()
         {
             var dataReaderCodeBuilder = new StringBuilder();
 
-            foreach (var (column, dataType) in _Columns.Skip(1).Zip(_DataTypes.Skip(1), (col, dt) => (col, dt)))
+            for (int i = 1; i < _Columns.Length; i++) // Start from 1 to skip the first column
             {
-                dataReaderCodeBuilder.AppendLine($"                                {column.Replace(" ", "")} = ({dataType})reader[\"{column}\"];");
+                string column = _Columns[i].Replace(" ", "");
+                string dataType = _DataTypes[i];
+
+                if (_NullibietyColumns[i]) // If the column is nullable
+                {
+                    dataReaderCodeBuilder.AppendLine($"                                {column} = reader[\"{_Columns[i]}\"] as {dataType}?;");
+                }
+                else // If the column is not nullable
+                {
+                    dataReaderCodeBuilder.AppendLine($"                                {column} = ({dataType})reader[\"{_Columns[i]}\"];");
+                }
             }
 
             return dataReaderCodeBuilder.ToString();
         }
 
+
+
         public string AddGetTableInfoByIDMethod()
         {
-            string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]} {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns,_DataTypes)})
+            string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]} {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns,_DataTypes, _NullibietyColumns)})
             {{
                 bool isFound = false;
 
@@ -160,15 +175,13 @@ namespace BizDataLayerGen.GeneralClasses
             return GetTableByIDCode;
         }
 
-
-
         public string AddAddingNewRecordMethod()
         {
 
 
-            string GetTableByIDCode = @$" public static int AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, 1)})
+            string GetTableByIDCode = @$" public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
         {{
-            int {_Columns[0]} = -1;
+            int? {_Columns[0]} = null;
 
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
@@ -246,9 +259,9 @@ namespace {clsGlobal.DataBaseName}_DataAccess
 
         }
 
-        public static clsGlobal.enTypeRaisons CreateDataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes)
+        public static clsGlobal.enTypeRaisons CreateDataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
-            clsCreateDataAccessFile Files = new clsCreateDataAccessFile(filePath, TableName, Columns, DataTypes);
+            clsCreateDataAccessFile Files = new clsCreateDataAccessFile(filePath, TableName, Columns, DataTypes, NullibietyColumns);
 
             return Files.CreateDataAccessClassFile();
         }

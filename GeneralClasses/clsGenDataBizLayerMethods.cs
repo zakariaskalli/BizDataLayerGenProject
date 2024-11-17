@@ -8,13 +8,14 @@ namespace BizDataLayerGen.GeneralClasses
 {
     public class clsGenDataBizLayerMethods
     {
-        public static string ReferencesCode(string[] Columns, string[] DataTypes)
+        public static string ReferencesCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
             var referencesCodeBuilder = new StringBuilder();
 
-            foreach (var (column, dataType) in Columns.Skip(1).Zip(DataTypes.Skip(1), (col, dt) => (col, dt)))
+            for (int i = 1; i < Columns.Length; i++) // Start from 1 to skip the first column
             {
-                referencesCodeBuilder.Append($", ref {dataType} {column.Replace(" ", "")}");
+                string nullableIndicator = NullibietyColumns[i] ? "?" : ""; // Add "?" if the column is nullable
+                referencesCodeBuilder.Append($", ref {DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "")}");
             }
 
             return referencesCodeBuilder.ToString();

@@ -407,6 +407,44 @@ namespace BizDataLayerGen.DataAccessLayer
             return IsFound;
         }
 
+        public static bool[] GetColumnNullabilityFromTable(string tableName, string DBName)
+        {
+            List<bool> nullabilities = new List<bool>();
+
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {
+                string query = @$"
+            Use [{DBName}]
+            SELECT 
+                COLUMN_NAME AS ColumnName,
+                CASE IS_NULLABLE WHEN 'YES' THEN 1 ELSE 0 END AS IsNullable
+            FROM 
+                INFORMATION_SCHEMA.COLUMNS
+            WHERE 
+                TABLE_NAME = @TableName
+            ORDER BY 
+                ORDINAL_POSITION;";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@TableName", tableName);
+
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            bool isNullable = (int)reader["IsNullable"] == 1;
+
+                            nullabilities.Add(isNullable);
+                        }
+                    }
+                }
+            }
+
+            return nullabilities.ToArray();
+        }
 
     }
 }
