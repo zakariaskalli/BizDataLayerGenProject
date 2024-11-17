@@ -6,6 +6,8 @@ using System.Windows.Forms;
 using BizDataLayerGen.GeneralClasses;
 using System.Data;
 using GymDB_DataAccess;
+using Project_DataAccessLayer;
+
 namespace BizDataLayerGen
 {
     public partial class frmTablesShow : Form
@@ -126,17 +128,46 @@ namespace BizDataLayerGen
 
             // Test NameTables
 
+            // the CreatebyUseName in People in GymDB is Not Nullable
+
+            // Adding Record
+
             /*
-            clsPeopleData.AddNewPeople("Khalid","Arzaz", "Malki", "Mohmadi", "Arzaz@gmail.com",
-                                    "0625251456", DateTime.Now, true,"Fes",125, DateTime.Now,DateTime.Now,
-                                    "", 1);
+            MessageBox.Show(clsPeopleData.AddNewPeople("Khalid", "bibo", "nan", "Malki", "Arzaz@gmail.com",
+                                   "060044456", DateTime.Now, true, "Fes", 125, DateTime.Now, DateTime.Now,
+                                   null, 1).ToString());
+            */
+
+            //GetPeopleInfoByID
+
+            /*
+            int PersonID = 56;
+            string FirstName = "";
+            string? SecondName = "";
+            string? ThirdName = "";
+            string LastName = "";
+            string? Email = "";
+            string? Phone = "";
+            DateTime? DateOfBirth = DateTime.Now;
+            bool Gender =  false;
+            string? Address = "";
+            int CityID = -1;
+            DateTime CreatedTime = DateTime.Now;
+            DateTime LastUpdat = DateTime.Now;
+            string? ProfilePicture = "";
+            int? CreatedByUserID = -1;
+
+
+            clsPeopleData.GetPeopleInfoByID(PersonID,ref FirstName, ref SecondName, ref ThirdName,
+               ref LastName, ref Email, ref Phone, ref DateOfBirth, ref Gender, ref Address, ref CityID,
+               ref CreatedTime, ref LastUpdat, ref ProfilePicture, ref CreatedByUserID);
             */
 
 
-            if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
-                MessageBox.Show("Created Success");
-            else
-                MessageBox.Show("Error Created Success");
+            //if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
+            //    MessageBox.Show("Created Success");
+            //else
+            //    MessageBox.Show("Error Created Success");
 
         }
     }

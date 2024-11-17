@@ -21,7 +21,7 @@ namespace BizDataLayerGen.GeneralClasses
             return referencesCodeBuilder.ToString();
         }
 
-        public static string CreatingCommandParameter(string[] Columns)
+        public static string CreatingCommandParameter(string[] Columns, bool[] NullibietyColumns)
         {
             var parameterCommandsBuilder = new StringBuilder();
 
@@ -30,15 +30,24 @@ namespace BizDataLayerGen.GeneralClasses
                 // Remove Spaces to Add @
                 string cleanedColumn = Columns[i].Replace(" ", "");
 
-                
-                parameterCommandsBuilder.AppendLine(
-                    $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {cleanedColumn});"
-                );
+                // Check if the column is nullable
+                if (NullibietyColumns[i])
+                {
+                    parameterCommandsBuilder.AppendLine(
+                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {cleanedColumn} ?? (object)DBNull.Value);"
+                    );
+                }
+                else
+                {
+                    parameterCommandsBuilder.AppendLine(
+                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {cleanedColumn});"
+                    );
+                }
             }
 
             return parameterCommandsBuilder.ToString();
-
         }
+
 
         public static string[] ConvertSqlDataTypesToCSharp(string[] sqlDataTypes)
         {

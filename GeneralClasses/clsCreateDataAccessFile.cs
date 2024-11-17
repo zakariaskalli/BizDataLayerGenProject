@@ -92,19 +92,33 @@ namespace BizDataLayerGen.GeneralClasses
             {
                 string column = _Columns[i].Replace(" ", "");
                 string dataType = _DataTypes[i];
+                bool isNullable = _NullibietyColumns[i];
 
-                if (_NullibietyColumns[i]) // If the column is nullable
+                if (isNullable)
                 {
-                    dataReaderCodeBuilder.AppendLine($"                                {column} = reader[\"{_Columns[i]}\"] as {dataType}?;");
+                    // Handle nullable columns
+                    if (dataType == "string")
+                    {
+                        dataReaderCodeBuilder.AppendLine(
+                            $"                                {column} = reader[\"{_Columns[i]}\"] != DBNull.Value ? reader[\"{_Columns[i]}\"].ToString() : null;");
+                    }
+                    else
+                    {
+                        dataReaderCodeBuilder.AppendLine(
+                            $"                                {column} = reader[\"{_Columns[i]}\"] != DBNull.Value ? ({dataType}?)reader[\"{_Columns[i]}\"] : null;");
+                    }
                 }
-                else // If the column is not nullable
+                else
                 {
-                    dataReaderCodeBuilder.AppendLine($"                                {column} = ({dataType})reader[\"{_Columns[i]}\"];");
+                    // Handle non-nullable columns
+                    dataReaderCodeBuilder.AppendLine(
+                        $"                                {column} = ({dataType})reader[\"{_Columns[i]}\"];");
                 }
             }
 
             return dataReaderCodeBuilder.ToString();
         }
+
 
 
 
@@ -191,7 +205,7 @@ namespace BizDataLayerGen.GeneralClasses
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {{
-{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns)}
+{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns)}
 
                     connection.Open();
 
@@ -241,6 +255,7 @@ namespace {clsGlobal.DataBaseName}_DataAccess
 {{
     public class cls{_TableName}Data
     {{
+        #nullable enable
 
         {AddGetTableInfoByIDMethod()}
 
