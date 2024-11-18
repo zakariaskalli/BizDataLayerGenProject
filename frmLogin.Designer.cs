@@ -98,6 +98,7 @@
             // 
             // switch1
             // 
+            this.switch1.Checked = true;
             this.switch1.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.switch1.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.switch1.CheckedState.InnerBorderColor = System.Drawing.Color.White;
@@ -153,6 +154,7 @@
             this.tbUserID.ShadowDecoration.Parent = this.tbUserID;
             this.tbUserID.Size = new System.Drawing.Size(299, 41);
             this.tbUserID.TabIndex = 9;
+            this.tbUserID.TextChanged += new System.EventHandler(this.tbUserID_TextChanged);
             this.tbUserID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbUserID_KeyDown);
             this.tbUserID.Validating += new System.ComponentModel.CancelEventHandler(this.tbUserID_Validating);
             // 

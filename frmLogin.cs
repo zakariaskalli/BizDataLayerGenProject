@@ -1,4 +1,6 @@
-﻿using BizDataLayerGen.DataAccessLayer;
+﻿using BizDataLayerGen.ConnectingWithRegister;
+using BizDataLayerGen.DataAccessLayer;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,11 +32,29 @@ namespace BizDataLayerGen
             btnLogin.BackColor = Color.Transparent;
             lblRemeberMe.BackColor = Color.Transparent;
             switch1.BackColor = Color.Transparent;
+
+            string UserId = "";
+
+            string Password = "";
+
+            if (clsRegister.LoadUserIdAndPassword(ref UserId,ref Password))
+            {
+                tbUserID.Text = UserId;
+                tbPassword.Text = Password;
+
+                this.AcceptButton = btnLogin;
+                
+                //btnLogin.Checked = true;
+            }
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            
+            if (tbUserID.Text == "" || tbPassword.Text == "")
+            {
+                MessageBox.Show("Please Enter The UserName/Password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; 
+            }
 
 
 
@@ -45,7 +65,20 @@ namespace BizDataLayerGen
 
             if (clsGeneralWithData.TestDatabaseConnection(ConnectionString))
             {
-                clsDataAccessSettings.ConnectionString = ConnectionString;
+                clsDataAccessSettings.UserId = UserID;
+                clsDataAccessSettings.Password = Password;
+
+                if (switch1.Checked == true)
+                {
+                    clsRegister.DeleteDataSignInRegister();
+                    clsRegister.AddDataToRegister(UserID, Password);
+
+                }
+                else
+                {
+                    clsRegister.DeleteDataSignInRegister();
+                }
+
 
                 this.Hide();
                 CodeGenratorForm frm = new CodeGenratorForm();
@@ -65,7 +98,9 @@ namespace BizDataLayerGen
             if (string.IsNullOrEmpty(tbUserID.Text))
                 errorProvider1.SetError(tbUserID,"Please Enter UserID");
             else
+            {
                 errorProvider1.SetError(tbUserID, "");
+            }
 
         }
 
@@ -74,7 +109,9 @@ namespace BizDataLayerGen
             if (string.IsNullOrEmpty(tbPassword.Text))
                 errorProvider1.SetError(tbPassword, "Please Enter UserID");
             else
+            {
                 errorProvider1.SetError(tbPassword, "");
+            }
 
         }
 
@@ -116,7 +153,10 @@ namespace BizDataLayerGen
 
         private void tbPassword_KeyPress(object sender, KeyPressEventArgs e)
         {
+        }
 
+        private void tbUserID_TextChanged(object sender, EventArgs e)
+        {
         }
     }
 }

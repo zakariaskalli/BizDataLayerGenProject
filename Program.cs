@@ -17,19 +17,22 @@ namespace BizDataLayerGen
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            
             //
-            if (clsGeneralWithData.TestDatabaseConnection())
-            {
-                clsGlobal.UserId = clsDataAccessSettings.UserId;
-                clsGlobal.Password = clsDataAccessSettings.Password;
+            
+            //if (clsGeneralWithData.TestDatabaseConnection())
+            //{
+            //    clsGlobal.UserId = clsDataAccessSettings.UserId;
+            //    clsGlobal.Password = clsDataAccessSettings.Password;
+            //
+            //    Application.Run(new CodeGenratorForm());
+            //}
+            //else
+            //{
+            //    Application.Run(new frmLogin());
+            //}
 
-                Application.Run(new CodeGenratorForm());
-            }
-            else
-            {
-                Application.Run(new frmLogin());
-            }
-
+            Application.Run(new frmLogin());
 
         }
     }

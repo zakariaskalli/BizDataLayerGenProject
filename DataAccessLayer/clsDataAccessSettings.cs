@@ -4,8 +4,8 @@ namespace BizDataLayerGen.DataAccessLayer
 {
     static class clsDataAccessSettings
     {
-        public static string UserId = "sa";
-        public static string Password = "sa123456";
+        public static string UserId = "";
+        public static string Password = "";
 
         public static string ConnectionString = $"Server=.;User Id={UserId};Password={Password};";
 
