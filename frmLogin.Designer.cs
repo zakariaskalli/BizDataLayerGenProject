@@ -143,6 +143,7 @@
             this.tbUserID.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.tbUserID.FocusedState.Parent = this.tbUserID;
             this.tbUserID.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbUserID.ForeColor = System.Drawing.Color.DimGray;
             this.tbUserID.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.tbUserID.HoverState.Parent = this.tbUserID;
             this.tbUserID.Location = new System.Drawing.Point(39, 129);

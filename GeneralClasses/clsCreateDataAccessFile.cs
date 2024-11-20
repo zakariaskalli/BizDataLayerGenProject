@@ -25,7 +25,7 @@ namespace BizDataLayerGen.GeneralClasses
             this._NullibietyColumns = NullibietyColumns;
         }
 
-        public static string ParameterCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, int StartBy)
+        public static string ParameterCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, int StartBy = 1)
         {
             var parameterCodeBuilder = new StringBuilder();
 
@@ -119,6 +119,23 @@ namespace BizDataLayerGen.GeneralClasses
             return dataReaderCodeBuilder.ToString();
         }
 
+        public static string parameterForUpdateQuery(string[] Columns)
+        {
+            var parameterForInsertQueryBuilder = new StringBuilder();
+
+            for (int i = 1; i < Columns.Length; i++)
+            {
+                parameterForInsertQueryBuilder.Append($"                                         [{Columns[i]}] = @{Columns[i].Replace(" ", "")}");
+
+
+                if (i < Columns.Length - 1)
+                {
+                    parameterForInsertQueryBuilder.AppendLine(",");
+                }
+            }
+
+            return parameterForInsertQueryBuilder.ToString();
+        }
 
 
 
@@ -193,7 +210,7 @@ namespace BizDataLayerGen.GeneralClasses
         {
 
 
-            string GetTableByIDCode = @$" public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+            string GetTableByIDCode = @$" public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
         {{
             int? {_Columns[0]} = null;
 
@@ -226,7 +243,39 @@ namespace BizDataLayerGen.GeneralClasses
             return GetTableByIDCode;
         }
 
+        public string AddUpdatingRecordMethod()
+        {
 
+
+            string GetTableByIDCode = @$" public static bool Update{_TableName}ByID({ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 0)})
+        {{
+            int rowsAffected = 0;
+
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {{
+                string query = @""Update {_TableName}
+                                    set 
+{parameterForUpdateQuery(_Columns)}
+                                  where [{_Columns[0]}]= @{_Columns[0]}"";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {{
+{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns, 0)}
+
+                    connection.Open();
+
+                    rowsAffected = command.ExecuteNonQuery();
+                }}
+
+            }}
+
+            return (rowsAffected > 0);
+        }}
+";
+
+            return GetTableByIDCode;
+
+        }
 
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
         {
@@ -263,6 +312,7 @@ namespace {clsGlobal.DataBaseName}_DataAccess
 
         {AddAddingNewRecordMethod()}
 
+        {AddUpdatingRecordMethod()}
     }}
 }}
 ";

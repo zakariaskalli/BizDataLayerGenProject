@@ -7,6 +7,7 @@ namespace GymDB_DataAccess
 {
     public class clsPeopleData
     {
+        #nullable enable
 
         public static bool GetPeopleInfoByID(int PersonID , ref string FirstName, ref string? SecondName, ref string? ThirdName, ref string LastName, ref string? Email, ref string? Phone, ref DateTime? DateOfBirth, ref bool Gender, ref string? Address, ref int CityID, ref DateTime CreatedTime, ref DateTime LastUpdate, ref string? ProfilePicture, ref int? CreatedByUserID)
             {
@@ -122,6 +123,59 @@ namespace GymDB_DataAccess
 
         }
 
+
+         public static bool UpdatePeopleByID(int PersonID, string FirstName, string? SecondName, string? ThirdName, string LastName, string? Email, string? Phone, DateTime? DateOfBirth, bool Gender, string? Address, int CityID, DateTime CreatedTime, DateTime LastUpdate, string? ProfilePicture, int? CreatedByUserID)
+        {
+            int rowsAffected = 0;
+
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {
+                string query = @"Update People
+                                    set 
+                                         [FirstName] = @FirstName,
+                                         [Second Name] = @SecondName,
+                                         [ThirdName] = @ThirdName,
+                                         [LastName] = @LastName,
+                                         [Email] = @Email,
+                                         [Phone] = @Phone,
+                                         [DateOfBirth] = @DateOfBirth,
+                                         [Gender] = @Gender,
+                                         [Address] = @Address,
+                                         [CityID] = @CityID,
+                                         [CreatedTime] = @CreatedTime,
+                                         [LastUpdate] = @LastUpdate,
+                                         [ProfilePicture] = @ProfilePicture,
+                                         [CreatedByUserID] = @CreatedByUserID
+                                  where [PersonID]= @PersonID";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@PersonID", PersonID);
+                    command.Parameters.AddWithValue("@FirstName", FirstName);
+                    command.Parameters.AddWithValue("@SecondName", SecondName ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@ThirdName", ThirdName ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@LastName", LastName);
+                    command.Parameters.AddWithValue("@Email", Email ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Phone", Phone ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@DateOfBirth", DateOfBirth ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Gender", Gender);
+                    command.Parameters.AddWithValue("@Address", Address ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@CityID", CityID);
+                    command.Parameters.AddWithValue("@CreatedTime", CreatedTime);
+                    command.Parameters.AddWithValue("@LastUpdate", LastUpdate);
+                    command.Parameters.AddWithValue("@ProfilePicture", ProfilePicture ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID ?? (object)DBNull.Value);
+
+
+                    connection.Open();
+
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+
+            }
+
+            return (rowsAffected > 0);
+        }
 
     }
 }

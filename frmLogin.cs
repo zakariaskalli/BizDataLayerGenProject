@@ -65,8 +65,10 @@ namespace BizDataLayerGen
 
             if (clsGeneralWithData.TestDatabaseConnection(ConnectionString))
             {
-                clsDataAccessSettings.UserId = UserID;
-                clsDataAccessSettings.Password = Password;
+                clsGlobal.UserId = UserID;
+                clsGlobal.Password = Password;
+
+                //clsDataAccessSettings.ConnectionString = ConnectionString;
 
                 if (switch1.Checked == true)
                 {
@@ -80,7 +82,7 @@ namespace BizDataLayerGen
                 }
 
 
-                this.Hide();
+                //this.Hide();
                 CodeGenratorForm frm = new CodeGenratorForm();
                 frm.ShowDialog();
 

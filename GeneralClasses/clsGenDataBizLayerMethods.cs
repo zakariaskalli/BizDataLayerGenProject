@@ -21,11 +21,11 @@ namespace BizDataLayerGen.GeneralClasses
             return referencesCodeBuilder.ToString();
         }
 
-        public static string CreatingCommandParameter(string[] Columns, bool[] NullibietyColumns)
+        public static string CreatingCommandParameter(string[] Columns, bool[] NullibietyColumns, int StartBy = 1)
         {
             var parameterCommandsBuilder = new StringBuilder();
 
-            for (int i = 1; i < Columns.Length; i++) // Start With Second Item
+            for (int i = StartBy; i < Columns.Length; i++) // Start With Second Item
             {
                 // Remove Spaces to Add @
                 string cleanedColumn = Columns[i].Replace(" ", "");

@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Configuration;
 
 namespace BizDataLayerGen.DataAccessLayer
 {
     static class clsDataAccessSettings
     {
-        public static string UserId = "";
-        public static string Password = "";
+        //public static string UserId = "";
+        //public static string Password = "";
 
-        public static string ConnectionString = $"Server=.;User Id={UserId};Password={Password};";
+        public static string ConnectionString = $"Server=.;User Id={clsGlobal.UserId};Password={clsGlobal.Password};";
 
-        //public static string ConnectionString = "Server=.;Database=DVLD;User Id=sa;Password=sa123456;";
+        //static public string ConnectionString = ConfigurationManager.AppSettings["add"];
 
 
     }

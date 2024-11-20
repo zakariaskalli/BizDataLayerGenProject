@@ -17,7 +17,7 @@ namespace BizDataLayerGen
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            
+
             //
             
             //if (clsGeneralWithData.TestDatabaseConnection())

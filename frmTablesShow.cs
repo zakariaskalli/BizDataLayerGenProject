@@ -163,11 +163,23 @@ namespace BizDataLayerGen
                ref CreatedTime, ref LastUpdat, ref ProfilePicture, ref CreatedByUserID);
             */
 
+            // Update Person
 
-            //if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
-            //    MessageBox.Show("Created Success");
-            //else
-            //    MessageBox.Show("Error Created Success");
+            /*
+            MessageBox.Show(clsPeopleData.UpdatePeopleByID(57, "Ziko", "zaki", "nan", "Malki", "Arzaz@gmail.com",
+                                   "060044456", DateTime.Now, true, "Fes hakma l3alam", 125, DateTime.Now, DateTime.Now,
+                                   null, 1).ToString());
+            */
+
+            // Update Payment
+
+            //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, null, true, 2).ToString());
+
+
+            if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
+                MessageBox.Show("Created Success");
+            else
+                MessageBox.Show("Error Created Success");
 
         }
     }

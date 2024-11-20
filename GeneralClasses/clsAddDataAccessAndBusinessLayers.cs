@@ -54,17 +54,18 @@ namespace BizDataLayerGen.GeneralClasses
             string fullPath = Path.Combine(clsGlobal.dataAccessLayerPath, $"clsDataAccessSettings.cs");
 
             // Define the code to be written in the file
-            string code = $@"using System;
-                                namespace {ProjectName}_DataAccess
-                                {{
-                                    static class clsDataAccessSettings
-                                    {{
-                                        public static string ConnectionString = ""Server=.;Database={clsGlobal.DataBaseName};User Id={clsGlobal.UserId};Password={clsGlobal.Password}"";
-                                
-                                
-                                    }}
-                                }}
-                                ";
+            string code = $@"
+using System;
+namespace {ProjectName}_DataAccess
+{{
+    static class clsDataAccessSettings
+    {{
+        public static string ConnectionString = ""Server=.;Database={clsGlobal.DataBaseName};User Id={clsGlobal.UserId};Password={clsGlobal.Password}"";
+
+
+    }}
+}}
+";
 
             // Write the code to the file
             File.WriteAllText(fullPath, code);
