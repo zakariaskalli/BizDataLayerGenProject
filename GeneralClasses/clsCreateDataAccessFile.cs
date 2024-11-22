@@ -277,6 +277,39 @@ namespace BizDataLayerGen.GeneralClasses
 
         }
 
+        public string AddDeleteByIDMethod()
+        {
+            string GetTableByIDCode = @$"public static bool Delete{_TableName}({_DataTypes[0]} {_Columns[0]})
+{{
+    int rowsAffected = 0;
+
+    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    {{
+        string query = @""Delete {_TableName} 
+                        where {_Columns[0]} = @{_Columns[0]}"";
+
+        using (SqlCommand command = new SqlCommand(query, connection))
+        {{
+            command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
+
+
+            connection.Open();
+            
+            rowsAffected = command.ExecuteNonQuery();
+
+
+        }}
+
+    }}
+    
+    return (rowsAffected > 0);
+
+}}";
+
+            return GetTableByIDCode;
+        }
+
+
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
         {
             // Define the full path for the file
@@ -313,6 +346,8 @@ namespace {clsGlobal.DataBaseName}_DataAccess
         {AddAddingNewRecordMethod()}
 
         {AddUpdatingRecordMethod()}
+
+        {AddDeleteByIDMethod()}
     }}
 }}
 ";

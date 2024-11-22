@@ -175,6 +175,14 @@ namespace BizDataLayerGen
 
             //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, null, true, 2).ToString());
 
+            // Tests For Delete 
+            
+            /*
+            MessageBox.Show(clsPeopleData.deletePeople(57).ToString());
+
+            MessageBox.Show(clsPaymentsData.deletePayments(4).ToString());
+            */
+
 
             if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show("Created Success");

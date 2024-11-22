@@ -141,5 +141,32 @@ namespace GymDB_DataAccess
             return (rowsAffected > 0);
         }
 
+
+        public static bool deletePayments(int PaymentID)
+{
+    int rowsAffected = 0;
+
+    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    {
+        string query = @"Delete Payments 
+                        where PaymentID = @PaymentID";
+
+        using (SqlCommand command = new SqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@PaymentID", PaymentID);
+
+
+            connection.Open();
+            
+            rowsAffected = command.ExecuteNonQuery();
+
+
+        }
+
+    }
+    
+    return (rowsAffected > 0);
+
+}
     }
 }

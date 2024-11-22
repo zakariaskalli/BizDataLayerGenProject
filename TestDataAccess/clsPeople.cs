@@ -177,5 +177,32 @@ namespace GymDB_DataAccess
             return (rowsAffected > 0);
         }
 
+
+        public static bool deletePeople(int PersonID)
+{
+    int rowsAffected = 0;
+
+    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    {
+        string query = @"Delete People 
+                        where PersonID = @PersonID";
+
+        using (SqlCommand command = new SqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@PersonID", PersonID);
+
+
+            connection.Open();
+            
+            rowsAffected = command.ExecuteNonQuery();
+
+
+        }
+
+    }
+    
+    return (rowsAffected > 0);
+
+}
     }
 }
