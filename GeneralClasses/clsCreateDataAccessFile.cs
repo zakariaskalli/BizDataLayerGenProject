@@ -309,6 +309,43 @@ namespace BizDataLayerGen.GeneralClasses
             return GetTableByIDCode;
         }
 
+        public string AddSearchMethod()
+        {
+            string GetTableByIDCode = @$"static public DataTable SearchData(string ColumnName, string Data)
+{{
+    DataTable dt = new DataTable();
+
+    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    {{
+        string query = $@""select * from {_TableName}
+                    where {{ColumnName}} Like '' + @Data + '%';"";
+
+        using (SqlCommand Command = new SqlCommand(query, connection))
+        {{
+            Command.Parameters.AddWithValue(""@Data"", Data);
+
+
+            connection.Open();
+
+            using (SqlDataReader reader = Command.ExecuteReader())
+            {{
+                if (reader.HasRows)
+                {{
+                    dt.Load(reader);
+                }}
+
+                reader.Close();
+            }}
+        }}
+        
+    }}
+
+    return dt;
+}}";
+
+            return GetTableByIDCode;
+        }
+
 
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
         {
@@ -348,6 +385,8 @@ namespace {clsGlobal.DataBaseName}_DataAccess
         {AddUpdatingRecordMethod()}
 
         {AddDeleteByIDMethod()}
+        
+        {AddSearchMethod()}
     }}
 }}
 ";

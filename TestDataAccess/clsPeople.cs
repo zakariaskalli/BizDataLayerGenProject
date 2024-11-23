@@ -178,7 +178,7 @@ namespace GymDB_DataAccess
         }
 
 
-        public static bool deletePeople(int PersonID)
+        public static bool DeletePeople(int PersonID)
 {
     int rowsAffected = 0;
 
@@ -203,6 +203,38 @@ namespace GymDB_DataAccess
     
     return (rowsAffected > 0);
 
+}
+        
+        static public DataTable SearchData(string ColumnName, string Data)
+{
+    DataTable dt = new DataTable();
+
+    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    {
+        string query = $@"select * from People
+                    where {ColumnName} Like '' + @Data + '%';";
+
+        using (SqlCommand Command = new SqlCommand(query, connection))
+        {
+            Command.Parameters.AddWithValue("@Data", Data);
+
+
+            connection.Open();
+
+            using (SqlDataReader reader = Command.ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    dt.Load(reader);
+                }
+
+                reader.Close();
+            }
+        }
+        
+    }
+
+    return dt;
 }
     }
 }

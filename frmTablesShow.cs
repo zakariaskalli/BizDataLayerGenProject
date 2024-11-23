@@ -176,11 +176,32 @@ namespace BizDataLayerGen
             //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, null, true, 2).ToString());
 
             // Tests For Delete 
-            
+
             /*
             MessageBox.Show(clsPeopleData.deletePeople(57).ToString());
 
             MessageBox.Show(clsPaymentsData.deletePayments(4).ToString());
+            */
+
+            // Test SearchData
+
+            /*
+            int x = 0;
+            DataTable dt = clsPeopleData.SearchData("Gender", "0");
+            x = 5;
+
+            // تحويل محتويات DataTable إلى نص لعرضه في MessageBox
+            string result = "DataTable Contents:\n";
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn column in dt.Columns)
+                {
+                    result += $"{column.ColumnName}: {row[column]} \t";
+                }
+                result += "\n";
+            }
+
+            MessageBox.Show(result, "DataTable Data");
             */
 
 
