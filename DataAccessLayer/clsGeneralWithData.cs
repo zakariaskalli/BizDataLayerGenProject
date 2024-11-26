@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -137,7 +138,7 @@ namespace BizDataLayerGen.DataAccessLayer
                 return false;
             }
         }
-        
+
         public static string[] GetAllDataBasesName()
         {
             // Initialize a list to store the database names
@@ -241,7 +242,7 @@ namespace BizDataLayerGen.DataAccessLayer
             {
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    connection.Open(); 
+                    connection.Open();
                     string query = $@"
                             USE [{DBName}]
                             SELECT TABLE_NAME
@@ -305,7 +306,7 @@ namespace BizDataLayerGen.DataAccessLayer
                             while (reader.Read())
                             {
                                 string columnName = reader["COLUMN_NAME"].ToString();
-                                
+
                                 columns.Add(columnName);
                             }
                         }
@@ -397,7 +398,7 @@ namespace BizDataLayerGen.DataAccessLayer
                         if (reader.Read())
                         {
                             PKColumnName = reader["PrimaryKeyColumnName"].ToString();
-                            
+
                             IsFound = !string.IsNullOrEmpty(PKColumnName);
                         }
                     }
@@ -445,6 +446,99 @@ namespace BizDataLayerGen.DataAccessLayer
 
             return nullabilities.ToArray();
         }
+
+        public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string PrincipalTable, string DBName, ref string[] ColumnNames, ref string[] TablesName)
+        {
+            List<string> _ColumnNames = new List<string>();
+            List<string> _TablesName = new List<string>();
+
+            StringBuilder SpecificTables = new StringBuilder();
+
+            foreach (string table in Tables)
+            {
+                SpecificTables.Append(table + ",");
+            }
+
+            SpecificTables.Remove(SpecificTables.Length - 1, 1);
+
+            string query = @$"
+USE [{DBName}]
+
+DECLARE @TableName NVARCHAR(128) = @@TableName;
+DECLARE @PrincipalTable NVARCHAR(128) = @@PrincipalTable;
+DECLARE @SpecificTables NVARCHAR(MAX) = @@SpecificTables; -- Comma-separated list of table names to check against with extra spaces
+
+-- Convert the @SpecificTables string to a table for comparison
+DECLARE @TableList TABLE (TableName NVARCHAR(128));
+
+-- Insert values into the table variable, trimming spaces from each table name
+INSERT INTO @TableList (TableName)
+SELECT LTRIM(RTRIM(value))  -- Remove leading and trailing spaces
+FROM STRING_SPLIT(@SpecificTables, ',');
+
+
+
+SELECT 
+    col.name AS NameColumn,
+    refTable.name AS TableName
+FROM 
+    sys.foreign_key_columns fk
+INNER JOIN 
+    sys.columns col ON fk.parent_object_id = col.object_id AND fk.parent_column_id = col.column_id
+INNER JOIN 
+    sys.tables parentTable ON fk.parent_object_id = parentTable.object_id
+INNER JOIN 
+    sys.tables refTable ON fk.referenced_object_id = refTable.object_id
+WHERE 
+    parentTable.name = @TableName and Not(refTable.name = @PrincipalTable) and (refTable.name IN (SELECT TableName FROM @TableList));";
+            
+
+            using (SqlConnection conn = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@@TableName", TableName);
+                    if (PrincipalTable == " None")
+                        cmd.Parameters.AddWithValue("@@PrincipalTable", "");
+                    else
+                        cmd.Parameters.AddWithValue("@@PrincipalTable", PrincipalTable);
+                    
+                    cmd.Parameters.AddWithValue("@@SpecificTables", SpecificTables.ToString());
+
+
+                    conn.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+
+                            string nameColumn = (string)reader["NameColumn"];
+                            string tableName = (string)reader["TableName"];
+
+                            _ColumnNames.Add(nameColumn);
+                            _TablesName.Add(tableName);
+
+
+                        }
+                    }
+                }
+            }
+
+            if (_ColumnNames == null || _ColumnNames.Count == 0 || _TablesName == null || _TablesName.Count == 0)
+                return false;
+
+
+
+            ColumnNames = _ColumnNames.ToArray();
+            TablesName = _TablesName.ToArray();
+            
+            
+            return true;
+        }
+
+
+
 
     }
 }

@@ -370,7 +370,7 @@ using System;
 using System.Data.SqlClient;
 using System.Data;
 
-namespace {clsGlobal.DataBaseName}_DataAccess
+namespace {clsGlobal.DataBaseName}_DataLayer
 {{
     public class cls{_TableName}Data
     {{

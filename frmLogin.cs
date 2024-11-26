@@ -50,6 +50,7 @@ namespace BizDataLayerGen
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
+
             if (tbUserID.Text == "" || tbPassword.Text == "")
             {
                 MessageBox.Show("Please Enter The UserName/Password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

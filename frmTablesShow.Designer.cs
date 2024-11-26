@@ -32,6 +32,8 @@
             this.guna2HtmlLabel2 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.chBAllTables = new System.Windows.Forms.CheckBox();
             this.LBTables = new System.Windows.Forms.CheckedListBox();
+            this.cbTablePrincipale = new Guna.UI2.WinForms.Guna2ComboBox();
+            this.guna2HtmlLabel1 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.SuspendLayout();
             // 
             // btnGenerate
@@ -45,7 +47,7 @@
             this.btnGenerate.HoverState.Parent = this.btnGenerate;
             this.btnGenerate.Image = global::BizDataLayerGen.Properties.Resources.magic_wand;
             this.btnGenerate.ImageAlign = System.Windows.Forms.HorizontalAlignment.Left;
-            this.btnGenerate.Location = new System.Drawing.Point(122, 309);
+            this.btnGenerate.Location = new System.Drawing.Point(343, 369);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.ShadowDecoration.Parent = this.btnGenerate;
             this.btnGenerate.Size = new System.Drawing.Size(161, 48);
@@ -90,11 +92,48 @@
             this.LBTables.Sorted = true;
             this.LBTables.TabIndex = 16;
             // 
+            // cbTablePrincipale
+            // 
+            this.cbTablePrincipale.BackColor = System.Drawing.Color.Transparent;
+            this.cbTablePrincipale.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cbTablePrincipale.DropDownHeight = 200;
+            this.cbTablePrincipale.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTablePrincipale.DropDownWidth = 250;
+            this.cbTablePrincipale.FocusedColor = System.Drawing.Color.Empty;
+            this.cbTablePrincipale.FocusedState.Parent = this.cbTablePrincipale;
+            this.cbTablePrincipale.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbTablePrincipale.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
+            this.cbTablePrincipale.FormattingEnabled = true;
+            this.cbTablePrincipale.HoverState.Parent = this.cbTablePrincipale;
+            this.cbTablePrincipale.IntegralHeight = false;
+            this.cbTablePrincipale.ItemHeight = 30;
+            this.cbTablePrincipale.Items.AddRange(new object[] {
+            "None"});
+            this.cbTablePrincipale.ItemsAppearance.Parent = this.cbTablePrincipale;
+            this.cbTablePrincipale.Location = new System.Drawing.Point(441, 140);
+            this.cbTablePrincipale.Name = "cbTablePrincipale";
+            this.cbTablePrincipale.ShadowDecoration.Parent = this.cbTablePrincipale;
+            this.cbTablePrincipale.Size = new System.Drawing.Size(250, 36);
+            this.cbTablePrincipale.Sorted = true;
+            this.cbTablePrincipale.TabIndex = 17;
+            // 
+            // guna2HtmlLabel1
+            // 
+            this.guna2HtmlLabel1.BackColor = System.Drawing.Color.Transparent;
+            this.guna2HtmlLabel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.guna2HtmlLabel1.Location = new System.Drawing.Point(441, 112);
+            this.guna2HtmlLabel1.Name = "guna2HtmlLabel1";
+            this.guna2HtmlLabel1.Size = new System.Drawing.Size(114, 22);
+            this.guna2HtmlLabel1.TabIndex = 18;
+            this.guna2HtmlLabel1.Text = "Table Principale";
+            // 
             // frmTablesShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(411, 385);
+            this.ClientSize = new System.Drawing.Size(788, 431);
+            this.Controls.Add(this.guna2HtmlLabel1);
+            this.Controls.Add(this.cbTablePrincipale);
             this.Controls.Add(this.LBTables);
             this.Controls.Add(this.chBAllTables);
             this.Controls.Add(this.guna2HtmlLabel2);
@@ -113,5 +152,7 @@
         private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel2;
         private System.Windows.Forms.CheckBox chBAllTables;
         private System.Windows.Forms.CheckedListBox LBTables;
+        private Guna.UI2.WinForms.Guna2ComboBox cbTablePrincipale;
+        private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel1;
     }
 }

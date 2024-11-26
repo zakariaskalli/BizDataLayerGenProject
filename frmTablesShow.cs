@@ -33,6 +33,8 @@ namespace BizDataLayerGen
                 }
 
                 LBTables.Enabled = false;
+
+                //cbTablePrincipale.Enabled = true;
             }
             else
             {
@@ -43,6 +45,9 @@ namespace BizDataLayerGen
                 {
                     LBTables.SetItemChecked(i, false); // Select each item in the ListBox
                 }
+                //cbTablePrincipale.Enabled = false;
+
+
             }
 
         }
@@ -50,9 +55,9 @@ namespace BizDataLayerGen
         private void frmTablesShow_Load(object sender, EventArgs e)
         {
 
-            LBTables.Items.Clear();
+            //LBTables.Items.Clear();
 
-            LBTables.Items.AddRange(AllTables);
+            //LBTables.Items.AddRange(AllTables);
 
             LBTables.Items.Clear();
             LBTables.Items.AddRange(AllTables);
@@ -65,6 +70,15 @@ namespace BizDataLayerGen
             }
 
             LBTables.Enabled = false;
+
+
+            cbTablePrincipale.Items.Clear();
+
+            cbTablePrincipale.Items.Add(" None");
+
+            cbTablePrincipale.Items.AddRange(AllTables);
+
+            cbTablePrincipale.SelectedIndex = 0;
         }
 
         private void cbTablesName_DropDown(object sender, EventArgs e)
@@ -86,7 +100,7 @@ namespace BizDataLayerGen
             }
 
 
-             if (chBAllTables.Checked == false && !SelectItem)
+            if ((chBAllTables.Checked == false && !SelectItem))
             {
                 MessageBox.Show("Please Select An Tables", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -187,7 +201,7 @@ namespace BizDataLayerGen
 
             /*
             int x = 0;
-            DataTable dt = clsPeopleData.SearchData("Gender", "0");
+            DataTable dt = clsPeopleData.SearchData("Gender", "1");
             x = 5;
 
             // تحويل محتويات DataTable إلى نص لعرضه في MessageBox
@@ -205,11 +219,34 @@ namespace BizDataLayerGen
             */
 
 
+           
+
+
             if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show("Created Success");
             else
                 MessageBox.Show("Error Created Success");
 
+
         }
+
+        /*
+        private void LBTables_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < LBTables.Items.Count; i++)
+            {
+                bool isChecked = LBTables.GetItemChecked(i); // Check if the item is checked
+
+                if (isChecked == false)
+                {
+                    cbTablePrincipale.Enabled = false;
+                    return;
+                }
+            }
+
+            cbTablePrincipale.Enabled = true;
+
+        }
+        */
     }
 }

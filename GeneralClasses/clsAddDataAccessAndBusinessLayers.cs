@@ -123,13 +123,17 @@ namespace {ProjectName}_DataAccess
 
                 clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
 
+                // Test "GetForeignKeys"
+
+
 
                 // handle types of error enRaison and return
                 if (enRaisonForProjectDataAccess != clsGlobal.enTypeRaisons.enPerfect)
                 {
                     return enRaisonForProjectDataAccess;
                 }
-                
+
+                clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddDataAccessLayer.CreateDataAccessClassFile();
 
 
 

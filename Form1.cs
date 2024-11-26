@@ -41,6 +41,7 @@ namespace BizDataLayerGen
 
         private void CodeGenratorForm_Load(object sender, EventArgs e)
         {
+
             AddDataBaseNames();
             // this is
         }
