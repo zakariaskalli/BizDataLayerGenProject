@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BizDataLayerGen.DataAccessLayer;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics.Eventing.Reader;
@@ -16,19 +17,32 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _Columns;
         private string[] _DataTypes;
         private bool[] _NullibietyColumns;
-        public clsCreateBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
+        private string[] _ColumnNamesHasFK;
+        private string[] _TablesNameHasFK;
+
+        public clsCreateBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
+                                    bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK)
         {
             this._filePath = filePath;
             this._TableName = TableName;
             this._Columns = Columns;
+
+            for (int i = 0; i < _Columns.Length; i++)
+            {
+                _Columns[i] = _Columns[i].Replace(" ", "");
+            }
+
             this._DataTypes = DataTypes;
             this._NullibietyColumns = NullibietyColumns;
+            this._ColumnNamesHasFK = ColumnNamesHasFK;
+            this._TablesNameHasFK = TablesNameHasFK;
         }
 
-        public string AddAllFields(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns)
+        public string AddAllFields(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns,
+            string[] _ColumnNamesHasFK, string[] _TablesNameHasFK)
         {
             // Ensure that the arrays are of the same length
-            
+
             //if (_Columns.Length != _DataTypes.Length || _Columns.Length != _NullibietyColumns.Length)
             //{
             //    throw new ArgumentException("All arrays must have the same length.");
@@ -45,6 +59,21 @@ namespace BizDataLayerGen.GeneralClasses
 
                 // Generate property declaration
                 sb.AppendLine($"        public {dataType}{(isNullable ? "?" : "")} {columnName} {{ get; set; }}");
+
+                if (_ColumnNamesHasFK.Length > 0 && _TablesNameHasFK.Length > 0)
+                {
+                    // You can to more diminue this loop 
+                    for (int j = 0; j < _ColumnNamesHasFK.Length; j++)
+                    {
+                        // edit columnName is not string is variable
+                        if (_ColumnNamesHasFK[j] == columnName)
+                        {
+                            sb.AppendLine($"        public cls{_TablesNameHasFK[j]} {_TablesNameHasFK[j]}Info;");
+                        }
+                    }
+                }
+            
+            
             }
 
             return sb.ToString();
@@ -112,7 +141,8 @@ namespace BizDataLayerGen.GeneralClasses
             return sb.ToString();
         }
 
-        public string AddUpdateConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
+        public string AddUpdateConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName,
+            string[] _ColumnNamesHasFK, string[] _TablesNameHasFK)
         {
             // Ensure that the arrays are of the same length
             
@@ -125,20 +155,23 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"private {_TableName}(");
+            sb.AppendLine($"private cls{_TableName}(");
 
             // Loop through columns and generate constructor parameters
             for (int i = 0; i < _Columns.Length; i++)
             {
-                string columnName = _Columns[i];
+                string columnName = _Columns[i]; ;
                 string dataType = _DataTypes[i];
 
                 // Add parameter to the constructor
-                sb.AppendLine($"    {dataType} {columnName},");
+                sb.Append($" {dataType} {columnName},");
             }
 
+            int x = 1;
+
             // Remove the last comma
-            sb.Length--;
+            sb.Remove(sb.Length - 1, 1);
+
 
             // Close the parameter list and open the constructor body
             sb.AppendLine(")");
@@ -152,10 +185,22 @@ namespace BizDataLayerGen.GeneralClasses
                 string dataType = _DataTypes[i];
 
                 sb.AppendLine($"    this.{columnName} = {columnName};");
+
+
+                if (_ColumnNamesHasFK.Length > 0 && _TablesNameHasFK.Length > 0)
+                {
+                    for (int j = 0; j < _ColumnNamesHasFK.Length; j++)
+                    {
+                        // edit columnName is not string is variable
+                        if (_ColumnNamesHasFK[j] == columnName)
+                        {
+                            sb.AppendLine($"    this.{_TablesNameHasFK[j]}Info = cls{_TablesNameHasFK[j]}.FindBy{columnName}(this.{columnName});");
+                        }
+                    }
+                }
             }
 
             // Add the additional logic for nullable fields and other specific assignments
-            sb.AppendLine("    this.CountryInfo = clsCountry.Find(NationalityCountryID);");
             sb.AppendLine("    Mode = enMode.Update;");
 
             // Closing the constructor
@@ -171,7 +216,7 @@ namespace BizDataLayerGen.GeneralClasses
 
 
             // Methods in dataAccesLayer
-            
+
             //{AddGetTableInfoByIDMethod()}
             //
             //{AddGetAllDataMethod()}
@@ -183,9 +228,9 @@ namespace BizDataLayerGen.GeneralClasses
             //{AddDeleteByIDMethod()}
             //
             //{AddSearchMethod()}
-             
 
-            string code = @"
+
+            string code = @$"
 using System;
 using System.Data;
 using {clsGlobal.DataBaseName}_DataLayer;
@@ -199,11 +244,12 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
         public enum enMode {{ AddNew = 0, Update = 1 }};
         public enMode Mode = enMode.AddNew;
 
-{AddAllFields(_Columns, _DataTypes, _NullibietyColumns)}
+{AddAllFields(_Columns, _DataTypes, _NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK)}
 
 {AddNormalConstructor(_Columns, _DataTypes, _NullibietyColumns, _TableName)}
-        
-{}
+
+{AddUpdateConstructor(_Columns,_DataTypes, _NullibietyColumns, _TableName, _ColumnNamesHasFK, _TablesNameHasFK)}
+
 
 
     }}
@@ -217,9 +263,11 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 
         }
 
-        public static clsGlobal.enTypeRaisons CreateBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
+        public static clsGlobal.enTypeRaisons CreateBusinessLayerFile(string filePath, string TableName, string[] Columns,
+            string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK)
         {
-            clsCreateBusinessLayerFile Files = new clsCreateBusinessLayerFile(filePath, TableName, Columns, DataTypes, NullibietyColumns);
+            clsCreateBusinessLayerFile Files = new clsCreateBusinessLayerFile(filePath, TableName, Columns, DataTypes,
+                                                                        NullibietyColumns, ColumnNamesHasFK, TablesNameHasFK);
 
             return Files.CreateBusinessLayerFile();
         }

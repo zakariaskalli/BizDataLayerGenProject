@@ -5,7 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 using BizDataLayerGen.GeneralClasses;
 using System.Data;
-using GymDB_DataAccess;
+//using GymDB_DataAccess;
 using Project_DataAccessLayer;
 
 namespace BizDataLayerGen
@@ -34,7 +34,6 @@ namespace BizDataLayerGen
 
                 LBTables.Enabled = false;
 
-                //cbTablePrincipale.Enabled = true;
             }
             else
             {
@@ -45,7 +44,6 @@ namespace BizDataLayerGen
                 {
                     LBTables.SetItemChecked(i, false); // Select each item in the ListBox
                 }
-                //cbTablePrincipale.Enabled = false;
 
 
             }
@@ -72,13 +70,6 @@ namespace BizDataLayerGen
             LBTables.Enabled = false;
 
 
-            cbTablePrincipale.Items.Clear();
-
-            cbTablePrincipale.Items.Add(" None");
-
-            cbTablePrincipale.Items.AddRange(AllTables);
-
-            cbTablePrincipale.SelectedIndex = 0;
         }
 
         private void cbTablesName_DropDown(object sender, EventArgs e)
@@ -88,6 +79,7 @@ namespace BizDataLayerGen
         }
         private void btnGenerate_Click(object sender, EventArgs e)
         {
+
             bool SelectItem = false;
 
             for (int i = 0; i < LBTables.Items.Count; i++)
@@ -229,24 +221,5 @@ namespace BizDataLayerGen
 
 
         }
-
-        /*
-        private void LBTables_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            for (int i = 0; i < LBTables.Items.Count; i++)
-            {
-                bool isChecked = LBTables.GetItemChecked(i); // Check if the item is checked
-
-                if (isChecked == false)
-                {
-                    cbTablePrincipale.Enabled = false;
-                    return;
-                }
-            }
-
-            cbTablePrincipale.Enabled = true;
-
-        }
-        */
     }
 }

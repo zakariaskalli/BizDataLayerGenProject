@@ -125,17 +125,27 @@ namespace {ProjectName}_DataAccess
 
                 // Test "GetForeignKeys"
 
-
-
                 // handle types of error enRaison and return
                 if (enRaisonForProjectDataAccess != clsGlobal.enTypeRaisons.enPerfect)
                 {
                     return enRaisonForProjectDataAccess;
                 }
 
-                clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddDataAccessLayer.CreateDataAccessClassFile();
+                string[] _ColumnNamesHasFK = { };
+                string[] _TablesNameHasFK = { };
+
+                clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName,ref _ColumnNamesHasFK,ref _TablesNameHasFK);
 
 
+                clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK);
+
+                clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
+
+
+                if (enRaisonForProjectBusiness != clsGlobal.enTypeRaisons.enPerfect)
+                {
+                    return enRaisonForProjectBusiness;
+                }
 
 
                 //if (!clsGeneralWithData.HasForeignKey(NameTables[i]))

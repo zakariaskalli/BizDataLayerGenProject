@@ -369,6 +369,7 @@ namespace BizDataLayerGen.GeneralClasses
 using System;
 using System.Data.SqlClient;
 using System.Data;
+using {clsGlobal.DataBaseName}_DataAccess;
 
 namespace {clsGlobal.DataBaseName}_DataLayer
 {{

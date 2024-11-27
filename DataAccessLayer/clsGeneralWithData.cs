@@ -54,7 +54,9 @@ namespace BizDataLayerGen.DataAccessLayer
                 }
             }
         }
+        
 
+        /*
         public static DataTable GetForeignKeysInfo(string tableName)
         {
             // Define the query to check for foreign keys in the specified table
@@ -99,6 +101,8 @@ namespace BizDataLayerGen.DataAccessLayer
 
             return dataTable;
         }
+        */
+
 
         public static bool HasForeignKey(string tableName)
         {
@@ -447,7 +451,7 @@ namespace BizDataLayerGen.DataAccessLayer
             return nullabilities.ToArray();
         }
 
-        public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string PrincipalTable, string DBName, ref string[] ColumnNames, ref string[] TablesName)
+        public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string DBName, ref string[] ColumnNames, ref string[] TablesName)
         {
             List<string> _ColumnNames = new List<string>();
             List<string> _TablesName = new List<string>();
@@ -461,11 +465,12 @@ namespace BizDataLayerGen.DataAccessLayer
 
             SpecificTables.Remove(SpecificTables.Length - 1, 1);
 
+            // Test Becuase i delete PrincipaleTable(Users) Variable
+            
             string query = @$"
 USE [{DBName}]
 
 DECLARE @TableName NVARCHAR(128) = @@TableName;
-DECLARE @PrincipalTable NVARCHAR(128) = @@PrincipalTable;
 DECLARE @SpecificTables NVARCHAR(MAX) = @@SpecificTables; -- Comma-separated list of table names to check against with extra spaces
 
 -- Convert the @SpecificTables string to a table for comparison
@@ -490,7 +495,7 @@ INNER JOIN
 INNER JOIN 
     sys.tables refTable ON fk.referenced_object_id = refTable.object_id
 WHERE 
-    parentTable.name = @TableName and Not(refTable.name = @PrincipalTable) and (refTable.name IN (SELECT TableName FROM @TableList));";
+    parentTable.name = @TableName and (refTable.name IN (SELECT TableName FROM @TableList));";
             
 
             using (SqlConnection conn = new SqlConnection(clsDataAccessSettings.ConnectionString))
@@ -498,11 +503,7 @@ WHERE
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@@TableName", TableName);
-                    if (PrincipalTable == " None")
-                        cmd.Parameters.AddWithValue("@@PrincipalTable", "");
-                    else
-                        cmd.Parameters.AddWithValue("@@PrincipalTable", PrincipalTable);
-                    
+
                     cmd.Parameters.AddWithValue("@@SpecificTables", SpecificTables.ToString());
 
 
