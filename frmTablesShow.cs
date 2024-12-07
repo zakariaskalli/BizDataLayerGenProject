@@ -211,14 +211,21 @@ namespace BizDataLayerGen
             */
 
 
-           
+            bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
+
+            
 
 
-            if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables) == clsGlobal.enTypeRaisons.enPerfect)
+            if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show("Created Success");
             else
                 MessageBox.Show("Error Created Success");
 
+
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
 
         }
     }

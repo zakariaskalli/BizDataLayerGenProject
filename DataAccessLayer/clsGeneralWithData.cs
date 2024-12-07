@@ -451,7 +451,7 @@ namespace BizDataLayerGen.DataAccessLayer
             return nullabilities.ToArray();
         }
 
-        public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string DBName, ref string[] ColumnNames, ref string[] TablesName)
+        public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string DBName, bool FKOfAll, ref string[] ColumnNames, ref string[] TablesName)
         {
             List<string> _ColumnNames = new List<string>();
             List<string> _TablesName = new List<string>();
@@ -471,17 +471,18 @@ namespace BizDataLayerGen.DataAccessLayer
 USE [{DBName}]
 
 DECLARE @TableName NVARCHAR(128) = @@TableName;
-DECLARE @SpecificTables NVARCHAR(MAX) = @@SpecificTables; -- Comma-separated list of table names to check against with extra spaces
+DECLARE @SpecificTables NVARCHAR(MAX) = @@SpecificTables; -- قائمة الجداول المحددة مفصولة بفواصل
+DECLARE @FKOfAll BIT = {(FKOfAll ? "1" : "0")};
 
--- Convert the @SpecificTables string to a table for comparison
+-- إذا كان FKOfAll = 1، جلب جميع الجداول، وإلا قم باستخدام الجداول المحددة
 DECLARE @TableList TABLE (TableName NVARCHAR(128));
-
--- Insert values into the table variable, trimming spaces from each table name
-INSERT INTO @TableList (TableName)
-SELECT LTRIM(RTRIM(value))  -- Remove leading and trailing spaces
-FROM STRING_SPLIT(@SpecificTables, ',');
-
-
+IF (@FKOfAll = 0)
+BEGIN
+    -- تحويل قائمة الجداول المحددة إلى جدول
+    INSERT INTO @TableList (TableName)
+    SELECT LTRIM(RTRIM(value))  -- إزالة المسافات الزائدة
+    FROM STRING_SPLIT(@SpecificTables, ',');
+END
 
 SELECT 
     col.name AS NameColumn,
@@ -495,7 +496,10 @@ INNER JOIN
 INNER JOIN 
     sys.tables refTable ON fk.referenced_object_id = refTable.object_id
 WHERE 
-    parentTable.name = @TableName and (refTable.name IN (SELECT TableName FROM @TableList));";
+    parentTable.name = @TableName
+    AND (
+        @FKOfAll = 1 OR refTable.name IN (SELECT TableName FROM @TableList)
+    );";
             
 
             using (SqlConnection conn = new SqlConnection(clsDataAccessSettings.ConnectionString))

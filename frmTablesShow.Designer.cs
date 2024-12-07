@@ -32,6 +32,9 @@
             this.guna2HtmlLabel2 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.chBAllTables = new System.Windows.Forms.CheckBox();
             this.LBTables = new System.Windows.Forms.CheckedListBox();
+            this.guna2HtmlLabel1 = new Guna.UI2.WinForms.Guna2HtmlLabel();
+            this.rbAll = new System.Windows.Forms.RadioButton();
+            this.rbJustThis = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // btnGenerate
@@ -45,7 +48,7 @@
             this.btnGenerate.HoverState.Parent = this.btnGenerate;
             this.btnGenerate.Image = global::BizDataLayerGen.Properties.Resources.magic_wand;
             this.btnGenerate.ImageAlign = System.Windows.Forms.HorizontalAlignment.Left;
-            this.btnGenerate.Location = new System.Drawing.Point(106, 309);
+            this.btnGenerate.Location = new System.Drawing.Point(248, 309);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.ShadowDecoration.Parent = this.btnGenerate;
             this.btnGenerate.Size = new System.Drawing.Size(161, 48);
@@ -58,7 +61,7 @@
             this.guna2HtmlLabel2.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel2.Font = new System.Drawing.Font("Arial Narrow", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
-            this.guna2HtmlLabel2.Location = new System.Drawing.Point(55, 14);
+            this.guna2HtmlLabel2.Location = new System.Drawing.Point(179, 14);
             this.guna2HtmlLabel2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel2.Name = "guna2HtmlLabel2";
             this.guna2HtmlLabel2.Size = new System.Drawing.Size(283, 59);
@@ -90,11 +93,48 @@
             this.LBTables.Sorted = true;
             this.LBTables.TabIndex = 16;
             // 
+            // guna2HtmlLabel1
+            // 
+            this.guna2HtmlLabel1.BackColor = System.Drawing.Color.Transparent;
+            this.guna2HtmlLabel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.guna2HtmlLabel1.Location = new System.Drawing.Point(416, 112);
+            this.guna2HtmlLabel1.Name = "guna2HtmlLabel1";
+            this.guna2HtmlLabel1.Size = new System.Drawing.Size(129, 22);
+            this.guna2HtmlLabel1.TabIndex = 17;
+            this.guna2HtmlLabel1.Text = "Searching FK OF:";
+            // 
+            // rbAll
+            // 
+            this.rbAll.AutoSize = true;
+            this.rbAll.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rbAll.Location = new System.Drawing.Point(505, 150);
+            this.rbAll.Name = "rbAll";
+            this.rbAll.Size = new System.Drawing.Size(46, 25);
+            this.rbAll.TabIndex = 18;
+            this.rbAll.Text = "All";
+            this.rbAll.UseVisualStyleBackColor = true;
+            // 
+            // rbJustThis
+            // 
+            this.rbJustThis.AutoSize = true;
+            this.rbJustThis.Checked = true;
+            this.rbJustThis.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rbJustThis.Location = new System.Drawing.Point(416, 150);
+            this.rbJustThis.Name = "rbJustThis";
+            this.rbJustThis.Size = new System.Drawing.Size(87, 25);
+            this.rbJustThis.TabIndex = 19;
+            this.rbJustThis.TabStop = true;
+            this.rbJustThis.Text = "Just This";
+            this.rbJustThis.UseVisualStyleBackColor = true;
+            // 
             // frmTablesShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(402, 379);
+            this.ClientSize = new System.Drawing.Size(608, 379);
+            this.Controls.Add(this.rbJustThis);
+            this.Controls.Add(this.rbAll);
+            this.Controls.Add(this.guna2HtmlLabel1);
             this.Controls.Add(this.LBTables);
             this.Controls.Add(this.chBAllTables);
             this.Controls.Add(this.guna2HtmlLabel2);
@@ -113,5 +153,8 @@
         private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel2;
         private System.Windows.Forms.CheckBox chBAllTables;
         private System.Windows.Forms.CheckedListBox LBTables;
+        private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel1;
+        private System.Windows.Forms.RadioButton rbAll;
+        private System.Windows.Forms.RadioButton rbJustThis;
     }
 }

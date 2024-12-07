@@ -78,7 +78,7 @@ namespace {ProjectName}_DataAccess
                 return false;
         }
 
-        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables)
+        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll)
         {
 
 
@@ -134,9 +134,9 @@ namespace {ProjectName}_DataAccess
                 string[] _ColumnNamesHasFK = { };
                 string[] _TablesNameHasFK = { };
 
-                clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName,ref _ColumnNamesHasFK,ref _TablesNameHasFK);
+                clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName, FKOfAll, ref _ColumnNamesHasFK,ref _TablesNameHasFK);
 
-
+                
                 clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK);
 
                 clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
