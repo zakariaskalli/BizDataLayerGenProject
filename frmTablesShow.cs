@@ -52,7 +52,7 @@ namespace BizDataLayerGen
 
         private void frmTablesShow_Load(object sender, EventArgs e)
         {
-
+            
             //LBTables.Items.Clear();
 
             //LBTables.Items.AddRange(AllTables);
@@ -213,10 +213,11 @@ namespace BizDataLayerGen
 
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
-            
+            bool AddingStaticMethods = rbAddingStaticMethodsYes.Checked == true && rbAddingStaticMethodsNo.Checked == false;
 
 
-            if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll) == clsGlobal.enTypeRaisons.enPerfect)
+
+            if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show("Created Success");
             else
                 MessageBox.Show("Error Created Success");

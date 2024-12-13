@@ -78,7 +78,7 @@ namespace {ProjectName}_DataAccess
                 return false;
         }
 
-        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll)
+        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods )
         {
 
 
@@ -137,7 +137,8 @@ namespace {ProjectName}_DataAccess
                 clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName, FKOfAll, ref _ColumnNamesHasFK,ref _TablesNameHasFK);
 
                 
-                clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK);
+                clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
+                    DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, AddingStaticMethods);
 
                 clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
 

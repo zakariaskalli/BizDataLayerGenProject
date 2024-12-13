@@ -32,9 +32,14 @@
             this.guna2HtmlLabel2 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.chBAllTables = new System.Windows.Forms.CheckBox();
             this.LBTables = new System.Windows.Forms.CheckedListBox();
-            this.guna2HtmlLabel1 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.rbAll = new System.Windows.Forms.RadioButton();
             this.rbJustThis = new System.Windows.Forms.RadioButton();
+            this.rbAddingStaticMethodsYes = new System.Windows.Forms.RadioButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbAddingStaticMethodsNo = new System.Windows.Forms.RadioButton();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnGenerate
@@ -93,21 +98,11 @@
             this.LBTables.Sorted = true;
             this.LBTables.TabIndex = 16;
             // 
-            // guna2HtmlLabel1
-            // 
-            this.guna2HtmlLabel1.BackColor = System.Drawing.Color.Transparent;
-            this.guna2HtmlLabel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.guna2HtmlLabel1.Location = new System.Drawing.Point(416, 112);
-            this.guna2HtmlLabel1.Name = "guna2HtmlLabel1";
-            this.guna2HtmlLabel1.Size = new System.Drawing.Size(129, 22);
-            this.guna2HtmlLabel1.TabIndex = 17;
-            this.guna2HtmlLabel1.Text = "Searching FK OF:";
-            // 
             // rbAll
             // 
             this.rbAll.AutoSize = true;
             this.rbAll.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbAll.Location = new System.Drawing.Point(505, 150);
+            this.rbAll.Location = new System.Drawing.Point(116, 31);
             this.rbAll.Name = "rbAll";
             this.rbAll.Size = new System.Drawing.Size(46, 25);
             this.rbAll.TabIndex = 18;
@@ -119,7 +114,7 @@
             this.rbJustThis.AutoSize = true;
             this.rbJustThis.Checked = true;
             this.rbJustThis.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbJustThis.Location = new System.Drawing.Point(416, 150);
+            this.rbJustThis.Location = new System.Drawing.Point(23, 31);
             this.rbJustThis.Name = "rbJustThis";
             this.rbJustThis.Size = new System.Drawing.Size(87, 25);
             this.rbJustThis.TabIndex = 19;
@@ -127,14 +122,61 @@
             this.rbJustThis.Text = "Just This";
             this.rbJustThis.UseVisualStyleBackColor = true;
             // 
+            // rbAddingStaticMethodsYes
+            // 
+            this.rbAddingStaticMethodsYes.AutoSize = true;
+            this.rbAddingStaticMethodsYes.Checked = true;
+            this.rbAddingStaticMethodsYes.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rbAddingStaticMethodsYes.Location = new System.Drawing.Point(23, 27);
+            this.rbAddingStaticMethodsYes.Name = "rbAddingStaticMethodsYes";
+            this.rbAddingStaticMethodsYes.Size = new System.Drawing.Size(52, 25);
+            this.rbAddingStaticMethodsYes.TabIndex = 21;
+            this.rbAddingStaticMethodsYes.TabStop = true;
+            this.rbAddingStaticMethodsYes.Text = "Yes";
+            this.rbAddingStaticMethodsYes.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rbJustThis);
+            this.groupBox1.Controls.Add(this.rbAll);
+            this.groupBox1.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Location = new System.Drawing.Point(387, 98);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(200, 69);
+            this.groupBox1.TabIndex = 23;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Searching FK OF:";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.rbAddingStaticMethodsNo);
+            this.groupBox2.Controls.Add(this.rbAddingStaticMethodsYes);
+            this.groupBox2.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox2.Location = new System.Drawing.Point(387, 188);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 68);
+            this.groupBox2.TabIndex = 24;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Adding Static Methods:";
+            // 
+            // rbAddingStaticMethodsNo
+            // 
+            this.rbAddingStaticMethodsNo.AutoSize = true;
+            this.rbAddingStaticMethodsNo.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rbAddingStaticMethodsNo.Location = new System.Drawing.Point(100, 27);
+            this.rbAddingStaticMethodsNo.Name = "rbAddingStaticMethodsNo";
+            this.rbAddingStaticMethodsNo.Size = new System.Drawing.Size(49, 25);
+            this.rbAddingStaticMethodsNo.TabIndex = 20;
+            this.rbAddingStaticMethodsNo.Text = "No";
+            this.rbAddingStaticMethodsNo.UseVisualStyleBackColor = true;
+            // 
             // frmTablesShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 379);
-            this.Controls.Add(this.rbJustThis);
-            this.Controls.Add(this.rbAll);
-            this.Controls.Add(this.guna2HtmlLabel1);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.LBTables);
             this.Controls.Add(this.chBAllTables);
             this.Controls.Add(this.guna2HtmlLabel2);
@@ -143,6 +185,10 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Tables Shows";
             this.Load += new System.EventHandler(this.frmTablesShow_Load);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -153,8 +199,11 @@
         private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel2;
         private System.Windows.Forms.CheckBox chBAllTables;
         private System.Windows.Forms.CheckedListBox LBTables;
-        private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel1;
         private System.Windows.Forms.RadioButton rbAll;
         private System.Windows.Forms.RadioButton rbJustThis;
+        private System.Windows.Forms.RadioButton rbAddingStaticMethodsYes;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton rbAddingStaticMethodsNo;
     }
 }
