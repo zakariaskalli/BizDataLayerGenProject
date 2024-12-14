@@ -20,11 +20,12 @@ namespace BizDataLayerGen.GeneralClasses
         private bool[] _NullibietyColumns;
         private string[] _ColumnNamesHasFK;
         private string[] _TablesNameHasFK;
+        private string[] _ReferencedColumn;
         private bool _AddingStaticMethods;
 
         public clsCreateBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
-                                    bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK
-            , bool AddingStaticMethods)
+                                    bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] 
+                                    ReferencedColumn, bool AddingStaticMethods)
         {
             this._filePath = filePath;
             this._TableName = TableName;
@@ -39,6 +40,7 @@ namespace BizDataLayerGen.GeneralClasses
             this._NullibietyColumns = NullibietyColumns;
             this._ColumnNamesHasFK = ColumnNamesHasFK;
             this._TablesNameHasFK = TablesNameHasFK;
+            this._ReferencedColumn = ReferencedColumn;
             this._AddingStaticMethods = AddingStaticMethods;
         }
 
@@ -104,7 +106,7 @@ namespace BizDataLayerGen.GeneralClasses
                 // Check if the column has a foreign key and add the corresponding property
                 if (foreignKeys.TryGetValue(columnName, out string relatedTable))
                 {
-                    sb.AppendLine($"        public cls{relatedTable} {relatedTable}Info {{ get; set; }}");
+                    sb.AppendLine($"        public cls{relatedTable}? {relatedTable}Info {{ get; set; }}");
                 }
             }
 
@@ -112,6 +114,8 @@ namespace BizDataLayerGen.GeneralClasses
 
             
         }
+
+        // Consturctors
 
         public string AddNormalConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
         {
@@ -214,7 +218,7 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
         public string AddUpdateConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName,
-            string[] _ColumnNamesHasFK, string[] _TablesNameHasFK)
+            string[] _ColumnNamesHasFK, string[] _TablesNameHasFK, string[] _ReferencedColumn)
         {
 
             StringBuilder sb = new StringBuilder();
@@ -272,23 +276,24 @@ namespace BizDataLayerGen.GeneralClasses
 
             */
 
-                            // The New Algotithm More Optimze Use Dicationary 
+            // The New Algotithm More Optimze Use Dicationary 
 
 
             // إنشاء خريطة للمفاتيح الخارجية لسهولة الوصول
             var foreignKeyMap = _ColumnNamesHasFK
-                .Select((fkColumn, index) => new { fkColumn, tableName = _TablesNameHasFK[index] })
-                .ToDictionary(x => x.fkColumn, x => x.tableName);
+                .Select((fkColumn, index) => new { fkColumn, tableName = _TablesNameHasFK[index], referencedColumn = _ReferencedColumn[index] })
+                .ToDictionary(x => x.fkColumn, x => new { x.tableName, x.referencedColumn });
 
             // تعيين الحقول الداخلية من المعاملات
             foreach (var columnName in _Columns)
             {
                 sb.AppendLine($"            this.{columnName} = {columnName};");
 
-                // إذا كان العمود مفتاح خارجي، أضف البحث
-                if (foreignKeyMap.TryGetValue(columnName, out var tableName))
+                // إذا كان العمود مفتاح خارجي، أضف البحث مع استخدام العمود المرجعي
+                if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
                 {
-                    sb.AppendLine($"            this.{tableName}Info = cls{tableName}.FindBy{columnName}(this.{columnName});");
+                    // Replace with the corresponding referenced column
+                    sb.AppendLine($"            this.{foreignKey.tableName}Info = cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}({columnName});");
                 }
             }
 
@@ -299,9 +304,12 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine("        }");
 
             return sb.ToString();
+
         }
 
-        // this is methode is not completed
+
+        // The Methods
+
         public string AddAddingNewRow(string[] _Columns, string _TableName)
         {
 
@@ -337,6 +345,436 @@ namespace BizDataLayerGen.GeneralClasses
             return sb.ToString();
         }
 
+        public string AddStaticAddingNewRow(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature with parameters
+            sb.AppendLine($"       public static bool AddNew{_TableName}(");
+
+            sb.Append($"ref {_DataTypes[0]}? {_Columns[0]},");
+
+            // Loop through columns and generate constructor parameters
+            for (int i = 1; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+                string dataType = _DataTypes[i];
+                bool isNullable = _NullibietyColumns[i];
+
+                // Add parameter to the constructor
+                sb.Append($"{dataType}{(isNullable ? "?" : "")} {columnName}");
+
+                if (i < _Columns.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            // Close the parameter list and open the constructor body
+            sb.AppendLine(")");
+
+            sb.AppendLine("        {");
+
+
+
+
+            sb.AppendLine($"        {_Columns[0]} = cls{_TableName}Data.AddNew{_TableName}(");
+
+
+            // Loop through the columns and generate the assignments to fields
+            for (int i = 1; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+
+                sb.Append($"{columnName}");
+
+                if (i < _Columns.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            sb.AppendLine($@");
+
+            return ({_Columns[0]} != null);
+
+       }}");
+
+            return sb.ToString();
+        }
+
+        public string AddUpdateRow(string[] _Columns, string _TableName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature with parameters
+            sb.AppendLine($"       private bool _Update{_TableName}()");
+            sb.AppendLine("       {");
+
+
+            sb.AppendLine($"        return cls{_TableName}Data.Update{_TableName}ByID(");
+
+
+            // Loop through the columns and generate the assignments to fields
+            for (int i = 0; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+
+                sb.Append($"this.{columnName}");
+
+                if (i < _Columns.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            sb.AppendLine($@"       );");
+            sb.AppendLine("       }");
+
+            return sb.ToString();
+        }
+
+        public string AddStaticUpdateRow(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature with parameters
+            sb.AppendLine($"       public static bool Update{_TableName}ByID(");
+
+            sb.Append($"{_DataTypes[0]}? {_Columns[0]},");
+
+            // Loop through columns and generate constructor parameters
+            for (int i = 1; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+                string dataType = _DataTypes[i];
+                bool isNullable = _NullibietyColumns[i];
+
+                // Add parameter to the constructor
+                sb.Append($"{dataType}{(isNullable ? "?" : "")} {columnName}");
+
+                if (i < _Columns.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            // Close the parameter list and open the constructor body
+            sb.AppendLine("          )");
+
+            sb.AppendLine("        {");
+
+
+
+
+            sb.AppendLine($"        return cls{_TableName}Data.Update{_TableName}ByID(");
+
+
+            // Loop through the columns and generate the assignments to fields
+            for (int i = 0; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+
+                sb.Append($"{columnName}");
+
+                if (i < _Columns.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            sb.AppendLine($@");
+
+        }}");
+
+            return sb.ToString();
+        }
+
+        public string AddStaticFind(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature with parameters
+            sb.AppendLine($"       public static cls{_TableName}? FindBy{_Columns[0]}({_DataTypes[0]}? {_Columns[0]})");
+            sb.AppendLine(@$"
+        {{
+            if ({_Columns[0]} == null)
+            {{
+                return null;
+            }}");
+
+
+            var defaultValues = new Dictionary<string, string>
+            {
+                { "int", "0" },
+                { "short", "0" },
+                { "long", "0" },
+                { "float", "0f" },
+                { "double", "0.0" },
+                { "decimal", "0m" },
+                { "string", "\"\"" },
+                { "DateTime", "DateTime.Now" },
+                { "bool", "false" }
+            };
+
+
+            // Create Default value for The Variables
+            for (int i = 1; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+                string dataType = _DataTypes[i];
+                bool isNullable = _NullibietyColumns[i];
+
+                // تحديد القيمة الافتراضية باستخدام القاموس
+                if (isNullable)
+                {
+                    sb.AppendLine($"            {dataType}? {columnName} = null;");
+                }
+                else
+                {
+                    string defaultValue = defaultValues.ContainsKey(dataType)
+                        ? defaultValues[dataType]
+                        : $"default({dataType})";
+                    sb.AppendLine($"            {dataType} {columnName} = {defaultValue};");
+                }
+            }
+
+            sb.AppendLine($"            bool IsFound = cls{_TableName}Data.Get{_TableName}InfoByID({_Columns[0]},");
+
+            for (int i = 1; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+
+                sb.Append($" ref {columnName}");
+
+                if (i < _Columns.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            sb.AppendLine($@");");
+            sb.AppendLine($@"");
+
+
+            sb.AppendLine($@"           if(IsFound)");
+            sb.AppendLine($@"               return new cls{_TableName}(");
+
+            for (int i = 0; i < _Columns.Length; i++)
+            {
+                string columnName = _Columns[i];
+
+                sb.Append($" {columnName}");
+
+                if (i < _Columns.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            sb.AppendLine($@");
+            else
+                return  null;
+        }}");
+
+            return sb.ToString();
+        }
+
+        public string AddGetAllRows(string[] _Columns, string _TableName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature with parameters
+            sb.AppendLine($"       public static DataTable? GetAll{_TableName}()");
+            sb.AppendLine("       {");
+            sb.AppendLine("");
+
+
+            sb.AppendLine($"        return cls{_TableName}Data.GetAll{_TableName}();");
+
+
+            sb.AppendLine("");
+            sb.AppendLine("       }");
+
+            return sb.ToString();
+        }
+
+        public string AddSaveRow(string _TableName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature with parameters
+            sb.AppendLine($@"
+        public bool Save()
+        {{
+            switch (Mode)
+            {{
+                case enMode.AddNew:
+                    if(_AddNew{_TableName}())
+                    {{
+                        Mode = enMode.Update;
+                         return true;
+                    }}
+                    else
+                    {{
+                        return false;
+                    }}
+                case enMode.Update:
+                    return _Update{_TableName}();
+
+            }}
+        
+            return false;
+        }}
+");
+
+
+
+            return sb.ToString();
+        }
+
+        public string AddDeleteRow(string PKColumnName, string DataTypeForPk, string _TableName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature with parameters
+            sb.AppendLine($"       public static bool Delete{_TableName}({DataTypeForPk} {PKColumnName})");
+            sb.AppendLine("       {");
+            sb.AppendLine("");
+
+
+            sb.AppendLine($"        return cls{_TableName}Data.Delete{_TableName}({PKColumnName});");
+
+
+            sb.AppendLine("");
+            sb.AppendLine("       }");
+
+            return sb.ToString();
+        }
+
+        public string EnumForColumns(string[] _Columns, string _TableName)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"        public enum en{_TableName}Columns");
+            sb.AppendLine("         {");
+
+            for (int i = 0; i < _Columns.Length; i++)
+            {
+                string column = _Columns[i];
+                if (i == _Columns.Length - 1)
+                    sb.AppendLine($"            {column}");
+                else
+                    sb.AppendLine($"            {column},");
+            }
+
+            sb.AppendLine("         }");
+
+            return sb.ToString();
+        }
+
+
+        public string AddSearchData(string[] _Columns, string _TableName)
+        {
+
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(EnumForColumns(_Columns, _TableName));
+
+            // Constructor signature with parameters
+            sb.AppendLine($@"
+        public static DataTable? SearchData(en{_TableName}Columns enChose, string Data)
+        {{
+            if(!SqlHelper.IsSafeInput(Data))
+                return null;
+            
+            return cls{_TableName}Data.SearchData(enChose.ToString(), Data);
+
+        }}        
+");
+
+            return sb.ToString();
+        }
+
+
+        public void AddCheckedTheDataIsSafeMethod()
+        {
+
+            string code = @$"
+using System;
+using System.Data;
+using {clsGlobal.DataBaseName}_DataLayer;
+
+namespace {clsGlobal.DataBaseName}_BusinessLayer
+{{
+    public class SqlHelper
+    {{
+        public static bool IsSafeInput(string data)
+        {{
+            if (string.IsNullOrWhiteSpace(data))
+                return false; // Input is empty or contains only whitespace
+        
+            // Check for dangerous patterns or characters commonly used in SQL Injection
+            string[] dangerousPatterns = new string[]
+            {{
+                ""--"",         // SQL comment
+                "";"",          // Command terminator
+                ""'"",          // Single quote
+                ""\"""",         // Double quote
+                ""/*"", ""*/"",   // Multi-line comment
+                ""xp_"",        // Dangerous stored procedures
+                ""exec"",       // Execute commands
+                ""select"",     // SQL SELECT statements
+                ""insert"",     // SQL INSERT statements
+                ""update"",     // SQL UPDATE statements
+                ""delete"",     // SQL DELETE statements
+                ""drop"",       // Drop tables or databases
+                ""create"",     // Create tables or databases
+                ""alter""       // Alter tables
+            }};
+        
+            // Convert input to lowercase for case-insensitive checks
+            string lowerData = data.ToLower();
+        
+            // Check if any dangerous pattern exists in the input
+            foreach (string pattern in dangerousPatterns)
+            {{
+                if (lowerData.Contains(pattern))
+                {{
+                    return false; // Input is unsafe
+                }}
+            }}
+        
+            // Ensure input contains only allowed characters (e.g., alphanumeric, underscores, spaces)
+            string allowedCharacters = ""abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ "";
+            foreach (char c in data)
+            {{
+                if (!allowedCharacters.Contains(c.ToString()))
+                {{
+                    return false; // Input contains disallowed characters
+                }}
+            }}
+        
+            return true; // Input is safe
+        }}
+    }}
+}}
+";
+
+            string fullPath = Path.Combine(_filePath, $"SqlHelper.cs");
+
+            File.WriteAllText(fullPath, code);
+
+        }
+
 
         public clsGlobal.enTypeRaisons CreateBusinessLayerFile()
         {
@@ -347,17 +785,27 @@ namespace BizDataLayerGen.GeneralClasses
             // Methods in dataAccesLayer
 
             //{AddGetTableInfoByIDMethod()}
-            //
+
             //{AddGetAllDataMethod()}
-            //
+
             //{AddAddingNewRecordMethod()}
-            //
+
             //{AddUpdatingRecordMethod()}
-            //
+
             //{AddDeleteByIDMethod()}
-            //
+
             //{AddSearchMethod()}
 
+            // Add File SqlHelper
+            AddCheckedTheDataIsSafeMethod();
+
+
+            string StringAddStaticAddingNewRow = (_AddingStaticMethods) ? AddStaticAddingNewRow(_Columns, _DataTypes, _NullibietyColumns, _TableName) : "";
+            string StringAddStaticUpdateRow = (_AddingStaticMethods) ? AddStaticUpdateRow(_Columns, _DataTypes, _NullibietyColumns, _TableName) : "";
+            string StringAddStaticFind = (_AddingStaticMethods) ? AddStaticFind(_Columns, _DataTypes, _NullibietyColumns, _TableName) : "";
+            string StringAddGetAllRows = (_AddingStaticMethods) ? AddGetAllRows(_Columns,_TableName) : "";
+            string StringAddDeleteRow = (_AddingStaticMethods) ? AddDeleteRow(_Columns[0], _DataTypes[0], _TableName) : "";
+            string StringAddSearchData = (_AddingStaticMethods) ? AddSearchData(_Columns, _TableName) : "";
 
             string code = @$"
 using System;
@@ -377,11 +825,25 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 
 {AddNormalConstructor(_Columns, _DataTypes, _NullibietyColumns, _TableName)}
 
-{AddUpdateConstructor(_Columns,_DataTypes, _NullibietyColumns, _TableName, _ColumnNamesHasFK, _TablesNameHasFK)}
+{AddUpdateConstructor(_Columns,_DataTypes, _NullibietyColumns, _TableName, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn)}
 
 {AddAddingNewRow(_Columns, _TableName)}
 
+{StringAddStaticAddingNewRow}
 
+{AddUpdateRow(_Columns, _TableName)}
+
+{StringAddStaticUpdateRow}
+
+{StringAddStaticFind}
+
+{StringAddGetAllRows}
+
+{AddSaveRow(_TableName)}
+
+{StringAddDeleteRow}
+
+{StringAddSearchData}
 
     }}
 }}
@@ -395,10 +857,11 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
         }
 
         public static clsGlobal.enTypeRaisons CreateBusinessLayerFile(string filePath, string TableName, string[] Columns,
-            string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, bool AddingStaticMethods)
+            string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] ReferencedColumn, bool AddingStaticMethods)
         {
             clsCreateBusinessLayerFile Files = new clsCreateBusinessLayerFile(filePath, TableName, Columns, DataTypes,
-                                                                        NullibietyColumns, ColumnNamesHasFK, TablesNameHasFK, AddingStaticMethods);
+                                                                        NullibietyColumns, ColumnNamesHasFK, TablesNameHasFK,
+                                                                        ReferencedColumn,AddingStaticMethods);
 
             return Files.CreateBusinessLayerFile();
         }

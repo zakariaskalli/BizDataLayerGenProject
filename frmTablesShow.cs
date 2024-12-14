@@ -7,6 +7,7 @@ using BizDataLayerGen.GeneralClasses;
 using System.Data;
 //using GymDB_DataAccess;
 using Project_DataAccessLayer;
+//using GymDB_BusinessLayer;
 
 namespace BizDataLayerGen
 {
@@ -52,7 +53,7 @@ namespace BizDataLayerGen
 
         private void frmTablesShow_Load(object sender, EventArgs e)
         {
-            
+
             //LBTables.Items.Clear();
 
             //LBTables.Items.AddRange(AllTables);
@@ -217,15 +218,44 @@ namespace BizDataLayerGen
 
 
 
-            if ( clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
-                MessageBox.Show("Created Success");
+            if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
+                MessageBox.Show("Created Success", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             else
-                MessageBox.Show("Error Created Success");
+                MessageBox.Show("Error Created Success", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
 
+            
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void rbAddingStaticMethodsNo_CheckedChanged(object sender, EventArgs e)
+        {
+            // In Button Ok Less rbNo And Cancel Checked RbYes
+            if (rbAddingStaticMethodsNo.Checked == true )
+            {
+                if (MessageBox.Show(@"
+                If You Select This You Didn't Have All This     Methods in    Code:
+                        1) Static Adding New Row
+                        2) Static Update Row
+                        3) Static Find
+                        4) Get All Rows
+                        5) Delete Row
+                        6) Search Data And Return DataTable
+                Do you Want to Let?", "Message", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.No)
+                {
+                    rbAddingStaticMethodsNo.Checked = false;
+                    rbAddingStaticMethodsYes.Checked = true;
+                }
+
+            }
+
+        }
+
+        private void LBTables_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

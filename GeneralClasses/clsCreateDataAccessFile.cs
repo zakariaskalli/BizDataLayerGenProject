@@ -16,7 +16,7 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _Columns;
         private string[] _DataTypes;
         private bool[] _NullibietyColumns;
-        public clsCreateDataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns) 
+        public clsCreateDataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
             this._filePath = filePath;
             this._TableName = TableName;
@@ -28,6 +28,8 @@ namespace BizDataLayerGen.GeneralClasses
         public static string ParameterCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, int StartBy = 1)
         {
             var parameterCodeBuilder = new StringBuilder();
+
+
 
             for (int i = StartBy; i < Columns.Length; i++)
             {
@@ -141,7 +143,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddGetTableInfoByIDMethod()
         {
-            string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]} {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns,_DataTypes, _NullibietyColumns)})
+            string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
             {{
                 bool isFound = false;
 
@@ -247,7 +249,7 @@ namespace BizDataLayerGen.GeneralClasses
         {
 
 
-            string GetTableByIDCode = @$" public static bool Update{_TableName}ByID({ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 0)})
+            string GetTableByIDCode = @$" public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
         {{
             int rowsAffected = 0;
 
@@ -311,7 +313,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddSearchMethod()
         {
-            string GetTableByIDCode = @$"static public DataTable SearchData(string ColumnName, string Data)
+            string GetTableByIDCode = @$"public static DataTable SearchData(string ColumnName, string Data)
 {{
     DataTable dt = new DataTable();
 

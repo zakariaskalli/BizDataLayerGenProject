@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 
 
@@ -80,7 +81,7 @@ namespace {ProjectName}_DataAccess
 
         public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods )
         {
-
+            Stopwatch stopwatch1 = Stopwatch.StartNew();
 
             if (NameTables == null)
             {
@@ -133,12 +134,13 @@ namespace {ProjectName}_DataAccess
 
                 string[] _ColumnNamesHasFK = { };
                 string[] _TablesNameHasFK = { };
+                string[] _ReferencedColumn = { };
 
-                clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName, FKOfAll, ref _ColumnNamesHasFK,ref _TablesNameHasFK);
+                clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName, FKOfAll, ref _ColumnNamesHasFK,ref _TablesNameHasFK, ref _ReferencedColumn);
 
                 
                 clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
-                    DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, AddingStaticMethods);
+                    DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
 
                 clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
 
@@ -162,22 +164,9 @@ namespace {ProjectName}_DataAccess
 
 
 
-            /*
-            string cscPath = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe"; // تأكد من أن المسار صحيح أو ابحث عن المسار المناسب لإصدار .NET لديك
-            string outputDllPath = Path.Combine(clsGlobal.dataAccessLayerPath, $"{clsGlobal.DataBaseName}.dll");
+            stopwatch1.Stop();
 
-            string sourceFiles = string.Join(" ", Directory.GetFiles(clsGlobal.dataAccessLayerPath, "*.cs"));
-
-            Process process = new Process();
-            process.StartInfo.FileName = cscPath;
-            process.StartInfo.Arguments = $"-target:library -out:{outputDllPath} {sourceFiles}";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            // تشغيل العملية
-            process.Start();
-            process.WaitForExit();
-            */
+            MessageBox.Show(stopwatch1.ElapsedMilliseconds.ToString());
 
             return clsGlobal.enTypeRaisons.enPerfect;
         }

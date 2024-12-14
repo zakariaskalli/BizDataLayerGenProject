@@ -97,28 +97,29 @@
             this.LBTables.Size = new System.Drawing.Size(355, 148);
             this.LBTables.Sorted = true;
             this.LBTables.TabIndex = 16;
+            this.LBTables.SelectedIndexChanged += new System.EventHandler(this.LBTables_SelectedIndexChanged);
             // 
             // rbAll
             // 
             this.rbAll.AutoSize = true;
+            this.rbAll.Checked = true;
             this.rbAll.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbAll.Location = new System.Drawing.Point(116, 31);
+            this.rbAll.Location = new System.Drawing.Point(23, 27);
             this.rbAll.Name = "rbAll";
             this.rbAll.Size = new System.Drawing.Size(46, 25);
             this.rbAll.TabIndex = 18;
+            this.rbAll.TabStop = true;
             this.rbAll.Text = "All";
             this.rbAll.UseVisualStyleBackColor = true;
             // 
             // rbJustThis
             // 
             this.rbJustThis.AutoSize = true;
-            this.rbJustThis.Checked = true;
             this.rbJustThis.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbJustThis.Location = new System.Drawing.Point(23, 31);
+            this.rbJustThis.Location = new System.Drawing.Point(87, 27);
             this.rbJustThis.Name = "rbJustThis";
             this.rbJustThis.Size = new System.Drawing.Size(87, 25);
             this.rbJustThis.TabIndex = 19;
-            this.rbJustThis.TabStop = true;
             this.rbJustThis.Text = "Just This";
             this.rbJustThis.UseVisualStyleBackColor = true;
             // 
@@ -169,6 +170,7 @@
             this.rbAddingStaticMethodsNo.TabIndex = 20;
             this.rbAddingStaticMethodsNo.Text = "No";
             this.rbAddingStaticMethodsNo.UseVisualStyleBackColor = true;
+            this.rbAddingStaticMethodsNo.CheckedChanged += new System.EventHandler(this.rbAddingStaticMethodsNo_CheckedChanged);
             // 
             // frmTablesShow
             // 

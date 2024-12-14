@@ -249,9 +249,11 @@ namespace BizDataLayerGen.DataAccessLayer
                     connection.Open();
                     string query = $@"
                             USE [{DBName}]
-                            SELECT TABLE_NAME
-                            FROM INFORMATION_SCHEMA.TABLES
-                            WHERE TABLE_TYPE = 'BASE TABLE'";
+                                SELECT name AS TableName
+                                FROM sys.tables
+                                WHERE is_ms_shipped = 0
+                                  AND name NOT IN ('sysdiagrams');";
+
                     SqlCommand command = new SqlCommand(query, connection);
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -261,7 +263,7 @@ namespace BizDataLayerGen.DataAccessLayer
                             // Read each row and add the name to the list
                             while (reader.Read())
                             {
-                                databaseNames.Add(reader["TABLE_NAME"].ToString());
+                                databaseNames.Add(reader["TableName"].ToString());
                             }
                         }
 
@@ -451,10 +453,11 @@ namespace BizDataLayerGen.DataAccessLayer
             return nullabilities.ToArray();
         }
 
-        public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string DBName, bool FKOfAll, ref string[] ColumnNames, ref string[] TablesName)
+        public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string DBName, bool FKOfAll, ref string[] ColumnNames, ref string[] TablesName, ref string[] ReferencedColumn)
         {
             List<string> _ColumnNames = new List<string>();
             List<string> _TablesName = new List<string>();
+            List<string> _ReferencedColumn = new List<string>();
 
             StringBuilder SpecificTables = new StringBuilder();
 
@@ -468,38 +471,52 @@ namespace BizDataLayerGen.DataAccessLayer
             // Test Becuase i delete PrincipaleTable(Users) Variable
             
             string query = @$"
-USE [{DBName}]
+USE [{DBName}];
 
-DECLARE @TableName NVARCHAR(128) = @@TableName;
-DECLARE @SpecificTables NVARCHAR(MAX) = @@SpecificTables; -- قائمة الجداول المحددة مفصولة بفواصل
-DECLARE @FKOfAll BIT = {(FKOfAll ? "1" : "0")};
+DECLARE @TableName NVARCHAR(128) = @@TableName; -- The main table to check foreign keys for
+DECLARE @SpecificTables NVARCHAR(MAX) = @@SpecificTables; -- List of specific tables to filter by
+DECLARE @FKOfAll BIT = {(FKOfAll ? "1" : "0")}; -- Flag to determine whether to include all FK relationships or specific ones
 
--- إذا كان FKOfAll = 1، جلب جميع الجداول، وإلا قم باستخدام الجداول المحددة
+-- Create a table variable to hold the filtered table list
 DECLARE @TableList TABLE (TableName NVARCHAR(128));
 IF (@FKOfAll = 0)
 BEGIN
-    -- تحويل قائمة الجداول المحددة إلى جدول
+    -- Populate @TableList with specific tables from @SpecificTables
     INSERT INTO @TableList (TableName)
-    SELECT LTRIM(RTRIM(value))  -- إزالة المسافات الزائدة
+    SELECT LTRIM(RTRIM(value)) -- Trim any extra spaces
     FROM STRING_SPLIT(@SpecificTables, ',');
 END
 
+-- Query to retrieve the foreign key relationships
 SELECT 
-    col.name AS NameColumn,
-    refTable.name AS TableName
+    col.name AS FKColumnName,          -- Foreign key column in the parent table (People)
+    refTable.name AS ReferencedTable, -- Name of the referenced table
+    refCol.name AS ReferencedColumn   -- Name of the column in the referenced table
 FROM 
     sys.foreign_key_columns fk
 INNER JOIN 
-    sys.columns col ON fk.parent_object_id = col.object_id AND fk.parent_column_id = col.column_id
+    sys.columns col 
+    ON fk.parent_object_id = col.object_id 
+    AND fk.parent_column_id = col.column_id
 INNER JOIN 
-    sys.tables parentTable ON fk.parent_object_id = parentTable.object_id
+    sys.tables parentTable 
+    ON fk.parent_object_id = parentTable.object_id
 INNER JOIN 
-    sys.tables refTable ON fk.referenced_object_id = refTable.object_id
+    sys.tables refTable 
+    ON fk.referenced_object_id = refTable.object_id
+INNER JOIN 
+    sys.columns refCol 
+    ON fk.referenced_object_id = refCol.object_id 
+    AND fk.referenced_column_id = refCol.column_id
 WHERE 
-    parentTable.name = @TableName
+    parentTable.name = @TableName -- Filter by the parent table
     AND (
-        @FKOfAll = 1 OR refTable.name IN (SELECT TableName FROM @TableList)
-    );";
+        @FKOfAll = 1 -- If all FKs should be included
+        OR refTable.name IN (SELECT TableName FROM @TableList) -- If filtering by specific referenced tables
+    )
+ORDER BY 
+    refTable.name, -- Sort by referenced table
+    col.name; -- Then by foreign key column name";
             
 
             using (SqlConnection conn = new SqlConnection(clsDataAccessSettings.ConnectionString))
@@ -518,12 +535,13 @@ WHERE
                         while (reader.Read())
                         {
 
-                            string nameColumn = (string)reader["NameColumn"];
-                            string tableName = (string)reader["TableName"];
+                            string nameColumn = (string)reader["FKColumnName"];
+                            string tableName = (string)reader["ReferencedTable"];
+                            string referencedColumn = (string)reader["ReferencedColumn"];
 
                             _ColumnNames.Add(nameColumn);
                             _TablesName.Add(tableName);
-
+                            _ReferencedColumn.Add(referencedColumn);
 
                         }
                     }
@@ -537,8 +555,9 @@ WHERE
 
             ColumnNames = _ColumnNames.ToArray();
             TablesName = _TablesName.ToArray();
-            
-            
+            ReferencedColumn = _ReferencedColumn.ToArray();
+
+
             return true;
         }
 

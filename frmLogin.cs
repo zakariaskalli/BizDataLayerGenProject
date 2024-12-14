@@ -42,6 +42,8 @@ namespace BizDataLayerGen
                 tbUserID.Text = UserId;
                 tbPassword.Text = Password;
 
+                
+
                 this.AcceptButton = btnLogin;
                 
                 //btnLogin.Checked = true;

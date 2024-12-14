@@ -61,7 +61,7 @@
             this.tbPassword.SelectedText = "";
             this.tbPassword.ShadowDecoration.Parent = this.tbPassword;
             this.tbPassword.Size = new System.Drawing.Size(299, 41);
-            this.tbPassword.TabIndex = 10;
+            this.tbPassword.TabIndex = 2;
             this.tbPassword.TextChanged += new System.EventHandler(this.guna2TextBox2_TextChanged);
             this.tbPassword.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbPassword_KeyDown);
             this.tbPassword.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbPassword_KeyPress);
@@ -92,7 +92,7 @@
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.ShadowDecoration.Parent = this.btnLogin;
             this.btnLogin.Size = new System.Drawing.Size(180, 45);
-            this.btnLogin.TabIndex = 15;
+            this.btnLogin.TabIndex = 0;
             this.btnLogin.Text = "Login";
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
@@ -108,7 +108,7 @@
             this.switch1.Name = "switch1";
             this.switch1.ShadowDecoration.Parent = this.switch1;
             this.switch1.Size = new System.Drawing.Size(35, 20);
-            this.switch1.TabIndex = 16;
+            this.switch1.TabIndex = 3;
             this.switch1.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
             this.switch1.UncheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
             this.switch1.UncheckedState.InnerBorderColor = System.Drawing.Color.White;
@@ -154,7 +154,7 @@
             this.tbUserID.SelectedText = "";
             this.tbUserID.ShadowDecoration.Parent = this.tbUserID;
             this.tbUserID.Size = new System.Drawing.Size(299, 41);
-            this.tbUserID.TabIndex = 9;
+            this.tbUserID.TabIndex = 1;
             this.tbUserID.TextChanged += new System.EventHandler(this.tbUserID_TextChanged);
             this.tbUserID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbUserID_KeyDown);
             this.tbUserID.Validating += new System.ComponentModel.CancelEventHandler(this.tbUserID_Validating);
