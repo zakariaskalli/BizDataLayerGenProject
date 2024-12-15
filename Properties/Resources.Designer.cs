@@ -114,9 +114,9 @@ namespace BizDataLayerGen.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap magic_wand {
+        internal static System.Drawing.Bitmap FormImage {
             get {
-                object obj = ResourceManager.GetObject("magic-wand", resourceCulture);
+                object obj = ResourceManager.GetObject("FormImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -124,9 +124,9 @@ namespace BizDataLayerGen.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap pexels_jplenio_1103970 {
+        internal static System.Drawing.Bitmap magic_wand {
             get {
-                object obj = ResourceManager.GetObject("pexels-jplenio-1103970", resourceCulture);
+                object obj = ResourceManager.GetObject("magic-wand", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

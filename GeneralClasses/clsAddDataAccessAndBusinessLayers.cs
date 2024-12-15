@@ -18,6 +18,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             try
             {
+
                 string dataAccessLayerPath = "";
                 string businessLayerPath = "";
 
@@ -40,9 +41,23 @@ namespace BizDataLayerGen.GeneralClasses
                     Directory.CreateDirectory(businessLayerPath);
                 else
                     return false;
+
+                
             }
             catch (Exception ex)
             {
+
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+                
+                var modifiedMessage = ex.Message + ", We have another Folders By The Same Name";
+                var modifiedEx = new Exception(modifiedMessage, ex); // Create a new Exception with the modified message
+
+                ErrorHandler.RaiseError(modifiedEx, className, methodName);
+                
                 return false;
             }
 
@@ -85,17 +100,17 @@ namespace {ProjectName}_DataAccess
 
             if (NameTables == null)
             {
-                return clsGlobal.enTypeRaisons.enDBName;
+                return clsGlobal.enTypeRaisons.enError;
             }
 
             if (!CreateProjectFolders(clsGlobal.DataBaseName))
             {
-                return clsGlobal.enTypeRaisons.enCreateProjectFolders;
+                return clsGlobal.enTypeRaisons.enError;
             }
 
             if (!CreateDataAccessSettingsClassFile(clsGlobal.DataBaseName))
             {
-                return clsGlobal.enTypeRaisons.enCreateDataAccessSettingsClassFile;
+                return clsGlobal.enTypeRaisons.enError;
             }
 
             for (int i = 0; NameTables.Length > i; i++)
@@ -104,14 +119,14 @@ namespace {ProjectName}_DataAccess
                 
                 if (Columns == null)
                 {
-                    return clsGlobal.enTypeRaisons.enReloadColumnsName;
+                    return clsGlobal.enTypeRaisons.enError;
                 }
 
                 string[] DataTypes = clsGeneralWithData.GetDataTypes(NameTables[i], clsGlobal.DataBaseName);
 
                 if (DataTypes == null)
                 {
-                    return clsGlobal.enTypeRaisons.enReloadDataTypes;
+                    return clsGlobal.enTypeRaisons.enError;
                 }
 
                 DataTypes = clsGenDataBizLayerMethods.ConvertSqlDataTypesToCSharp(DataTypes);
@@ -165,9 +180,9 @@ namespace {ProjectName}_DataAccess
 
 
             stopwatch1.Stop();
+            clsGlobal.TimeInMillisecond = stopwatch1.ElapsedMilliseconds.ToString();
 
-            MessageBox.Show(stopwatch1.ElapsedMilliseconds.ToString());
-
+            
             return clsGlobal.enTypeRaisons.enPerfect;
         }
     }

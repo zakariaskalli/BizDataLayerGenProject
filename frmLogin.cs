@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net;
@@ -28,6 +29,8 @@ namespace BizDataLayerGen
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
+            
+
             lblLogin.BackColor = Color.Transparent;
             btnLogin.BackColor = Color.Transparent;
             lblRemeberMe.BackColor = Color.Transparent;

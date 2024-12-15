@@ -308,7 +308,7 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
-        // The Methods
+        // The Methods  
 
         public string AddAddingNewRow(string[] _Columns, string _TableName)
         {

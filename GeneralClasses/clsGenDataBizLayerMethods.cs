@@ -20,7 +20,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             return referencesCodeBuilder.ToString();
         }
-
+        
         public static string CreatingCommandParameter(string[] Columns, bool[] NullibietyColumns, int StartBy = 1)
         {
             var parameterCommandsBuilder = new StringBuilder();

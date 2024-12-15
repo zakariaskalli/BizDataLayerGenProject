@@ -10,13 +10,8 @@ namespace BizDataLayerGen
     {
         public enum enTypeRaisons
         {
-            enDBName = 1,
-            enReloadColumnsName = 2,
-            enReloadDataTypes = 3,
-            enCreateProjectFolders = 4,
-            enCreateDataAccessSettingsClassFile = 5,
-            enTableDontHavePK = 6,
-            enPerfect = 7
+            enError = 1,
+            enPerfect = 2
         }
         public static enTypeRaisons MyEnumProperty { get; set; }
 
@@ -31,5 +26,6 @@ namespace BizDataLayerGen
         public static string dataAccessLayerPath = "";
         public static string businessLayerPath = "";
 
+        public static string TimeInMillisecond = "";
     }
 }

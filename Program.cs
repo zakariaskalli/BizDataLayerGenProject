@@ -15,6 +15,9 @@ namespace BizDataLayerGen
         [STAThread]
         static void Main()
         {
+            ErrorHandler.OnErrorOccurred += ErrorHandler.ShowErrorMessage;
+
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

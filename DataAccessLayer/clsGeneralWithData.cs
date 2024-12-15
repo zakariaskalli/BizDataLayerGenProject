@@ -4,9 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace BizDataLayerGen.DataAccessLayer
 {
@@ -27,8 +29,13 @@ namespace BizDataLayerGen.DataAccessLayer
                 }
                 catch (Exception ex)
                 {
-                    // يمكنك تسجيل الخطأ هنا إذا لزم الأمر
-                    // Console.WriteLine("Connection Error: " + ex.Message);
+                    var stackTrace = new StackTrace();
+                    var frame = stackTrace.GetFrame(0);
+                    var method = frame.GetMethod();
+                    var className = method.DeclaringType.Name;
+                    var methodName = method.Name;
+
+                    ErrorHandler.RaiseError(ex, className, methodName);
                     return false; // إذا فشل الاتصال، نعيد false
                 }
             }
@@ -47,14 +54,12 @@ namespace BizDataLayerGen.DataAccessLayer
                     return true;
                 }
                 catch (Exception ex)
-                {
-                    // يمكنك تسجيل الخطأ هنا إذا لزم الأمر
-                    // Console.WriteLine("Connection Error: " + ex.Message);
+                {           
                     return false; // إذا فشل الاتصال، نعيد false
                 }
             }
         }
-        
+
 
         /*
         public static DataTable GetForeignKeysInfo(string tableName)
@@ -96,6 +101,15 @@ namespace BizDataLayerGen.DataAccessLayer
                 }
                 catch (Exception ex)
                 {
+        
+                    var stackTrace = new StackTrace();
+                    var frame = stackTrace.GetFrame(0);
+                    var method = frame.GetMethod();
+                    var className = method.DeclaringType.Name;
+                    var methodName = method.Name;
+
+                    ErrorHandler.RaiseError(ex, className, methodName);
+                    
                 }
             }
 
@@ -108,7 +122,7 @@ namespace BizDataLayerGen.DataAccessLayer
         {
             // Define the query to check if the specified table has any foreign keys
             string query = @"
-            SELECT 
+            SELECT
                 COUNT(fk.name) 
             FROM 
                 sys.tables AS tp
@@ -136,59 +150,61 @@ namespace BizDataLayerGen.DataAccessLayer
                 }
                 catch (Exception ex)
                 {
-                    return false; // Return false in case of an error
+
+                    var stackTrace = new StackTrace();
+                    var frame = stackTrace.GetFrame(0);
+                    var method = frame.GetMethod();
+                    var className = method.DeclaringType.Name;
+                    var methodName = method.Name;
+
+                    ErrorHandler.RaiseError(ex, className, methodName);
                 }
 
-                return false;
             }
+            return false;
         }
 
         public static string[] GetAllDataBasesName()
         {
-            // Initialize a list to store the database names
+            // List to store database names
             List<string> databaseNames = new List<string>();
 
-            // Connection string to your database
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
             // SQL query to retrieve database names except 'master'
-            string query = "SELECT name FROM sys.databases WHERE name != 'master'";
-
-            SqlCommand command = new SqlCommand(query, connection);
+            const string query = "SELECT name FROM sys.databases  WHERE name != 'master'";
 
             try
             {
-                // Open the connection
-                connection.Open();
-
-                // Execute the query and get the SqlDataReader
-                SqlDataReader reader = command.ExecuteReader();
-
-                // Check if the reader has rows
-                if (reader.HasRows)
+                // Use 'using' to ensure proper resource disposal
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    // Read each row and add the name to the list
-                    while (reader.Read())
+                    // Open the connection
+                    connection.Open();
+
+                    // Execute the query and read data
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        databaseNames.Add(reader["name"].ToString());
+                        while (reader.Read())
+                        {
+                            databaseNames.Add(reader["name"].ToString());
+                        }
                     }
                 }
-
-                // Close the reader
-                reader.Close();
             }
             catch (Exception ex)
             {
-                // Handle any errors
-                // Console.WriteLine("Error: " + ex.Message);
-            }
-            finally
-            {
-                // Close the connection
-                connection.Close();
+                // Log the error (centralized logging is better if available)
+
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
             }
 
-            // Convert the list to an array and return it
+            // Return the database names as an array
             return databaseNames.ToArray();
         }
 
@@ -274,7 +290,14 @@ namespace BizDataLayerGen.DataAccessLayer
             }
             catch (Exception ex)
             {
-                // Handle any errors
+
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
                 // Console.WriteLine("Error: " + ex.Message);
             }
 
@@ -323,6 +346,15 @@ namespace BizDataLayerGen.DataAccessLayer
             }
             catch (Exception ex)
             {
+
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
+
             }
 
             return columns.ToArray();
@@ -370,6 +402,15 @@ namespace BizDataLayerGen.DataAccessLayer
             }
             catch (Exception ex)
             {
+
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
+
             }
 
             return DataTypes.ToArray();

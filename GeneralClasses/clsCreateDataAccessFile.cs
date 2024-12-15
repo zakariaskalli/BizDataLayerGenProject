@@ -47,7 +47,6 @@ namespace BizDataLayerGen.GeneralClasses
             return parameterCodeBuilder.ToString();
         }
 
-
         public static string parameterForInsertQueryBuilder(string[] Columns)
         {
             var parameterForInsertQueryBuilder = new StringBuilder();

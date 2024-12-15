@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace BizDataLayerGen.ConnectingWithRegister
 {
@@ -27,12 +30,18 @@ namespace BizDataLayerGen.ConnectingWithRegister
                 Registry.SetValue(keyPath, valuePasswordName, valuePasswordData, RegistryValueKind.String);
 
             }
-            catch
+            catch(Exception ex)
             {
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
                 return;
             }
         }
-
 
         static public void DeleteDataSignInRegister()
         {
@@ -57,8 +66,16 @@ namespace BizDataLayerGen.ConnectingWithRegister
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
+
                 return;
             }
         }
@@ -86,8 +103,15 @@ namespace BizDataLayerGen.ConnectingWithRegister
                     IsAvailableData = false;
 
             }
-            catch
+            catch(Exception ex)
             {
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
             }
 
             return IsAvailableData;

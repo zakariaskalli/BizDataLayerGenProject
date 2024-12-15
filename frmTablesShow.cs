@@ -219,10 +219,10 @@ namespace BizDataLayerGen
 
 
             if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
-                MessageBox.Show("Created Success", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            else
-                MessageBox.Show("Error Created Success", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //else
+            //    MessageBox.Show("Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                
 
             
         }
