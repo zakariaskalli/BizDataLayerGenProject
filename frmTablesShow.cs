@@ -53,6 +53,7 @@ namespace BizDataLayerGen
 
         private void frmTablesShow_Load(object sender, EventArgs e)
         {
+            this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 35, 35));
 
             //LBTables.Items.Clear();
 
@@ -256,6 +257,16 @@ namespace BizDataLayerGen
         }
 
         private void LBTables_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2CircleButton1_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void guna2HtmlLabel2_Click(object sender, EventArgs e)
         {
 
         }

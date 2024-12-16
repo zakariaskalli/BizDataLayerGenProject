@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -27,9 +28,11 @@ namespace BizDataLayerGen
 
         }
 
+        
+
         private void frmLogin_Load(object sender, EventArgs e)
         {
-            
+            this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 30, 30));
 
             lblLogin.BackColor = Color.Transparent;
             btnLogin.BackColor = Color.Transparent;
@@ -165,6 +168,11 @@ namespace BizDataLayerGen
 
         private void tbUserID_TextChanged(object sender, EventArgs e)
         {
+        }
+
+        private void guna2CircleButton1_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

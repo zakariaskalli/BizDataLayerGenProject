@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -39,8 +40,10 @@ namespace BizDataLayerGen
 
         }
 
+
         private void CodeGenratorForm_Load(object sender, EventArgs e)
         {
+            this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 40, 40));
 
             AddDataBaseNames();
             // this is
@@ -119,6 +122,11 @@ namespace BizDataLayerGen
         {
             clsGlobal.DataBaseName = cbDatabaseName.Text;
 
+        }
+
+        private void guna2CircleButton1_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

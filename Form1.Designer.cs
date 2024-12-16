@@ -42,9 +42,9 @@
             this.guna2PictureBox3 = new Guna.UI2.WinForms.Guna2PictureBox();
             this.guna2PictureBox2 = new Guna.UI2.WinForms.Guna2PictureBox();
             this.guna2PictureBox1 = new Guna.UI2.WinForms.Guna2PictureBox();
-            this.btnClose = new Guna.UI2.WinForms.Guna2Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.guna2CircleButton1 = new Guna.UI2.WinForms.Guna2CircleButton();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox1)).BeginInit();
@@ -88,7 +88,7 @@
             // 
             // btnBrowse
             // 
-            this.btnBrowse.BorderRadius = 10;
+            this.btnBrowse.BorderRadius = 20;
             this.btnBrowse.CheckedState.Parent = this.btnBrowse;
             this.btnBrowse.CustomImages.Parent = this.btnBrowse;
             this.btnBrowse.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(98)))), ((int)(((byte)(81)))));
@@ -98,7 +98,7 @@
             this.btnBrowse.Location = new System.Drawing.Point(820, 262);
             this.btnBrowse.Name = "btnBrowse";
             this.btnBrowse.ShadowDecoration.Parent = this.btnBrowse;
-            this.btnBrowse.Size = new System.Drawing.Size(138, 40);
+            this.btnBrowse.Size = new System.Drawing.Size(130, 40);
             this.btnBrowse.TabIndex = 6;
             this.btnBrowse.Text = "Browse";
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
@@ -111,9 +111,9 @@
             this.guna2HtmlLabel4.Location = new System.Drawing.Point(776, 376);
             this.guna2HtmlLabel4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel4.Name = "guna2HtmlLabel4";
-            this.guna2HtmlLabel4.Size = new System.Drawing.Size(110, 25);
+            this.guna2HtmlLabel4.Size = new System.Drawing.Size(85, 25);
             this.guna2HtmlLabel4.TabIndex = 8;
-            this.guna2HtmlLabel4.Text = "Made From:";
+            this.guna2HtmlLabel4.Text = "Made By:";
             // 
             // guna2HtmlLabel5
             // 
@@ -129,6 +129,7 @@
             // 
             // tbPathFilesToGenrate
             // 
+            this.tbPathFilesToGenrate.BorderRadius = 15;
             this.tbPathFilesToGenrate.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbPathFilesToGenrate.DefaultText = "";
             this.tbPathFilesToGenrate.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
@@ -142,19 +143,20 @@
             this.tbPathFilesToGenrate.Font = new System.Drawing.Font("Microsoft YaHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbPathFilesToGenrate.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.tbPathFilesToGenrate.HoverState.Parent = this.tbPathFilesToGenrate;
-            this.tbPathFilesToGenrate.Location = new System.Drawing.Point(277, 262);
+            this.tbPathFilesToGenrate.Location = new System.Drawing.Point(281, 262);
             this.tbPathFilesToGenrate.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.tbPathFilesToGenrate.Name = "tbPathFilesToGenrate";
             this.tbPathFilesToGenrate.PasswordChar = '\0';
             this.tbPathFilesToGenrate.PlaceholderText = "";
             this.tbPathFilesToGenrate.SelectedText = "";
             this.tbPathFilesToGenrate.ShadowDecoration.Parent = this.tbPathFilesToGenrate;
-            this.tbPathFilesToGenrate.Size = new System.Drawing.Size(531, 36);
+            this.tbPathFilesToGenrate.Size = new System.Drawing.Size(531, 40);
             this.tbPathFilesToGenrate.TabIndex = 10;
             // 
             // cbDatabaseName
             // 
             this.cbDatabaseName.BackColor = System.Drawing.Color.Transparent;
+            this.cbDatabaseName.BorderRadius = 15;
             this.cbDatabaseName.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cbDatabaseName.DropDownHeight = 200;
             this.cbDatabaseName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -166,29 +168,29 @@
             this.cbDatabaseName.FormattingEnabled = true;
             this.cbDatabaseName.HoverState.Parent = this.cbDatabaseName;
             this.cbDatabaseName.IntegralHeight = false;
-            this.cbDatabaseName.ItemHeight = 30;
+            this.cbDatabaseName.ItemHeight = 35;
             this.cbDatabaseName.ItemsAppearance.Parent = this.cbDatabaseName;
-            this.cbDatabaseName.Location = new System.Drawing.Point(281, 173);
+            this.cbDatabaseName.Location = new System.Drawing.Point(281, 168);
             this.cbDatabaseName.Name = "cbDatabaseName";
             this.cbDatabaseName.ShadowDecoration.Parent = this.cbDatabaseName;
-            this.cbDatabaseName.Size = new System.Drawing.Size(393, 36);
+            this.cbDatabaseName.Size = new System.Drawing.Size(497, 41);
             this.cbDatabaseName.Sorted = true;
             this.cbDatabaseName.TabIndex = 11;
             this.cbDatabaseName.SelectedIndexChanged += new System.EventHandler(this.cbDatabaseName_SelectedIndexChanged);
             // 
             // btnUpload
             // 
-            this.btnUpload.BorderRadius = 10;
+            this.btnUpload.BorderRadius = 20;
             this.btnUpload.CheckedState.Parent = this.btnUpload;
             this.btnUpload.CustomImages.Parent = this.btnUpload;
             this.btnUpload.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(98)))), ((int)(((byte)(81)))));
             this.btnUpload.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpload.ForeColor = System.Drawing.Color.White;
             this.btnUpload.HoverState.Parent = this.btnUpload;
-            this.btnUpload.Location = new System.Drawing.Point(748, 169);
+            this.btnUpload.Location = new System.Drawing.Point(820, 169);
             this.btnUpload.Name = "btnUpload";
             this.btnUpload.ShadowDecoration.Parent = this.btnUpload;
-            this.btnUpload.Size = new System.Drawing.Size(138, 40);
+            this.btnUpload.Size = new System.Drawing.Size(130, 40);
             this.btnUpload.TabIndex = 13;
             this.btnUpload.Text = "Upload";
             this.btnUpload.Click += new System.EventHandler(this.btnUpload_Click);
@@ -198,7 +200,7 @@
             this.guna2HtmlLabel6.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel6.Font = new System.Drawing.Font("Microsoft Tai Le", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel6.ForeColor = System.Drawing.Color.Black;
-            this.guna2HtmlLabel6.Location = new System.Drawing.Point(701, 184);
+            this.guna2HtmlLabel6.Location = new System.Drawing.Point(787, 184);
             this.guna2HtmlLabel6.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel6.Name = "guna2HtmlLabel6";
             this.guna2HtmlLabel6.Size = new System.Drawing.Size(25, 25);
@@ -207,7 +209,7 @@
             // 
             // btnGenerate
             // 
-            this.btnGenerate.BorderRadius = 15;
+            this.btnGenerate.BorderRadius = 20;
             this.btnGenerate.CheckedState.Parent = this.btnGenerate;
             this.btnGenerate.CustomImages.Parent = this.btnGenerate;
             this.btnGenerate.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
@@ -260,26 +262,27 @@
             this.guna2PictureBox1.TabIndex = 3;
             this.guna2PictureBox1.TabStop = false;
             // 
-            // btnClose
-            // 
-            this.btnClose.CheckedState.Parent = this.btnClose;
-            this.btnClose.CustomImages.Parent = this.btnClose;
-            this.btnClose.FillColor = System.Drawing.SystemColors.Control;
-            this.btnClose.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnClose.ForeColor = System.Drawing.SystemColors.Control;
-            this.btnClose.HoverState.Parent = this.btnClose;
-            this.btnClose.Image = global::BizDataLayerGen.Properties.Resources.close;
-            this.btnClose.ImageSize = new System.Drawing.Size(30, 30);
-            this.btnClose.Location = new System.Drawing.Point(913, 12);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.ShadowDecoration.Parent = this.btnClose;
-            this.btnClose.Size = new System.Drawing.Size(45, 39);
-            this.btnClose.TabIndex = 15;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-            // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // guna2CircleButton1
+            // 
+            this.guna2CircleButton1.BackgroundImage = global::BizDataLayerGen.Properties.Resources.Cancel;
+            this.guna2CircleButton1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.guna2CircleButton1.CheckedState.Parent = this.guna2CircleButton1;
+            this.guna2CircleButton1.CustomImages.Parent = this.guna2CircleButton1;
+            this.guna2CircleButton1.FillColor = System.Drawing.Color.Transparent;
+            this.guna2CircleButton1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.guna2CircleButton1.ForeColor = System.Drawing.Color.White;
+            this.guna2CircleButton1.HoverState.Parent = this.guna2CircleButton1;
+            this.guna2CircleButton1.Location = new System.Drawing.Point(920, 12);
+            this.guna2CircleButton1.Name = "guna2CircleButton1";
+            this.guna2CircleButton1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.guna2CircleButton1.ShadowDecoration.Parent = this.guna2CircleButton1;
+            this.guna2CircleButton1.Size = new System.Drawing.Size(35, 35);
+            this.guna2CircleButton1.TabIndex = 21;
+            this.guna2CircleButton1.Click += new System.EventHandler(this.guna2CircleButton1_Click);
             // 
             // CodeGenratorForm
             // 
@@ -287,7 +290,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
             this.ClientSize = new System.Drawing.Size(970, 450);
-            this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.guna2CircleButton1);
             this.Controls.Add(this.guna2HtmlLabel6);
             this.Controls.Add(this.btnUpload);
             this.Controls.Add(this.btnGenerate);
@@ -334,9 +337,9 @@
         private Guna.UI2.WinForms.Guna2Button btnGenerate;
         private Guna.UI2.WinForms.Guna2Button btnUpload;
         private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel6;
-        private Guna.UI2.WinForms.Guna2Button btnClose;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private Guna.UI2.WinForms.Guna2CircleButton guna2CircleButton1;
     }
 }
 
