@@ -5,9 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 using BizDataLayerGen.GeneralClasses;
 using System.Data;
-//using GymDB_DataAccess;
-using Project_DataAccessLayer;
-//using GymDB_BusinessLayer;
+using GymDB_DataLayer;
 
 namespace BizDataLayerGen
 {
@@ -157,19 +155,19 @@ namespace BizDataLayerGen
             string? Email = "";
             string? Phone = "";
             DateTime? DateOfBirth = DateTime.Now;
-            bool Gender =  false;
+            bool Gender = false;
             string? Address = "";
             int CityID = -1;
             DateTime CreatedTime = DateTime.Now;
-            DateTime LastUpdat = DateTime.Now;
+            DateTime LastUpdate = DateTime.Now; // Corrected variable name
             string? ProfilePicture = "";
             int? CreatedByUserID = -1;
 
-
-            clsPeopleData.GetPeopleInfoByID(PersonID,ref FirstName, ref SecondName, ref ThirdName,
+           clsPeopleData.GetPeopleInfoByID(PersonID, ref FirstName, ref SecondName, ref ThirdName,
                ref LastName, ref Email, ref Phone, ref DateOfBirth, ref Gender, ref Address, ref CityID,
-               ref CreatedTime, ref LastUpdat, ref ProfilePicture, ref CreatedByUserID);
+               ref CreatedTime, ref LastUpdate, ref ProfilePicture); // Removed extra paramet
             */
+
 
             // Update Person
 
@@ -212,7 +210,7 @@ namespace BizDataLayerGen
             MessageBox.Show(result, "DataTable Data");
             */
 
-
+            
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
             bool AddingStaticMethods = rbAddingStaticMethodsYes.Checked == true && rbAddingStaticMethodsNo.Checked == false;
@@ -221,6 +219,8 @@ namespace BizDataLayerGen
 
             if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
+            
             //else
             //    MessageBox.Show("Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 

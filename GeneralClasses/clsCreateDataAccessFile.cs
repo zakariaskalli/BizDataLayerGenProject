@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BizDataLayerGen.DataAccessLayer;
+
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -139,6 +142,20 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
+        /*
+         SP_Get_TableName_ByID
+
+            SP_Get_All_TableName
+            
+            SP_Add_TableName
+            
+            SP_Update_TableName_ByID
+            
+            SP_Delete_TableName_ByID
+            
+            SP_Search_TableName_ByColumn
+         
+         */
 
         public string AddGetTableInfoByIDMethod()
         {
@@ -148,11 +165,14 @@ namespace BizDataLayerGen.GeneralClasses
 
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    string query = ""SELECT * FROM {_TableName} WHERE {_Columns[0]} = @{_Columns[0]}"";
+                    string query = ""SP_Get_{_TableName}_ByID;"";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {{
-                        command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
+                        command.CommandType = CommandType.StoredProcedure;
+
+
+                        command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
 
                         connection.Open();
                         using (SqlDataReader reader = command.ExecuteReader())
@@ -177,6 +197,71 @@ namespace BizDataLayerGen.GeneralClasses
 
             return GetTableByIDCode;
         }
+
+
+
+// For Error Handling
+
+/*
+        public string AddGetTableInfoByIDMethod()
+{
+    string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
+    {{
+        bool isFound = false;
+
+        try
+        {{
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {{
+                string query = ""SP_Get_{_TableName}_ByID;"";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {{
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add the parameter for ID
+                    command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
+
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {{
+                        if (reader.Read())
+                        {{
+                            // The record was found
+                            isFound = true;
+
+{AddDataReaderToVariables()}
+                        }}
+                    }}
+                }}
+            }}
+        }}
+        catch (SqlException sqlEx)
+        {{
+            // Log SQL exception (database-related issue)
+            clsLogger.Log(sqlEx); // افترض وجود دالة Log
+            throw new DataAccessException(""An error occurred while accessing the database."", sqlEx);
+        }}
+        catch (Exception ex)
+        {{
+            // Log general exceptions
+            clsLogger.Log(ex);
+            throw new ApplicationException(""An unexpected error occurred."", ex);
+        }}
+
+        return isFound;
+    }}";
+
+    return GetTableByIDCode;
+}
+*/
+
+
+
+
+
+
+
 
         public string AddGetAllDataMethod()
         {
@@ -348,10 +433,130 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
+        public void CreateTableLog()
+        {
+
+            // SQL query to check if the table already exists
+            string checkTableQuery = @$"
+        USE {clsGlobal.DataBaseName};
+        IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'ErrorLog')
+        BEGIN
+            CREATE TABLE ErrorLog (
+                ErrorID INT IDENTITY(1,1) PRIMARY KEY,         -- Unique ID for each log entry
+                ErrorMessage NVARCHAR(MAX) NOT NULL,          -- Error message
+                StackTrace NVARCHAR(MAX),                      -- Stack trace of the error (optional)
+                Timestamp DATETIME DEFAULT GETDATE(),          -- Time when the error occurred
+                Severity NVARCHAR(50),                         -- Severity level (e.g., Low, Medium, High)
+                AdditionalInfo NVARCHAR(MAX)                   -- Optional additional info about the error
+            );
+        END;";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(checkTableQuery, connection))
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();  // Execute the command to check and create the table
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            
+            }
+
+        }
+
+        public void GenerateErrorLogClassesFile(string filePath)
+        {
+            // Define the content of the Log and ErrorLogHandler classes
+            string Code = @"
+using System;
+using System.Data.SqlClient;
+using GymDB_DataAccess;
+
+namespace GymDB_DataLayer
+{
+    public class Log
+    {
+        public string ErrorMessage { get; set; }
+        public string StackTrace { get; set; }
+        public string Severity { get; set; }
+        public string AdditionalInfo { get; set; }
+
+        // Constructor for Log object
+        public Log(string errorMessage, string stackTrace = null, string severity = ""Medium"", string additionalInfo = null)
+        {
+            ErrorMessage = errorMessage;
+            StackTrace = stackTrace;
+            Severity = severity;
+            AdditionalInfo = additionalInfo;
+        }
+    }
+        public class clsErrorLogHandler
+    {
+        public void CreateClassForLog(Log log)
+        {
+            string query = @""INSERT INTO ErrorLog (ErrorMessage, StackTrace, Severity, AdditionalInfo)
+                VALUES (@ErrorMessage, @StackTrace, @Severity, @AdditionalInfo);"";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        // Add parameters
+                        command.Parameters.AddWithValue(""@ErrorMessage"", log.ErrorMessage ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue(""@StackTrace"", log.StackTrace ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue(""@Severity"", log.Severity ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue(""@AdditionalInfo"", log.AdditionalInfo ?? (object)DBNull.Value);
+
+                        // Open connection and execute the query
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+    }
+}
+";
+
+            // Combine both classes' contents into one
+            string fullClassContent = Code;
+
+            // Write the content to the file
+            try
+            {
+                // Create or overwrite the file
+                System.IO.File.WriteAllText(filePath, fullClassContent);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+
+
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
         {
+            CreateTableLog();
+
+            string GenerateClassFileForErrorLog = Path.Combine(_filePath, "clsErrorLogHandler.cs");
+
+            GenerateErrorLogClassesFile(GenerateClassFileForErrorLog);
+
+
             // Define the full path for the file
             string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
+
+            
 
             // if you use PK in AllTables, but we have tables Don't have it
 
@@ -395,7 +600,7 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 
             // Write the code to the file
             File.WriteAllText(fullPath, code);
-
+            
             return clsGlobal.enTypeRaisons.enPerfect;
 
         }
