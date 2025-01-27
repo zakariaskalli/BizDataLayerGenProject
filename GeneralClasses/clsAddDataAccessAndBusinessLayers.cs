@@ -66,8 +66,20 @@ namespace BizDataLayerGen.GeneralClasses
 
         public static bool CreateDataAccessSettingsClassFile(string ProjectName)
         {
-            // Define the full path for the file
-            string fullPath = Path.Combine(clsGlobal.dataAccessLayerPath, $"clsDataAccessSettings.cs");
+            string errorHandlerFolderPath = Path.Combine(clsGlobal.dataAccessLayerPath, "ConnectionString");
+
+            // Step 2: Create the folder if it doesn't exist
+            if (!Directory.Exists(errorHandlerFolderPath))
+            {
+                Directory.CreateDirectory(errorHandlerFolderPath);
+            }
+            else
+            {
+            }
+
+            // Step 3: Define the path for the 'clsErrorHandlingManager.cs' file
+            string fullPath = Path.Combine(errorHandlerFolderPath, $"clsDataAccessSettings.cs");
+
 
             // Define the code to be written in the file
             string code = $@"
@@ -113,6 +125,19 @@ namespace {ProjectName}_DataAccess
                 return clsGlobal.enTypeRaisons.enError;
             }
 
+            if (!CreateDataAccessSettingsClassFile(clsGlobal.DataBaseName))
+            {
+                return clsGlobal.enTypeRaisons.enError;
+            }
+            if (!clsErrorHandling.CreatingForErrorHanding(clsGlobal.dataAccessLayerPath))
+            {
+                return clsGlobal.enTypeRaisons.enError;
+            }
+
+
+
+
+
             for (int i = 0; NameTables.Length > i; i++)
             {
                 string[] Columns = clsGeneralWithData.GetColumnsName(NameTables[i], clsGlobal.DataBaseName);
@@ -138,6 +163,16 @@ namespace {ProjectName}_DataAccess
                 clsCreateDataAccessFile AddDataAccessLayer = new clsCreateDataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
 
                 clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
+
+
+                
+
+
+
+
+
+
+
 
                 // Test "GetForeignKeys"
 

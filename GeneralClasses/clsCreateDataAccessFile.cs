@@ -7,8 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using BizDataLayerGen.DataAccessLayer;
-
+using Newtonsoft.Json;
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -157,110 +158,110 @@ namespace BizDataLayerGen.GeneralClasses
          
          */
 
+
         public string AddGetTableInfoByIDMethod()
         {
             string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
+{{
+    bool isFound = false;
+
+    try
+    {{
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+        {{
+            string query = ""SP_Get_{_TableName}_ByID;"";
+
+            using (SqlCommand command = new SqlCommand(query, connection))
             {{
-                bool isFound = false;
+                command.CommandType = CommandType.StoredProcedure;
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-                {{
-                    string query = ""SP_Get_{_TableName}_ByID;"";
+                // Ensure correct parameter assignment
+                command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {{ 
+                    if (reader.Read())
                     {{
-                        command.CommandType = CommandType.StoredProcedure;
+                        // The record was found
+                        isFound = true;
 
-
-                        command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
-
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {{ 
-                            if (reader.Read())
-                            {{
-
-                                // The record was found
-                                isFound = true;
-
-{AddDataReaderToVariables()}
-
-
-                            }}
-                        }}
-
+                        {AddDataReaderToVariables()}
                     }}
                 }}
-                return isFound;
+            }}
+        }}
+    }}
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(Get{_TableName}InfoByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
 
-            }}";
+    return isFound;
+}}";
 
             return GetTableByIDCode;
         }
 
 
 
-// For Error Handling
 
-/*
-        public string AddGetTableInfoByIDMethod()
-{
-    string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
-    {{
-        bool isFound = false;
+        // For Error Handling
 
-        try
-        {{
-            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+        /*
+                public string AddGetTableInfoByIDMethod()
+        {
+            string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
             {{
-                string query = ""SP_Get_{_TableName}_ByID;"";
+                bool isFound = false;
 
-                using (SqlCommand command = new SqlCommand(query, connection))
+                try
                 {{
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    // Add the parameter for ID
-                    command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
-
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                     {{
-                        if (reader.Read())
-                        {{
-                            // The record was found
-                            isFound = true;
+                        string query = ""SP_Get_{_TableName}_ByID;"";
 
-{AddDataReaderToVariables()}
+                        using (SqlCommand command = new SqlCommand(query, connection))
+                        {{
+                            command.CommandType = CommandType.StoredProcedure;
+
+                            // Add the parameter for ID
+                            command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
+
+                            connection.Open();
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {{
+                                if (reader.Read())
+                                {{
+                                    // The record was found
+                                    isFound = true;
+
+        {AddDataReaderToVariables()}
+                                }}
+                            }}
                         }}
                     }}
                 }}
-            }}
-        }}
-        catch (SqlException sqlEx)
-        {{
-            // Log SQL exception (database-related issue)
-            clsLogger.Log(sqlEx); // افترض وجود دالة Log
-            throw new DataAccessException(""An error occurred while accessing the database."", sqlEx);
-        }}
-        catch (Exception ex)
-        {{
-            // Log general exceptions
-            clsLogger.Log(ex);
-            throw new ApplicationException(""An unexpected error occurred."", ex);
-        }}
+                catch (SqlException sqlEx)
+                {{
+                    // Log SQL exception (database-related issue)
+                    clsLogger.Log(sqlEx); // افترض وجود دالة Log
+                    throw new DataAccessException(""An error occurred while accessing the database."", sqlEx);
+                }}
+                catch (Exception ex)
+                {{
+                    // Log general exceptions
+                    clsLogger.Log(ex);
+                    throw new ApplicationException(""An unexpected error occurred."", ex);
+                }}
 
-        return isFound;
-    }}";
+                return isFound;
+            }}";
 
-    return GetTableByIDCode;
-}
-*/
-
-
-
-
-
-
+            return GetTableByIDCode;
+        }
+        */
 
 
         public string AddGetAllDataMethod()
@@ -269,42 +270,52 @@ namespace BizDataLayerGen.GeneralClasses
 {{
     DataTable dt = new DataTable();
 
-    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    try
     {{
-        string query = ""SELECT * FROM {_TableName}"";
-
-        using (SqlCommand command = new SqlCommand(query, connection))
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
+            string query = ""SELECT * FROM {_TableName}"";
 
-            connection.Open();
-
-            using (SqlDataReader reader = command.ExecuteReader())
+            using (SqlCommand command = new SqlCommand(query, connection))
             {{
-                if (reader.HasRows)
-                    dt.Load(reader);
+                connection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {{
+                    if (reader.HasRows)
+                    {{
+                        dt.Load(reader);
+                    }}
+                }}
             }}
         }}
     }}
-    return dt;
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(GetAll{_TableName}), ""No parameters for this method."");
+    }}
 
+    return dt;
 }}";
 
             return GetTableByIDCode;
         }
 
+
         public string AddAddingNewRecordMethod()
         {
+            string GetTableByIDCode = @$"public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
+    {{
+        int? {_Columns[0]} = null;
 
-
-            string GetTableByIDCode = @$" public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
+        try
         {{
-            int? {_Columns[0]} = null;
-
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
                 string query = @""Insert Into {_TableName} ({parameterForInsertQueryBuilder(_Columns)})
-                            Values ({parameterForInsertQueryBuilderValue(_Columns)})
-                            SELECT SCOPE_IDENTITY();"";
+                                Values ({parameterForInsertQueryBuilderValue(_Columns)})
+                                SELECT SCOPE_IDENTITY();"";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {{
@@ -319,48 +330,55 @@ namespace BizDataLayerGen.GeneralClasses
                         {_Columns[0]} = insertedID;
                     }}
                 }}
-
             }}
-            return {_Columns[0]};
-
         }}
-";
+        catch (Exception ex)
+        {{
+            // Handle all exceptions in a general way
+            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName}), $""Parameters: {ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
+        }}
+
+        return {_Columns[0]};
+    }}";
 
             return GetTableByIDCode;
         }
 
         public string AddUpdatingRecordMethod()
         {
+            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+{{
+    int rowsAffected = 0;
 
-
-            string GetTableByIDCode = @$" public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+    try
+    {{
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            int rowsAffected = 0;
-
-            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-            {{
-                string query = @""Update {_TableName}
-                                    set 
+            string query = $@""UPDATE {_TableName}
+                              SET 
 {parameterForUpdateQuery(_Columns)}
-                                  where [{_Columns[0]}]= @{_Columns[0]}"";
+                              WHERE [{_Columns[0]}] = @{_Columns[0]}"";  // Ensure dynamic update query generation
 
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {{
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {{
 {clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns, 0)}
 
-                    connection.Open();
+                connection.Open();
 
-                    rowsAffected = command.ExecuteNonQuery();
-                }}
-
+                rowsAffected = command.ExecuteNonQuery();
             }}
-
-            return (rowsAffected > 0);
         }}
-";
+    }}
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
+
+    return (rowsAffected > 0);
+}}";
 
             return GetTableByIDCode;
-
         }
 
         public string AddDeleteByIDMethod()
@@ -369,31 +387,36 @@ namespace BizDataLayerGen.GeneralClasses
 {{
     int rowsAffected = 0;
 
-    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    try
     {{
-        string query = @""Delete {_TableName} 
-                        where {_Columns[0]} = @{_Columns[0]}"";
-
-        using (SqlCommand command = new SqlCommand(query, connection))
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
+            string query = $@""DELETE FROM {_TableName} 
+                            WHERE {_Columns[0]} = @{_Columns[0]}"";  // Ensure correct dynamic query generation
 
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {{
+                command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
 
-            connection.Open();
-            
-            rowsAffected = command.ExecuteNonQuery();
+                connection.Open();
 
-
+                rowsAffected = command.ExecuteNonQuery();
+            }}
         }}
-
     }}
-    
-    return (rowsAffected > 0);
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(Delete{_TableName}), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
 
+    return (rowsAffected > 0);
 }}";
 
             return GetTableByIDCode;
         }
+
+
 
         public string AddSearchMethod()
         {
@@ -401,29 +424,35 @@ namespace BizDataLayerGen.GeneralClasses
 {{
     DataTable dt = new DataTable();
 
-    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    try
     {{
-        string query = $@""select * from {_TableName}
-                    where {{ColumnName}} Like '' + @Data + '%';"";
-
-        using (SqlCommand Command = new SqlCommand(query, connection))
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            Command.Parameters.AddWithValue(""@Data"", Data);
+            string query = $@""SELECT * FROM {_TableName}
+                        WHERE {{ColumnName}} LIKE '' + @Data + '%';"";
 
-
-            connection.Open();
-
-            using (SqlDataReader reader = Command.ExecuteReader())
+            using (SqlCommand command = new SqlCommand(query, connection))
             {{
-                if (reader.HasRows)
-                {{
-                    dt.Load(reader);
-                }}
+                command.Parameters.AddWithValue(""@Data"", Data);
 
-                reader.Close();
+                connection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {{
+                    if (reader.HasRows)
+                    {{
+                        dt.Load(reader);
+                    }}
+
+                    reader.Close();
+                }}
             }}
         }}
-        
+    }}
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(SearchData), $""ColumnName: {{ColumnName}}, Data: {{Data}}"");
     }}
 
     return dt;
@@ -433,142 +462,30 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
-        public void CreateTableLog()
-        {
-
-            // SQL query to check if the table already exists
-            string checkTableQuery = @$"
-        USE {clsGlobal.DataBaseName};
-        IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'ErrorLog')
-        BEGIN
-            CREATE TABLE ErrorLog (
-                ErrorID INT IDENTITY(1,1) PRIMARY KEY,         -- Unique ID for each log entry
-                ErrorMessage NVARCHAR(MAX) NOT NULL,          -- Error message
-                StackTrace NVARCHAR(MAX),                      -- Stack trace of the error (optional)
-                Timestamp DATETIME DEFAULT GETDATE(),          -- Time when the error occurred
-                Severity NVARCHAR(50),                         -- Severity level (e.g., Low, Medium, High)
-                AdditionalInfo NVARCHAR(MAX)                   -- Optional additional info about the error
-            );
-        END;";
-
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-                {
-                    using (SqlCommand command = new SqlCommand(checkTableQuery, connection))
-                    {
-                        connection.Open();
-                        command.ExecuteNonQuery();  // Execute the command to check and create the table
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-            
-            }
-
-        }
-
-        public void GenerateErrorLogClassesFile(string filePath)
-        {
-            // Define the content of the Log and ErrorLogHandler classes
-            string Code = @"
-using System;
-using System.Data.SqlClient;
-using GymDB_DataAccess;
-
-namespace GymDB_DataLayer
-{
-    public class Log
-    {
-        public string ErrorMessage { get; set; }
-        public string StackTrace { get; set; }
-        public string Severity { get; set; }
-        public string AdditionalInfo { get; set; }
-
-        // Constructor for Log object
-        public Log(string errorMessage, string stackTrace = null, string severity = ""Medium"", string additionalInfo = null)
-        {
-            ErrorMessage = errorMessage;
-            StackTrace = stackTrace;
-            Severity = severity;
-            AdditionalInfo = additionalInfo;
-        }
-    }
-        public class clsErrorLogHandler
-    {
-        public void CreateClassForLog(Log log)
-        {
-            string query = @""INSERT INTO ErrorLog (ErrorMessage, StackTrace, Severity, AdditionalInfo)
-                VALUES (@ErrorMessage, @StackTrace, @Severity, @AdditionalInfo);"";
-
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-                {
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        // Add parameters
-                        command.Parameters.AddWithValue(""@ErrorMessage"", log.ErrorMessage ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue(""@StackTrace"", log.StackTrace ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue(""@Severity"", log.Severity ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue(""@AdditionalInfo"", log.AdditionalInfo ?? (object)DBNull.Value);
-
-                        // Open connection and execute the query
-                        connection.Open();
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-    }
-}
-";
-
-            // Combine both classes' contents into one
-            string fullClassContent = Code;
-
-            // Write the content to the file
-            try
-            {
-                // Create or overwrite the file
-                System.IO.File.WriteAllText(filePath, fullClassContent);
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-
-
 
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
         {
-            CreateTableLog();
 
-            string GenerateClassFileForErrorLog = Path.Combine(_filePath, "clsErrorLogHandler.cs");
+
+
+            // First Code 
+
+            /*
+             
+            string GenerateClassFileForErrorLog = Path.Combine(_filePath, "clsErrorHandlingManager.cs");
 
             GenerateErrorLogClassesFile(GenerateClassFileForErrorLog);
+             
+             */
+
+
 
 
             // Define the full path for the file
             string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
 
+
             
-
-            // if you use PK in AllTables, but we have tables Don't have it
-
-            /*
-            string PKColmnNameInTable = "";
-            
-            if (!clsGeneralWithData.GetPrimaryKeyColumnNameFromTable(TableName,ref PKColmnNameInTable))
-            {
-                return clsGlobal.enTypeRaisons.enTableDontHavePK;
-            }
-            */
-
 
             // Define the code to be written in the file
             string code = $@"

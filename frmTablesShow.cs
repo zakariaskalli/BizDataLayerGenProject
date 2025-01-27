@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using BizDataLayerGen.GeneralClasses;
 using System.Data;
 using GymDB_DataLayer;
+using System.Collections.Generic;
 
 namespace BizDataLayerGen
 {
@@ -30,14 +31,14 @@ namespace BizDataLayerGen
                 {
                     LBTables.SetItemChecked(i, true); // Select each item in the ListBox
                 }
-
-                LBTables.Enabled = false;
+                
+                //LBTables.Enabled = false;
 
             }
             else
             {
 
-                LBTables.Enabled = true;
+                //LBTables.Enabled = true;
 
                 for (int i = 0; i < LBTables.Items.Count; i++)
                 {
@@ -67,7 +68,7 @@ namespace BizDataLayerGen
                 LBTables.SetItemChecked(i, true); // Select each item in the ListBox
             }
 
-            LBTables.Enabled = false;
+            //LBTables.Enabled = false;
 
 
         }
@@ -146,7 +147,11 @@ namespace BizDataLayerGen
 
             //GetPeopleInfoByID
 
-            /*
+
+
+
+
+            
             int PersonID = 56;
             string FirstName = "";
             string? SecondName = "";
@@ -161,12 +166,14 @@ namespace BizDataLayerGen
             DateTime CreatedTime = DateTime.Now;
             DateTime LastUpdate = DateTime.Now; // Corrected variable name
             string? ProfilePicture = "";
-            int? CreatedByUserID = -1;
-
+            
            clsPeopleData.GetPeopleInfoByID(PersonID, ref FirstName, ref SecondName, ref ThirdName,
                ref LastName, ref Email, ref Phone, ref DateOfBirth, ref Gender, ref Address, ref CityID,
                ref CreatedTime, ref LastUpdate, ref ProfilePicture); // Removed extra paramet
-            */
+            
+            
+
+
 
 
             // Update Person
@@ -210,6 +217,10 @@ namespace BizDataLayerGen
             MessageBox.Show(result, "DataTable Data");
             */
 
+
+
+
+            /*
             
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
@@ -221,6 +232,13 @@ namespace BizDataLayerGen
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
             
+            */
+
+
+
+
+
+
             //else
             //    MessageBox.Show("Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 
@@ -258,6 +276,48 @@ namespace BizDataLayerGen
 
         private void LBTables_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // Assume all items are selected initially
+            bool IsSelectedAll = true;
+
+            // Create lists to store checked and unchecked items
+            List<string> checkedItems = new List<string>();
+            List<string> uncheckedItems = new List<string>();
+
+            for (int i = 0; i < LBTables.Items.Count; i++)
+            {
+                // Check if the item is selected (adjust the property based on your ListBox or item type)
+                if (LBTables.GetItemChecked(i)) // Assuming you are using a CheckedListBox
+                {
+                    // Add to checked items list
+                    checkedItems.Add(LBTables.Items[i].ToString());
+                }
+                else
+                {
+                    // Add to unchecked items list
+                    uncheckedItems.Add(LBTables.Items[i].ToString());
+                    IsSelectedAll = false; // If any item is not selected, set to false
+                }
+            }
+
+            // Update the checkbox based on whether all items are selected
+            chBAllTables.Checked = IsSelectedAll;
+
+            // Display the state of each item
+            for (int i = 0; i < LBTables.Items.Count; i++)
+            {
+                if (checkedItems.Contains(LBTables.Items[i].ToString()))
+                {
+                    LBTables.SetItemChecked(i, true);
+                }
+                else if (uncheckedItems.Contains(LBTables.Items[i].ToString()))
+                {
+                    LBTables.SetItemChecked(i, false);
+
+                }
+
+
+            }
+
 
         }
 

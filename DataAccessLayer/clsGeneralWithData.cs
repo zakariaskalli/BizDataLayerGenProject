@@ -58,7 +58,7 @@ namespace BizDataLayerGen.DataAccessLayer
                     connection.Open();
                     return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     return false;
                 }
