@@ -490,9 +490,12 @@ namespace BizDataLayerGen.GeneralClasses
             // Define the code to be written in the file
             string code = $@"
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data;
+using System.Linq;
 using {clsGlobal.DataBaseName}_DataAccess;
+using Newtonsoft.Json;
 
 namespace {clsGlobal.DataBaseName}_DataLayer
 {{

@@ -132,7 +132,46 @@ public class JsonErrorLogger : IErrorSubscriber
         string userProvidedPath = ???;
 
         userProvidedPath += ""ErrorHandling_JsonFile.json"";
+        
         // Validate the path
+        if (string.IsNullOrWhiteSpace(userProvidedPath) || !Directory.Exists(Path.GetDirectoryName(userProvidedPath)))
+        {{
+            throw new DirectoryNotFoundException(""Invalid directory path provided."");
+        }}
+
+        // Ensure the file exists or create an empty one
+        if (!File.Exists(userProvidedPath))
+        {{
+            File.WriteAllText(userProvidedPath, ""[]"");
+        }}
+
+        // Define the method to save the new log
+        void SaveNewLog(Log log)
+        {{
+            try
+            {{
+                // Create a new list containing only the new log
+                var newLogList = new List<Log> {{ log }};
+
+                // Serialize the list to JSON with indentation
+                string newJsonContent = JsonConvert.SerializeObject(newLogList, Formatting.Indented);
+
+                // Write the new JSON content to the file (replacing old content)
+                File.WriteAllText(userProvidedPath, newJsonContent);
+            }}
+            catch
+            {{
+            }}
+        }}
+
+        // Pass the new log to the method
+        SaveNewLog(log);
+
+
+
+        // Save All Version For errors in Json File
+
+        /*
         if (string.IsNullOrWhiteSpace(userProvidedPath) || !Directory.Exists(Path.GetDirectoryName(userProvidedPath)))
         {{
             throw new DirectoryNotFoundException(""Invalid directory path provided."");
@@ -162,6 +201,8 @@ public class JsonErrorLogger : IErrorSubscriber
         catch
         {{
         }}
+        */
+
 
     }}
     

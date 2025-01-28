@@ -7,6 +7,9 @@ using BizDataLayerGen.GeneralClasses;
 using System.Data;
 using GymDB_DataLayer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace BizDataLayerGen
 {
@@ -133,6 +136,7 @@ namespace BizDataLayerGen
                 }
             }
 
+            
             // Test NameTables
 
             // the CreatebyUseName in People in GymDB is Not Nullable
@@ -142,16 +146,13 @@ namespace BizDataLayerGen
             /*
             MessageBox.Show(clsPeopleData.AddNewPeople("Khalid", "bibo", "nan", "Malki", "Arzaz@gmail.com",
                                    "060044456", DateTime.Now, true, "Fes", 125, DateTime.Now, DateTime.Now,
-                                   null, 1).ToString());
+                                   null).ToString());
             */
 
             //GetPeopleInfoByID
 
-
-
-
-
             
+            /*
             int PersonID = 56;
             string FirstName = "";
             string? SecondName = "";
@@ -170,9 +171,118 @@ namespace BizDataLayerGen
            clsPeopleData.GetPeopleInfoByID(PersonID, ref FirstName, ref SecondName, ref ThirdName,
                ref LastName, ref Email, ref Phone, ref DateOfBirth, ref Gender, ref Address, ref CityID,
                ref CreatedTime, ref LastUpdate, ref ProfilePicture); // Removed extra paramet
-            
-            
+            */
 
+
+
+            // First Mythologic to read Last Error from JsonFile
+
+            /*
+            
+            // Path to the JSON file provided by the user
+            string userProvidedPath = "C:\\Programation Level 2\\BizDataLayerGen\\TestCodeGenerator\\GymDB_DataAccess\\ErrorHandler\\JsonFile\\ErrorHandling_JsonFile.json"; 
+
+            
+            try
+            {
+                // Read the JSON file
+                string jsonContent = File.ReadAllText(userProvidedPath);
+
+                // Deserialize the JSON content into a list of ErrorLog objects
+                List<Log> errorLogs = JsonConvert.DeserializeObject<List<Log>>(jsonContent);
+
+                // Check if there are any errors in the file
+                if (errorLogs == null || errorLogs.Count == 0)
+                {
+                    MessageBox.Show("No errors found in the file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Replace the problematic line with the following code
+                Log lastError = errorLogs.Last(); // Retrieves the last element
+
+                // Prepare the message to display
+                string errorMessage = $"Error Message: {lastError.ErrorMessage}\n" +
+                                      $"Severity: {lastError.Severity}\n" +
+                                      $"Additional Info: {lastError.AdditionalInfo}\n" +
+                                      $"Stack Trace: {lastError.StackTrace}";
+
+                // Display the error in a MessageBox
+                MessageBox.Show(errorMessage, "Last Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (FileNotFoundException)
+            {
+                MessageBox.Show($"The file was not found at the provided path: {userProvidedPath}", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (JsonException)
+            {
+                MessageBox.Show("The file does not contain valid JSON data.", "Invalid JSON", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+
+            */
+
+            // Second Mythologic to read Last Error from JsonFile
+
+            /*
+
+           // Path to the JSON file provided by the user
+           string userProvidedPath = "C:\\Programation Level 2\\BizDataLayerGen\\TestCodeGenerator\\GymDB_DataAccess\\ErrorHandler\\JsonFile\\ErrorHandling_JsonFile.json"; 
+
+
+           try
+           {
+               // Open the file for reading
+               using (StreamReader file = File.OpenText(userProvidedPath))
+               using (JsonTextReader reader = new JsonTextReader(file))
+               {
+                   // Parse the JSON file as a JArray
+                   JArray errorsArray = JArray.Load(reader);
+
+                   // Check if the JSON array has any errors
+                   if (errorsArray.Count == 0)
+                   {
+                       MessageBox.Show("No errors found in the file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                       return;
+                   }
+
+                   // Get the last error as a JObject
+                   JObject lastError = (JObject)errorsArray.Last;
+
+                   // Extract error details
+                   string errorMessage = lastError["ErrorMessage"]?.ToString();
+                   string stackTrace = lastError["StackTrace"]?.ToString();
+                   string severity = lastError["Severity"]?.ToString();
+                   string additionalInfo = lastError["AdditionalInfo"]?.ToString();
+
+                   // Prepare the message to display
+                   string displayMessage = $"Error Message: {errorMessage}\n" +
+                                           $"Severity: {severity}\n" +
+                                           $"Additional Info: {additionalInfo}\n" +
+                                           $"Stack Trace: {stackTrace}";
+
+                   // Display the error in a MessageBox
+                   MessageBox.Show(displayMessage, "Last Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               }
+           }
+           catch (FileNotFoundException)
+           {
+               MessageBox.Show($"The file was not found at the provided path: {userProvidedPath}", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+           }
+           catch (JsonException)
+           {
+               MessageBox.Show("The file does not contain valid JSON data.", "Invalid JSON", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+           }
+           catch (Exception ex)
+           {
+               MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+           }
+
+           */
 
 
 
@@ -181,20 +291,21 @@ namespace BizDataLayerGen
             /*
             MessageBox.Show(clsPeopleData.UpdatePeopleByID(57, "Ziko", "zaki", "nan", "Malki", "Arzaz@gmail.com",
                                    "060044456", DateTime.Now, true, "Fes hakma l3alam", 125, DateTime.Now, DateTime.Now,
-                                   null, 1).ToString());
+                                   null).ToString());
             */
 
             // Update Payment
 
             //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, null, true, 2).ToString());
 
+
             // Tests For Delete 
 
-            /*
-            MessageBox.Show(clsPeopleData.deletePeople(57).ToString());
+            
+            //MessageBox.Show(clsPeopleData.DeletePeople(28).ToString());
 
-            MessageBox.Show(clsPaymentsData.deletePayments(4).ToString());
-            */
+            //MessageBox.Show(clsPaymentsData.DeletePayments(3).ToString());
+            
 
             // Test SearchData
 
@@ -215,12 +326,12 @@ namespace BizDataLayerGen
             }
 
             MessageBox.Show(result, "DataTable Data");
-            */
+          */
 
 
 
 
-            /*
+            
             
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
@@ -231,8 +342,8 @@ namespace BizDataLayerGen
             if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
-            
-            */
+           
+
 
 
 
@@ -241,9 +352,9 @@ namespace BizDataLayerGen
 
             //else
             //    MessageBox.Show("Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                
 
-            
+
+
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
