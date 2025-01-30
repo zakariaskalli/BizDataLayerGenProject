@@ -325,6 +325,8 @@ public static class ErrorHandler
                 // Step 1: Create the table log
                 CreateTableLog();
 
+
+
                 // Step 2: Prepare the error handler folder path
                 string errorHandlerFolderPath = Path.Combine(filePath, "ErrorHandler");
 

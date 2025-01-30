@@ -98,6 +98,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAccessLayer\clsCreatingSPsForTable.cs" />
     <Compile Include="DataAccessLayer\clsErrorHandling.cs" />
     <Compile Include="ErrorHandler\ErrorHandler.cs" />
     <Compile Include="ConnectingWithRegister\clsRegister.cs" />
@@ -179,9 +180,6 @@
     <None Include="resources\abstract-square-interface-modern-background-concept-fingerprint-digital-scanning-visual-security-system-authentication-login-vector.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="TestCodeGenerator\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="resources\FormImage.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +196,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestCodeGenerator\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

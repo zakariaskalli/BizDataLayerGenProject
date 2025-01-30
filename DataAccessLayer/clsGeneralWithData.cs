@@ -308,10 +308,11 @@ namespace BizDataLayerGen.DataAccessLayer
                 {
                     connection.Open();
                     string query = $@"
-                            Use [{DBName}]
-                            SELECT DATA_TYPE
-                             FROM INFORMATION_SCHEMA.COLUMNS
-                             WHERE TABLE_NAME = @TableName";
+                                        Use [{DBName}]
+                                        SELECT COLUMN_NAME, 
+                                               DATA_TYPE
+                                        FROM INFORMATION_SCHEMA.COLUMNS
+                                        WHERE TABLE_NAME = @TableName";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@TableName", tableName);
@@ -323,6 +324,89 @@ namespace BizDataLayerGen.DataAccessLayer
                             while (reader.Read())
                             {
                                 string columnName = reader["DATA_TYPE"].ToString();
+                                DataTypes.Add(columnName);
+                            }
+                        }
+                        reader.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
+            }
+
+            return DataTypes.ToArray();
+        }
+
+
+        public static string[] GetDataTypesForCreating(string tableName, string DBName)
+        {
+            List<string> DataTypes = new List<string>();
+
+            if (!clsGeneraleThings.IsValidDatabaseName(DBName))
+            {
+                return null;
+            }
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    connection.Open();
+                    string query = $@"
+                            Use [{DBName}]
+                            SELECT DATA_TYPE + 
+       CASE 
+           -- Handle character types with length (e.g., varchar, nvarchar, char, nchar)
+           WHEN DATA_TYPE IN ('char', 'varchar', 'nchar', 'nvarchar') THEN 
+               CASE 
+                   WHEN CHARACTER_MAXIMUM_LENGTH = -1 THEN '(MAX)'  -- Handle MAX case
+                   ELSE '(' + CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR) + ')'
+               END
+           
+           -- Handle numeric types (decimal, numeric) with precision and scale
+           WHEN DATA_TYPE IN ('decimal', 'numeric') THEN 
+               '(' + CAST(NUMERIC_PRECISION AS VARCHAR) + ',' + CAST(NUMERIC_SCALE AS VARCHAR) + ')'
+
+           -- Handle exact numeric types (int, smallint, bigint, etc.)
+           WHEN DATA_TYPE IN ('int', 'smallint', 'bigint', 'tinyint', 'bit', 'float', 'real') THEN 
+               ''  -- No additional info needed for these types
+
+           -- Handle date and time types (datetime, date, time, etc.)
+           WHEN DATA_TYPE IN ('datetime', 'date', 'time', 'smalldatetime') THEN 
+               ''  -- No additional info needed for these types
+
+           -- Handle binary types (binary, varbinary)
+           WHEN DATA_TYPE IN ('binary', 'varbinary') THEN 
+               CASE
+                   WHEN CHARACTER_MAXIMUM_LENGTH = -1 THEN '(MAX)'  -- Handle MAX case for binary/varbinary
+                   ELSE '(' + CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR) + ')'
+               END
+
+           -- Handle other types like uniqueidentifier, xml, etc.
+           ELSE 
+               ''  -- No additional info needed for other types
+       END AS FULL_DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = @TableName";
+
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@TableName", tableName);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string columnName = reader["FULL_DATA_TYPE"].ToString();
                                 DataTypes.Add(columnName);
                             }
                         }

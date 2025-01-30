@@ -1,6 +1,7 @@
 ﻿using BizDataLayerGen.DataAccessLayer;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -106,6 +107,63 @@ namespace {ProjectName}_DataAccess
                 return false;
         }
 
+        public static bool CreateSp_HandlerError()
+        {
+            bool isGood = false;
+
+            // SQL query to check if the stored procedure already exists and create it if it doesn't
+            string createProcedureQuery = $@"
+USE [{clsGlobal.DataBaseName}];
+
+-- Check if the stored procedure already exists
+IF OBJECT_ID('SP_HandleError', 'P') IS NULL
+BEGIN
+    -- Create the stored procedure if it does not exist
+    EXEC('CREATE PROCEDURE SP_HandleError
+    AS
+    BEGIN
+        DECLARE @ErrorMessage NVARCHAR(4000), 
+                @ErrorSeverity INT, 
+                @ErrorState INT;
+
+        -- Get error message, severity, and state
+        SELECT 
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+
+        -- Return the error details so they can be handled in the calling procedure
+        SELECT 
+            @ErrorMessage AS ErrorMessage,
+            @ErrorSeverity AS ErrorSeverity,
+            @ErrorState AS ErrorState;
+    END');
+END;
+";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand(createProcedureQuery, connection))
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery(); // Execute the command to check and create the procedure
+                        isGood = true; // Set to true if execution succeeds
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // Example: Logger.Log(ex);
+                isGood = false; // Set to false if an exception occurs
+            }
+
+            return isGood;
+        }
+
+
         public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods )
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
@@ -129,11 +187,16 @@ namespace {ProjectName}_DataAccess
             {
                 return clsGlobal.enTypeRaisons.enError;
             }
+
             if (!clsErrorHandling.CreatingForErrorHanding(clsGlobal.dataAccessLayerPath))
             {
                 return clsGlobal.enTypeRaisons.enError;
             }
 
+            if (!CreateSp_HandlerError())
+            {
+                return clsGlobal.enTypeRaisons.enError;
+            }
 
 
 
@@ -165,10 +228,23 @@ namespace {ProjectName}_DataAccess
                 clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
 
 
-                
 
 
+                // Build the path to the new folder "SPTables"
+                string spTablesFolderPath = Path.Combine(clsGlobal.dataAccessLayerPath, "SPTables");
 
+                // Ensure the folder exists (create it if it doesn't)
+                if (!Directory.Exists(spTablesFolderPath))
+                {
+                    Directory.CreateDirectory(spTablesFolderPath);
+                }
+
+                string[] DataTypesForCreating = clsGeneralWithData.GetDataTypesForCreating(NameTables[i], clsGlobal.DataBaseName);
+                // Create the instance of clsCreatingSPsForTable with the new folder path
+                clsCreatingSPsForTable AddSPs = new clsCreatingSPsForTable(spTablesFolderPath, NameTables[i], Columns, DataTypesForCreating, NullibietyColumns);
+
+                // Generate the stored procedures
+                clsGlobal.enTypeRaisons enRaisonForProjectSPs = AddSPs.GenerateAllSPs();
 
 
 

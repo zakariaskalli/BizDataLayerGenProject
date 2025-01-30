@@ -5,11 +5,13 @@ using System.IO;
 using System.Windows.Forms;
 using BizDataLayerGen.GeneralClasses;
 using System.Data;
-using GymDB_DataLayer;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using System.Text;
+//using GymDB_DataLayer;
+
 
 namespace BizDataLayerGen
 {
@@ -136,7 +138,7 @@ namespace BizDataLayerGen
                 }
             }
 
-            
+
             // Test NameTables
 
             // the CreatebyUseName in People in GymDB is Not Nullable
@@ -144,14 +146,22 @@ namespace BizDataLayerGen
             // Adding Record
 
             /*
-            MessageBox.Show(clsPeopleData.AddNewPeople("Khalid", "bibo", "nan", "Malki", "Arzaz@gmail.com",
-                                   "060044456", DateTime.Now, true, "Fes", 125, DateTime.Now, DateTime.Now,
+            MessageBox.Show(clsPeopleData.AddNewPeople(" Zamil Moha     ", "  Zomala  ", "nan", "Malki", "Arzaz@gmail.com",
+                                   "   064545125455  ", DateTime.Now, true, "Fes", 123, DateTime.Now, DateTime.Now,
                                    null).ToString());
             */
 
+
+            /*
+            MessageBox.Show(clsUsersData.AddNewUsers(74, "  Zakaria Ziko  ", "1212 ", DateTime.Now, null, true).ToString());
+            */
+
+
+
+
             //GetPeopleInfoByID
 
-            
+
             /*
             int PersonID = 56;
             string FirstName = "";
@@ -171,7 +181,47 @@ namespace BizDataLayerGen
            clsPeopleData.GetPeopleInfoByID(PersonID, ref FirstName, ref SecondName, ref ThirdName,
                ref LastName, ref Email, ref Phone, ref DateOfBirth, ref Gender, ref Address, ref CityID,
                ref CreatedTime, ref LastUpdate, ref ProfilePicture); // Removed extra paramet
+            
+            
+
+
+            // GetAllPeople
+
+
+            /*
+            DataTable dt = clsPeopleData.GetAllPeople();
+
+            // تأكد من أن الجدول يحتوي على بيانات
+            if (dt.Rows.Count == 0)
+            {
+                MessageBox.Show("No data available.");
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            // إضافة أسماء الأعمدة
+            foreach (DataColumn column in dt.Columns)
+            {
+                sb.Append(column.ColumnName).Append("\t");
+            }
+            sb.AppendLine();
+
+            // إضافة الصفوف
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (var item in row.ItemArray)
+                {
+                    sb.Append(item.ToString()).Append("\t");
+                }
+                sb.AppendLine();
+            }
+
+            // عرض البيانات في رسالة
+            MessageBox.Show(sb.ToString(), "People Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             */
+
 
 
 
@@ -301,11 +351,11 @@ namespace BizDataLayerGen
 
             // Tests For Delete 
 
-            
+
             //MessageBox.Show(clsPeopleData.DeletePeople(28).ToString());
 
             //MessageBox.Show(clsPaymentsData.DeletePayments(3).ToString());
-            
+
 
             // Test SearchData
 
@@ -331,8 +381,10 @@ namespace BizDataLayerGen
 
 
 
-            
-            
+
+
+
+
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
             bool AddingStaticMethods = rbAddingStaticMethodsYes.Checked == true && rbAddingStaticMethodsNo.Checked == false;
@@ -341,8 +393,7 @@ namespace BizDataLayerGen
 
             if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
-           
+
 
 
 

@@ -65,35 +65,55 @@ namespace BizDataLayerGen.GeneralClasses
         // Helper method to map SQL data types to C# data types
         public static string MapSqlTypeToCSharpType(string sqlDataType)
         {
-            switch (sqlDataType.ToLower())
+            // Convert SQL type to lower case for easier matching
+            string type = sqlDataType.ToLower();
+
+            switch (type)
             {
-                case "int": return "int";
-                case "bigint": return "long";
-                case "smallint": return "short";
-                case "tinyint": return "byte";
-                case "bit": return "bool";
+                case "int":
+                    return "int";
+                case "bigint":
+                    return "long";
+                case "smallint":
+                    return "short";
+                case "tinyint":
+                    return "byte";
+                case "bit":
+                    return "bool";
                 case "decimal":
                 case "numeric":
                 case "money":
-                case "smallmoney": return "decimal";
-                case "float": return "double";
-                case "real": return "float";
+                case "smallmoney":
+                    return "decimal";
+                case "float":
+                    return "double";
+                case "real":
+                    return "float";
                 case "char":
                 case "varchar":
                 case "text":
                 case "nchar":
                 case "nvarchar":
-                case "ntext": return "string";
+                case "ntext":
+                    return "string";
                 case "date":
                 case "datetime":
                 case "datetime2":
-                case "smalldatetime": return "DateTime";
-                case "time": return "TimeSpan";
+                case "smalldatetime":
+                    return "DateTime";
+                case "time":
+                    return "TimeSpan";
                 case "timestamp":
+                    return "byte[]"; // In SQL, 'timestamp' is a synonym for 'rowversion'
                 case "binary":
-                case "varbinary": return "byte[]";
-                case "uniqueidentifier": return "Guid";
-                default: return "text";
+                case "varbinary":
+                    return "byte[]";
+                case "uniqueidentifier":
+                    return "Guid";
+                case "xml":
+                    return "XDocument"; // XML type can be mapped to XDocument or string (for raw XML)
+                default:
+                    return "object"; // Default fallback for any unknown types
             }
         }
 

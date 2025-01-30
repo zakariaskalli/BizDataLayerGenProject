@@ -169,7 +169,7 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = ""SP_Get_{_TableName}_ByID;"";
+            string query = ""SP_Get_{_TableName}_ByID"";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
@@ -274,10 +274,12 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = ""SELECT * FROM {_TableName}"";
+            string query = ""SP_Get_All_{_TableName}"";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
+                command.CommandType = CommandType.StoredProcedure; 
+
                 connection.Open();
 
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -305,6 +307,16 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddAddingNewRecordMethod()
         {
+            // First Query Is Dynamic Query
+
+            /*
+             string query = @""Insert Into {_TableName} ({parameterForInsertQueryBuilder(_Columns)})
+                                Values ({parameterForInsertQueryBuilderValue(_Columns)})
+                                SELECT SCOPE_IDENTITY();"";
+
+             */
+
+
             string GetTableByIDCode = @$"public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
     {{
         int? {_Columns[0]} = null;
@@ -313,22 +325,29 @@ namespace BizDataLayerGen.GeneralClasses
         {{
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
-                string query = @""Insert Into {_TableName} ({parameterForInsertQueryBuilder(_Columns)})
-                                Values ({parameterForInsertQueryBuilderValue(_Columns)})
-                                SELECT SCOPE_IDENTITY();"";
+                string query = @""SP_Add_{_TableName}"";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {{
+                    command.CommandType = CommandType.StoredProcedure;
+
 {clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns)}
 
-                    connection.Open();
-
-                    object result = command.ExecuteScalar();
-
-                    if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                    SqlParameter outputIdParam = new SqlParameter(""@NewID"", SqlDbType.Int)
                     {{
-                        {_Columns[0]} = insertedID;
+                        Direction = ParameterDirection.Output
+                    }};
+                    command.Parameters.Add(outputIdParam);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+
+                    // Bring added value
+                    if (outputIdParam.Value != DBNull.Value)
+                    {{
+                        {_Columns[0]} = (int)outputIdParam.Value;
                     }}
+
                 }}
             }}
         }}
@@ -346,6 +365,9 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddUpdatingRecordMethod()
         {
+            // First Code Dynamic query
+
+            /*
             string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
 {{
     int rowsAffected = 0;
@@ -357,7 +379,7 @@ namespace BizDataLayerGen.GeneralClasses
             string query = $@""UPDATE {_TableName}
                               SET 
 {parameterForUpdateQuery(_Columns)}
-                              WHERE [{_Columns[0]}] = @{_Columns[0]}"";  // Ensure dynamic update query generation
+                              WHERE [{_Columns[0]}] = @{_Columns[0]}"";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
@@ -377,6 +399,45 @@ namespace BizDataLayerGen.GeneralClasses
 
     return (rowsAffected > 0);
 }}";
+            */
+
+            // Second With SP
+
+
+            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+{{
+    int rowsAffected = 0;
+
+    try
+    {{
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+        {{
+            string query = $@""SP_Update_{_TableName}_ByID"";  // Specify the stored procedure name
+
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {{
+                // Set the command type to Stored Procedure
+                command.CommandType = CommandType.StoredProcedure;
+
+                // Create the parameters for the stored procedure
+{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns, 0)}
+
+                // Open the connection and execute the update
+                connection.Open();
+                rowsAffected = command.ExecuteNonQuery();
+            }}
+        }}
+    }}
+    catch (Exception ex)
+    {{
+        // Handle exceptions
+        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
+
+    return (rowsAffected > 0);
+}}";
+
+
 
             return GetTableByIDCode;
         }
