@@ -32,13 +32,18 @@ namespace BizDataLayerGen.DataAccessLayer
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("-- Stored Procedures for Table: " + _tableName);
+            
             sb.AppendLine();
+            sb.AppendLine($"Use [{clsGlobal.DataBaseName}];");
+            sb.AppendLine("Go");
+            sb.AppendLine();
+
             sb.AppendLine(CreateSP_GetByID());
             sb.AppendLine(CreateSP_GetAll());
             sb.AppendLine(CreateSP_Add());
             sb.AppendLine(CreateSP_UpdateByID());
-            //sb.AppendLine(CreateSP_DeleteByID());
-            //sb.AppendLine(CreateSP_SearchByColumn());
+            sb.AppendLine(CreateSP_DeleteByID());
+            sb.AppendLine(CreateSP_SearchByColumn());
 
             // Ensure the directory exists
             string directory = Path.GetDirectoryName(fullPath);
@@ -60,7 +65,7 @@ namespace BizDataLayerGen.DataAccessLayer
             string primaryKeyType = _dataTypes[0];
 
             return $@"
-CREATE PROCEDURE SP_Get_{_tableName}_ByID
+CREATE OR ALTER PROCEDURE SP_Get_{_tableName}_ByID
 (
     @{primaryKey} {primaryKeyType}
 )
@@ -83,7 +88,7 @@ GO";
         private string CreateSP_GetAll()
         {
             return $@"
-CREATE PROCEDURE SP_Get_All_{_tableName}
+CREATE OR ALTER PROCEDURE SP_Get_All_{_tableName}
 AS
 BEGIN
     BEGIN TRY
@@ -99,10 +104,6 @@ END;
 GO
 ";
         }
-
-
-        // First Version
-
 
         private string CreateSP_Add()
         {
@@ -134,7 +135,7 @@ GO
             string columnsString = columnsList.ToString().TrimEnd(',', '\n');
 
             return $@"
-CREATE PROCEDURE SP_Add_{_tableName}
+CREATE OR ALTER PROCEDURE SP_Add_{_tableName}
 (
 {parameterString}
 )
@@ -163,8 +164,6 @@ GO
 ";
         }
 
-
-
         private string CreateSP_UpdateByID()
         {
             StringBuilder setClauses = new StringBuilder();
@@ -192,7 +191,7 @@ GO
 
             // Generate the full stored procedure with proper error handling and parameter validation
             return $@"
-CREATE PROCEDURE SP_Update_{_tableName}_ByID
+CREATE OR ALTER PROCEDURE SP_Update_{_tableName}_ByID
 (
     {primaryKeyParam},
 {parametersString}
@@ -233,51 +232,172 @@ GO
             string primaryKeyType = _dataTypes[0];
 
             return $@"
-
-CREATE PROCEDURE SP_Delete_{_tableName}_ByID
+CREATE OR ALTER PROCEDURE SP_Delete_{_tableName}_ByID
 (
     @{primaryKey} {primaryKeyType}
 )
 AS
 BEGIN
-    DELETE FROM {_tableName}
-    WHERE {primaryKey} = @{primaryKey};
+
+    BEGIN TRY
+        -- Check if the record exists before attempting to delete
+        IF NOT EXISTS (SELECT 1 FROM {_tableName} WHERE {primaryKey} = @{primaryKey})
+        BEGIN
+            EXEC SP_HandleError;
+            RETURN;
+        END
+
+        -- Attempt to delete the record
+        DELETE FROM {_tableName} WHERE {primaryKey} = @{primaryKey};
+
+        -- Ensure at least one row was deleted
+        IF @@ROWCOUNT = 0
+        BEGIN
+            EXEC SP_HandleError;
+            RETURN;
+        END
+    END TRY
+    BEGIN CATCH
+        -- Handle all errors (including FK constraint violations)
+        EXEC SP_HandleError;
+    END CATCH
 END;
 GO
-
 ";
         }
 
+        // First method Search (Search for all data anywhere)
+
+        /*
         private string CreateSP_SearchByColumn()
         {
-            StringBuilder searchConditions = new StringBuilder();
-
-            // Build search conditions for each column
-            for (int i = 0; i < _columns.Length; i++) // Loop through the columns and avoid trailing OR
-            {
-                searchConditions.AppendLine($"    {_columns[i]} LIKE '%' + @{_columns[i]} + '%'" + (i == _columns.Length - 1 ? "" : " OR"));
-            }
-
-            // Build parameters without the trailing comma
-            string parameters = string.Join("\n", _columns.Select((col, i) =>
-                $"    @{col} {_dataTypes[i]}{(_nullabilityColumns[i] ? " NULL" : " NOT NULL")}"
-            ));
+            // Build the CASE statement for column mapping
+            string searchConditions = string.Join("\n        ",
+                _columns.Select(col => $"WHEN '{col.Replace(" ", "")}' THEN '{col}'")
+            );
 
             return $@"
-
-CREATE PROCEDURE SP_Search_{_tableName}_ByColumn
+CREATE OR ALTER PROCEDURE SP_Search_{_tableName}_ByColumn
 (
-{parameters}
+    @ColumnName NVARCHAR(128),  -- Column name without spaces
+    @SearchValue NVARCHAR(255)  -- Value to search for
 )
 AS
 BEGIN
-    SELECT *
-    FROM {_tableName}
-    WHERE {searchConditions.ToString()}
-END;
-GO
+    BEGIN TRY
+        DECLARE @ActualColumn NVARCHAR(128);
 
-";
+        -- Map input column name to actual database column name
+        SET @ActualColumn = 
+            CASE @ColumnName
+                {searchConditions}
+                ELSE NULL
+            END;
+
+        -- Validate the column name
+        IF @ActualColumn IS NULL
+        BEGIN
+            RAISERROR('Invalid Column Name provided.', 16, 1);
+            RETURN;
+        END
+
+        -- Validate the search value (ensure it's not empty or NULL)
+        IF ISNULL(LTRIM(RTRIM(@SearchValue)), '') = ''
+        BEGIN
+            RAISERROR('Search value cannot be empty.', 16, 1);
+            RETURN;
+        END
+
+        -- Perform the search query
+        DECLARE @SQL NVARCHAR(MAX);
+        DECLARE @SearchPattern NVARCHAR(255);
+
+        -- Prepare the search pattern
+        SET @SearchPattern = N'%' + LTRIM(RTRIM(@SearchValue)) + N'%';
+
+        -- Build the dynamic SQL query safely
+        SET @SQL = N'SELECT * FROM ' + QUOTENAME('{_tableName}') + 
+                   N' WHERE ' + QUOTENAME(@ActualColumn) + N' LIKE @SearchPattern OPTION (RECOMPILE)';
+
+        -- Execute the dynamic SQL with parameterized search pattern
+        EXEC sp_executesql @SQL, N'@SearchPattern NVARCHAR(255)', @SearchPattern;
+    END TRY
+    BEGIN CATCH
+        -- Handle errors
+        EXEC SP_HandleError;
+    END CATCH
+END;
+GO";
+        }
+        */
+
+        // Second method Search (Search for data in a specific column)
+
+        private string CreateSP_SearchByColumn()
+        {
+            // Build the CASE statement for column mapping
+            string searchConditions = string.Join("\n        ",
+                _columns.Select(col => $"WHEN '{col.Replace(" ", "")}' THEN '{col}'")
+            );
+
+            return $@"
+CREATE OR ALTER PROCEDURE SP_Search_{_tableName}_ByColumn
+(
+    @ColumnName NVARCHAR(128),  -- Column name without spaces
+    @SearchValue NVARCHAR(255), -- Value to search for
+    @Mode NVARCHAR(20) = 'Anywhere' -- Search mode (default: Anywhere)
+)
+AS
+BEGIN
+    BEGIN TRY
+        DECLARE @ActualColumn NVARCHAR(128);
+        DECLARE @SQL NVARCHAR(MAX);
+        DECLARE @SearchPattern NVARCHAR(255);
+
+        -- Map input column name to actual database column name
+        SET @ActualColumn = 
+            CASE @ColumnName
+                {searchConditions}
+                ELSE NULL
+            END;
+
+        -- Validate the column name
+        IF @ActualColumn IS NULL
+        BEGIN
+            RAISERROR('Invalid Column Name provided.', 16, 1);
+            RETURN;
+        END
+
+        -- Validate the search value (ensure it's not empty or NULL)
+        IF ISNULL(LTRIM(RTRIM(@SearchValue)), '') = ''
+        BEGIN
+            RAISERROR('Search value cannot be empty.', 16, 1);
+            RETURN;
+        END
+
+        -- Prepare the search pattern based on the mode
+        SET @SearchPattern =
+            CASE 
+                WHEN @Mode = 'Anywhere' THEN '%' + LTRIM(RTRIM(@SearchValue)) + '%'
+                WHEN @Mode = 'StartsWith' THEN LTRIM(RTRIM(@SearchValue)) + '%'
+                WHEN @Mode = 'EndsWith' THEN '%' + LTRIM(RTRIM(@SearchValue))
+                WHEN @Mode = 'ExactMatch' THEN LTRIM(RTRIM(@SearchValue))
+                ELSE '%' + LTRIM(RTRIM(@SearchValue)) + '%'
+            END;
+
+        -- Build the dynamic SQL query safely
+        SET @SQL = N'SELECT * FROM ' + QUOTENAME('{_tableName}') + 
+                   N' WHERE ' + QUOTENAME(@ActualColumn) + N' LIKE @SearchPattern OPTION (RECOMPILE)';
+
+        -- Execute the dynamic SQL with parameterized search pattern
+        EXEC sp_executesql @SQL, N'@SearchPattern NVARCHAR(255)', @SearchPattern;
+    END TRY
+    BEGIN CATCH
+        -- Handle errors
+        EXEC SP_HandleError;
+    END CATCH
+END;
+GO";
         }
 
     }

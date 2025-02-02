@@ -11,7 +11,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Text;
 //using GymDB_DataLayer;
-
+//using GymDB_BusinessLayer;
 
 namespace BizDataLayerGen
 {
@@ -83,6 +83,40 @@ namespace BizDataLayerGen
             //guna2CheckBox1.Visible = true;
 
         }
+
+
+        /*
+                public static void ShowDataTableContents(DataTable dt)
+        {
+            if (dt == null)
+            {
+                MessageBox.Show("DataTable is null.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Use StringBuilder for efficient string concatenation
+            var result = new StringBuilder();
+            result.AppendLine("DataTable Contents:");
+            result.AppendLine(); // Optional: add a blank line after the title
+
+            // Loop through each row and column to build the output string
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn column in dt.Columns)
+                {
+                    result.AppendFormat("{0}: {1}\t", column.ColumnName, row[column]);
+                }
+                result.AppendLine(); // End the current row
+                result.AppendLine(); // Extra blank line between rows
+            }
+
+            // Display the results in a MessageBox
+            MessageBox.Show(result.ToString(), "DataTable Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+         
+         */
+
         private void btnGenerate_Click(object sender, EventArgs e)
         {
 
@@ -339,52 +373,58 @@ namespace BizDataLayerGen
             // Update Person
 
             /*
-            MessageBox.Show(clsPeopleData.UpdatePeopleByID(57, "Ziko", "zaki", "nan", "Malki", "Arzaz@gmail.com",
-                                   "060044456", DateTime.Now, true, "Fes hakma l3alam", 125, DateTime.Now, DateTime.Now,
+            MessageBox.Show(clsPeopleData.UpdatePeopleByID(74, "Zakaria", "zaki", "nan", "Malki", "Arzaz@gmail.com",
+                                   "  06454556 ", DateTime.Now, true, "Fes hakma l3alam", 125, DateTime.Now, DateTime.Now,
                                    null).ToString());
             */
 
             // Update Payment
 
-            //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, null, true, 2).ToString());
+            //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, DateTime.Now, true, 2).ToString());
+
+
 
 
             // Tests For Delete 
 
 
             //MessageBox.Show(clsPeopleData.DeletePeople(28).ToString());
+            //MessageBox.Show(clsPeople.DeletePeople(30).ToString());
 
-            //MessageBox.Show(clsPaymentsData.DeletePayments(3).ToString());
+
+
+            //MessageBox.Show(clsPayments.DeletePayments(7).ToString());
 
 
             // Test SearchData
 
             /*
-            int x = 0;
-            DataTable dt = clsPeopleData.SearchData("Gender", "1");
-            x = 5;
+            
+            DataTable dt = clsUsers.SearchData(clsUsers.UsersColumn.CreatedDate, "-");
+            ShowDataTableContents(dt);
 
-            // تحويل محتويات DataTable إلى نص لعرضه في MessageBox
-            string result = "DataTable Contents:\n";
-            foreach (DataRow row in dt.Rows)
-            {
-                foreach (DataColumn column in dt.Columns)
-                {
-                    result += $"{column.ColumnName}: {row[column]} \t";
-                }
-                result += "\n";
-            }
+            
+            //string result = "DataTable Contents:\n";
+            //foreach (DataRow row in dt.Rows)
+            //{
+                //foreach (DataColumn column in dt.Columns)
+                //{
+                    //result += $"{column.ColumnName}: {row[column]} \t";
+                //}
+                //result += "\n";
+            //}
 
-            MessageBox.Show(result, "DataTable Data");
-          */
-
-
+            //MessageBox.Show(result, "DataTable Data");
+            
 
 
-
+            */
 
 
 
+
+
+            
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
             bool AddingStaticMethods = rbAddingStaticMethodsYes.Checked == true && rbAddingStaticMethodsNo.Checked == false;
@@ -393,8 +433,7 @@ namespace BizDataLayerGen
 
             if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-
+            
 
 
 

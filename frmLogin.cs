@@ -4,6 +4,9 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using GymDB_BusinessLayer;
+using System.Data;
+using System.Text;
 
 namespace BizDataLayerGen
 {
@@ -20,9 +23,13 @@ namespace BizDataLayerGen
         }
 
 
-
         private void frmLogin_Load(object sender, EventArgs e)
         {
+
+
+
+
+
             this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 30, 30));
 
             lblLogin.BackColor = Color.Transparent;

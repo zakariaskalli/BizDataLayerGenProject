@@ -663,7 +663,7 @@ namespace BizDataLayerGen.GeneralClasses
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"        public enum en{_TableName}Columns");
+            sb.AppendLine($"        public enum {_TableName}Column");
             sb.AppendLine("         {");
 
             for (int i = 0; i < _Columns.Length; i++)
@@ -680,24 +680,39 @@ namespace BizDataLayerGen.GeneralClasses
             return sb.ToString();
         }
 
+        public string EnumForSearchModes()
+        {
+            return @"
+        public enum SearchMode
+        {
+            Anywhere,
+            StartsWith,
+            EndsWith,
+            ExactMatch
+        }
+    ";
+        }
 
         public string AddSearchData(string[] _Columns, string _TableName)
         {
-
-
             StringBuilder sb = new StringBuilder();
 
+            // Add Enum for columns
             sb.AppendLine(EnumForColumns(_Columns, _TableName));
+
+            // Add Enum for Search Modes
+            sb.AppendLine(EnumForSearchModes());
 
             // Constructor signature with parameters
             sb.AppendLine($@"
-        public static DataTable? SearchData(en{_TableName}Columns enChose, string Data)
+        public static DataTable? SearchData({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere)
         {{
-            if(!SqlHelper.IsSafeInput(Data))
-                return null;
-            
-            return cls{_TableName}Data.SearchData(enChose.ToString(), Data);
+            if (string.IsNullOrWhiteSpace(SearchValue) || !SqlHelper.IsSafeInput(SearchValue))
+                return new DataTable();
 
+            string modeValue = Mode.ToString(); // Get the mode as string for passing to the stored procedure
+
+            return cls{_TableName}Data.SearchData(ChosenColumn.ToString(), SearchValue, modeValue);
         }}        
 ");
 

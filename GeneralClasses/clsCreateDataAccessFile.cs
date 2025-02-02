@@ -412,11 +412,10 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = $@""SP_Update_{_TableName}_ByID"";  // Specify the stored procedure name
+            string query = $@""SP_Update_{_TableName}_ByID""; 
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
-                // Set the command type to Stored Procedure
                 command.CommandType = CommandType.StoredProcedure;
 
                 // Create the parameters for the stored procedure
@@ -452,11 +451,12 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = $@""DELETE FROM {_TableName} 
-                            WHERE {_Columns[0]} = @{_Columns[0]}"";  // Ensure correct dynamic query generation
+            string query = $@""SP_Delete_{_TableName}_ByID"";  
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
+                command.CommandType = CommandType.StoredProcedure;
+
                 command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
 
                 connection.Open();
@@ -467,7 +467,7 @@ namespace BizDataLayerGen.GeneralClasses
     }}
     catch (Exception ex)
     {{
-        // Handle all exceptions in a general way
+        // Handle all exceptions in a general way, this includes errors from SP_HandleError if any
         ErrorHandler.HandleException(ex, nameof(Delete{_TableName}), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
     }}
 
@@ -478,10 +478,9 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
-
         public string AddSearchMethod()
         {
-            string GetTableByIDCode = @$"public static DataTable SearchData(string ColumnName, string Data)
+            string GetTableByIDCode = @$"public static DataTable SearchData(string ColumnName, string SearchValue, string Mode = ""Anywhere"")
 {{
     DataTable dt = new DataTable();
 
@@ -489,12 +488,15 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = $@""SELECT * FROM {_TableName}
-                        WHERE {{ColumnName}} LIKE '' + @Data + '%';"";
+            string query = $@""SP_Search_{_TableName}_ByColumn"";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
-                command.Parameters.AddWithValue(""@Data"", Data);
+                command.CommandType = CommandType.StoredProcedure;
+
+                command.Parameters.AddWithValue(""@ColumnName"", ColumnName);
+                command.Parameters.AddWithValue(""@SearchValue"", SearchValue);
+                command.Parameters.AddWithValue(""@Mode"", Mode);  // Added Mode parameter
 
                 connection.Open();
 
@@ -513,7 +515,7 @@ namespace BizDataLayerGen.GeneralClasses
     catch (Exception ex)
     {{
         // Handle all exceptions in a general way
-        ErrorHandler.HandleException(ex, nameof(SearchData), $""ColumnName: {{ColumnName}}, Data: {{Data}}"");
+        ErrorHandler.HandleException(ex, nameof(SearchData), $""ColumnName: {{ColumnName}}, SearchValue: {{SearchValue}}, Mode: {{Mode}}"");
     }}
 
     return dt;
@@ -521,7 +523,6 @@ namespace BizDataLayerGen.GeneralClasses
 
             return GetTableByIDCode;
         }
-
 
 
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
