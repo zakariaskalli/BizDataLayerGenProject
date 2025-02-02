@@ -12,19 +12,22 @@ using System.Windows.Forms;
 
 namespace BizDataLayerGen.DataAccessLayer
 {
+    /// <summary>
+    /// Provides general data access methods.
+    /// </summary>
     public class clsGeneralWithData
     {
-
+        /// <summary>
+        /// Tests the database connection using the default connection string.
+        /// </summary>
+        /// <returns>True if the connection is successful, otherwise false.</returns>
         public static bool TestDatabaseConnection()
         {
-            // Connection string to your database
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {
                 try
                 {
-                    // فتح الاتصال
                     connection.Open();
-                    // إذا تم فتح الاتصال بنجاح، نعيد true
                     return true;
                 }
                 catch (Exception ex)
@@ -36,91 +39,39 @@ namespace BizDataLayerGen.DataAccessLayer
                     var methodName = method.Name;
 
                     ErrorHandler.RaiseError(ex, className, methodName);
-                    return false; // إذا فشل الاتصال، نعيد false
+                    return false;
                 }
             }
         }
 
+        /// <summary>
+        /// Tests the database connection using a specified connection string.
+        /// </summary>
+        /// <param name="ConnectionString">The connection string to use.</param>
+        /// <returns>True if the connection is successful, otherwise false.</returns>
         public static bool TestDatabaseConnection(string ConnectionString)
         {
-            // Connection string to your database
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
                 try
                 {
-                    // فتح الاتصال
                     connection.Open();
-                    // إذا تم فتح الاتصال بنجاح، نعيد true
                     return true;
                 }
-                catch (Exception ex)
-                {           
-                    return false; // إذا فشل الاتصال، نعيد false
+                catch
+                {
+                    return false;
                 }
             }
         }
 
-
-        /*
-        public static DataTable GetForeignKeysInfo(string tableName)
-        {
-            // Define the query to check for foreign keys in the specified table
-            string query = @"
-            SELECT 
-                tp.name AS TableName,
-                fk.name AS ForeignKeyName,
-                rc.name AS ReferencedTableName
-            FROM 
-                sys.tables AS tp
-            LEFT JOIN 
-                sys.foreign_keys AS fk ON fk.parent_object_id = tp.object_id
-            LEFT JOIN 
-                sys.tables AS rc ON fk.referenced_object_id = rc.object_id
-            WHERE 
-                tp.name = @TableName";
-
-            // Create a DataTable to hold the result
-            DataTable dataTable = new DataTable();
-
-            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-            using (SqlCommand command = new SqlCommand(query, connection))
-            {
-                // Add the table name as a parameter to prevent SQL injection
-                command.Parameters.AddWithValue("@TableName", tableName);
-
-                try
-                {
-                    // Open the connection
-                    connection.Open();
-
-                    // Execute the query and load the result into the DataTable
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                    {
-                        adapter.Fill(dataTable);
-                    }
-                }
-                catch (Exception ex)
-                {
-        
-                    var stackTrace = new StackTrace();
-                    var frame = stackTrace.GetFrame(0);
-                    var method = frame.GetMethod();
-                    var className = method.DeclaringType.Name;
-                    var methodName = method.Name;
-
-                    ErrorHandler.RaiseError(ex, className, methodName);
-                    
-                }
-            }
-
-            return dataTable;
-        }
-        */
-
-
+        /// <summary>
+        /// Checks if the specified table has any foreign keys.
+        /// </summary>
+        /// <param name="tableName">The name of the table to check.</param>
+        /// <returns>True if the table has foreign keys, otherwise false.</returns>
         public static bool HasForeignKey(string tableName)
         {
-            // Define the query to check if the specified table has any foreign keys
             string query = @"
             SELECT
                 COUNT(fk.name) 
@@ -134,23 +85,16 @@ namespace BizDataLayerGen.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             using (SqlCommand command = new SqlCommand(query, connection))
             {
-                // Add the table name as a parameter to prevent SQL injection
                 command.Parameters.AddWithValue("@TableName", tableName);
 
                 try
                 {
-                    // Open the connection
                     connection.Open();
-
-                    // Execute the query and get the result
                     int foreignKeyCount = (int)command.ExecuteScalar();
-
-                    // Return true if foreign keys exist, otherwise false
                     return foreignKeyCount > 0;
                 }
                 catch (Exception ex)
                 {
-
                     var stackTrace = new StackTrace();
                     var frame = stackTrace.GetFrame(0);
                     var method = frame.GetMethod();
@@ -159,29 +103,25 @@ namespace BizDataLayerGen.DataAccessLayer
 
                     ErrorHandler.RaiseError(ex, className, methodName);
                 }
-
             }
             return false;
         }
 
+        /// <summary>
+        /// Retrieves the names of all databases except 'master'.
+        /// </summary>
+        /// <returns>An array of database names.</returns>
         public static string[] GetAllDataBasesName()
         {
-            // List to store database names
             List<string> databaseNames = new List<string>();
-
-            // SQL query to retrieve database names except 'master'
             const string query = "SELECT name FROM sys.databases  WHERE name != 'master'";
 
             try
             {
-                // Use 'using' to ensure proper resource disposal
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    // Open the connection
                     connection.Open();
-
-                    // Execute the query and read data
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -193,8 +133,6 @@ namespace BizDataLayerGen.DataAccessLayer
             }
             catch (Exception ex)
             {
-                // Log the error (centralized logging is better if available)
-
                 var stackTrace = new StackTrace();
                 var frame = stackTrace.GetFrame(0);
                 var method = frame.GetMethod();
@@ -204,39 +142,30 @@ namespace BizDataLayerGen.DataAccessLayer
                 ErrorHandler.RaiseError(ex, className, methodName);
             }
 
-            // Return the database names as an array
             return databaseNames.ToArray();
         }
 
-
+        /// <summary>
+        /// Adds a database to SQL Server from a backup file.
+        /// </summary>
+        /// <param name="backupFilePath">The path to the backup file.</param>
+        /// <param name="databaseName">The name of the database to add.</param>
+        /// <returns>True if the database is added successfully, otherwise false.</returns>
         public static bool AddDataBaseToSQL(string backupFilePath, string databaseName)
         {
             bool IsAdd = false;
-
-
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-
-            string query = $@"RESTORE Database @databaseName 
-                                FROM DISK = @backupFilePath";
-
+            string query = $@"RESTORE Database @databaseName FROM DISK = @backupFilePath";
             SqlCommand Command = new SqlCommand(query, connection);
 
             Command.Parameters.AddWithValue("@databaseName", databaseName);
             Command.Parameters.AddWithValue("@backupFilePath", backupFilePath);
 
-
-
             try
             {
                 connection.Open();
-
                 int result = Command.ExecuteNonQuery();
-
-
-                if (result > 0)
-                    IsAdd = true;
-                else
-                    IsAdd = false;
+                IsAdd = result > 0;
             }
             finally
             {
@@ -244,14 +173,16 @@ namespace BizDataLayerGen.DataAccessLayer
             }
 
             return IsAdd;
-
         }
 
+        /// <summary>
+        /// Retrieves the names of all tables in the specified database.
+        /// </summary>
+        /// <param name="DBName">The name of the database.</param>
+        /// <returns>An array of table names.</returns>
         public static string[] GetAllTablesByDBName(string DBName)
         {
-
             List<string> databaseNames = new List<string>();
-
 
             if (!clsGeneraleThings.IsValidDatabaseName(DBName))
             {
@@ -276,21 +207,17 @@ namespace BizDataLayerGen.DataAccessLayer
                     {
                         if (reader.HasRows)
                         {
-                            // Read each row and add the name to the list
                             while (reader.Read())
                             {
                                 databaseNames.Add(reader["TableName"].ToString());
                             }
                         }
-
-                        // Close the reader
                         reader.Close();
                     }
                 }
             }
             catch (Exception ex)
             {
-
                 var stackTrace = new StackTrace();
                 var frame = stackTrace.GetFrame(0);
                 var method = frame.GetMethod();
@@ -298,13 +225,17 @@ namespace BizDataLayerGen.DataAccessLayer
                 var methodName = method.Name;
 
                 ErrorHandler.RaiseError(ex, className, methodName);
-                // Console.WriteLine("Error: " + ex.Message);
             }
 
             return databaseNames.ToArray();
         }
 
-
+        /// <summary>
+        /// Retrieves the column names of the specified table in the specified database.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="DBName">The name of the database.</param>
+        /// <returns>An array of column names.</returns>
         public static string[] GetColumnsName(string tableName, string DBName)
         {
             List<string> columns = new List<string>();
@@ -335,18 +266,15 @@ namespace BizDataLayerGen.DataAccessLayer
                             while (reader.Read())
                             {
                                 string columnName = reader["COLUMN_NAME"].ToString();
-
                                 columns.Add(columnName);
                             }
                         }
-
                         reader.Close();
                     }
                 }
             }
             catch (Exception ex)
             {
-
                 var stackTrace = new StackTrace();
                 var frame = stackTrace.GetFrame(0);
                 var method = frame.GetMethod();
@@ -354,16 +282,73 @@ namespace BizDataLayerGen.DataAccessLayer
                 var methodName = method.Name;
 
                 ErrorHandler.RaiseError(ex, className, methodName);
-
             }
 
             return columns.ToArray();
         }
 
+        /// <summary>
+        /// Retrieves the data types of the columns in the specified table in the specified database.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="DBName">The name of the database.</param>
+        /// <returns>An array of data types.</returns>
         public static string[] GetDataTypes(string tableName, string DBName)
         {
             List<string> DataTypes = new List<string>();
 
+            if (!clsGeneraleThings.IsValidDatabaseName(DBName))
+            {
+                return null;
+            }
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    connection.Open();
+                    string query = $@"
+                                        Use [{DBName}]
+                                        SELECT COLUMN_NAME, 
+                                               DATA_TYPE
+                                        FROM INFORMATION_SCHEMA.COLUMNS
+                                        WHERE TABLE_NAME = @TableName";
+
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@TableName", tableName);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string columnName = reader["DATA_TYPE"].ToString();
+                                DataTypes.Add(columnName);
+                            }
+                        }
+                        reader.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
+            }
+
+            return DataTypes.ToArray();
+        }
+
+
+        public static string[] GetDataTypesForCreating(string tableName, string DBName)
+        {
+            List<string> DataTypes = new List<string>();
 
             if (!clsGeneraleThings.IsValidDatabaseName(DBName))
             {
@@ -377,9 +362,40 @@ namespace BizDataLayerGen.DataAccessLayer
                     connection.Open();
                     string query = $@"
                             Use [{DBName}]
-                            SELECT DATA_TYPE
-                             FROM INFORMATION_SCHEMA.COLUMNS
-                             WHERE TABLE_NAME = @TableName";
+                            SELECT DATA_TYPE + 
+       CASE 
+           -- Handle character types with length (e.g., varchar, nvarchar, char, nchar)
+           WHEN DATA_TYPE IN ('char', 'varchar', 'nchar', 'nvarchar') THEN 
+               CASE 
+                   WHEN CHARACTER_MAXIMUM_LENGTH = -1 THEN '(MAX)'  -- Handle MAX case
+                   ELSE '(' + CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR) + ')'
+               END
+           
+           -- Handle numeric types (decimal, numeric) with precision and scale
+           WHEN DATA_TYPE IN ('decimal', 'numeric') THEN 
+               '(' + CAST(NUMERIC_PRECISION AS VARCHAR) + ',' + CAST(NUMERIC_SCALE AS VARCHAR) + ')'
+
+           -- Handle exact numeric types (int, smallint, bigint, etc.)
+           WHEN DATA_TYPE IN ('int', 'smallint', 'bigint', 'tinyint', 'bit', 'float', 'real') THEN 
+               ''  -- No additional info needed for these types
+
+           -- Handle date and time types (datetime, date, time, etc.)
+           WHEN DATA_TYPE IN ('datetime', 'date', 'time', 'smalldatetime') THEN 
+               ''  -- No additional info needed for these types
+
+           -- Handle binary types (binary, varbinary)
+           WHEN DATA_TYPE IN ('binary', 'varbinary') THEN 
+               CASE
+                   WHEN CHARACTER_MAXIMUM_LENGTH = -1 THEN '(MAX)'  -- Handle MAX case for binary/varbinary
+                   ELSE '(' + CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR) + ')'
+               END
+
+           -- Handle other types like uniqueidentifier, xml, etc.
+           ELSE 
+               ''  -- No additional info needed for other types
+       END AS FULL_DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = @TableName";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@TableName", tableName);
@@ -390,19 +406,16 @@ namespace BizDataLayerGen.DataAccessLayer
                         {
                             while (reader.Read())
                             {
-                                string columnName = reader["DATA_TYPE"].ToString();
-
+                                string columnName = reader["FULL_DATA_TYPE"].ToString();
                                 DataTypes.Add(columnName);
                             }
                         }
-
                         reader.Close();
                     }
                 }
             }
             catch (Exception ex)
             {
-
                 var stackTrace = new StackTrace();
                 var frame = stackTrace.GetFrame(0);
                 var method = frame.GetMethod();
@@ -410,12 +423,17 @@ namespace BizDataLayerGen.DataAccessLayer
                 var methodName = method.Name;
 
                 ErrorHandler.RaiseError(ex, className, methodName);
-
             }
 
             return DataTypes.ToArray();
         }
 
+        /// <summary>
+        /// Retrieves the primary key column name of the specified table.
+        /// </summary>
+        /// <param name="TableName">The name of the table.</param>
+        /// <param name="PKColumnName">The primary key column name.</param>
+        /// <returns>True if the primary key column name is found, otherwise false.</returns>
         public static bool GetPrimaryKeyColumnNameFromTable(string TableName, ref string PKColumnName)
         {
             bool IsFound = false;
@@ -445,7 +463,6 @@ namespace BizDataLayerGen.DataAccessLayer
                         if (reader.Read())
                         {
                             PKColumnName = reader["PrimaryKeyColumnName"].ToString();
-
                             IsFound = !string.IsNullOrEmpty(PKColumnName);
                         }
                     }
@@ -455,6 +472,12 @@ namespace BizDataLayerGen.DataAccessLayer
             return IsFound;
         }
 
+        /// <summary>
+        /// Retrieves the nullability of the columns in the specified table in the specified database.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="DBName">The name of the database.</param>
+        /// <returns>An array of booleans indicating the nullability of each column.</returns>
         public static bool[] GetColumnNullabilityFromTable(string tableName, string DBName)
         {
             List<bool> nullabilities = new List<bool>();
@@ -476,7 +499,6 @@ namespace BizDataLayerGen.DataAccessLayer
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
-
                     connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -484,7 +506,6 @@ namespace BizDataLayerGen.DataAccessLayer
                         while (reader.Read())
                         {
                             bool isNullable = (int)reader["IsNullable"] == 1;
-
                             nullabilities.Add(isNullable);
                         }
                     }
@@ -494,6 +515,17 @@ namespace BizDataLayerGen.DataAccessLayer
             return nullabilities.ToArray();
         }
 
+        /// <summary>
+        /// Retrieves the foreign keys of the specified table in the specified database.
+        /// </summary>
+        /// <param name="TableName">The name of the table.</param>
+        /// <param name="Tables">An array of table names to filter by.</param>
+        /// <param name="DBName">The name of the database.</param>
+        /// <param name="FKOfAll">A flag to determine whether to include all foreign key relationships or specific ones.</param>
+        /// <param name="ColumnNames">An array of foreign key column names.</param>
+        /// <param name="TablesName">An array of referenced table names.</param>
+        /// <param name="ReferencedColumn">An array of referenced column names.</param>
+        /// <returns>True if foreign keys are found, otherwise false.</returns>
         public static bool GetForeignKeysByTableName(string TableName, string[] Tables, string DBName, bool FKOfAll, ref string[] ColumnNames, ref string[] TablesName, ref string[] ReferencedColumn)
         {
             List<string> _ColumnNames = new List<string>();
@@ -509,8 +541,6 @@ namespace BizDataLayerGen.DataAccessLayer
 
             SpecificTables.Remove(SpecificTables.Length - 1, 1);
 
-            // Test Becuase i delete PrincipaleTable(Users) Variable
-            
             string query = @$"
 USE [{DBName}];
 
@@ -558,16 +588,13 @@ WHERE
 ORDER BY 
     refTable.name, -- Sort by referenced table
     col.name; -- Then by foreign key column name";
-            
 
             using (SqlConnection conn = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@@TableName", TableName);
-
                     cmd.Parameters.AddWithValue("@@SpecificTables", SpecificTables.ToString());
-
 
                     conn.Open();
 
@@ -575,7 +602,6 @@ ORDER BY
                     {
                         while (reader.Read())
                         {
-
                             string nameColumn = (string)reader["FKColumnName"];
                             string tableName = (string)reader["ReferencedTable"];
                             string referencedColumn = (string)reader["ReferencedColumn"];
@@ -583,7 +609,6 @@ ORDER BY
                             _ColumnNames.Add(nameColumn);
                             _TablesName.Add(tableName);
                             _ReferencedColumn.Add(referencedColumn);
-
                         }
                     }
                 }
@@ -592,18 +617,11 @@ ORDER BY
             if (_ColumnNames == null || _ColumnNames.Count == 0 || _TablesName == null || _TablesName.Count == 0)
                 return false;
 
-
-
             ColumnNames = _ColumnNames.ToArray();
             TablesName = _TablesName.ToArray();
             ReferencedColumn = _ReferencedColumn.ToArray();
 
-
             return true;
         }
-
-
-
-
     }
 }

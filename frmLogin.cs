@@ -1,18 +1,12 @@
 ﻿using BizDataLayerGen.ConnectingWithRegister;
 using BizDataLayerGen.DataAccessLayer;
-using Microsoft.VisualBasic.ApplicationServices;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using GymDB_BusinessLayer;
+using System.Data;
+using System.Text;
 
 namespace BizDataLayerGen
 {
@@ -28,10 +22,14 @@ namespace BizDataLayerGen
 
         }
 
-        
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
+
+
+
+
+
             this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 30, 30));
 
             lblLogin.BackColor = Color.Transparent;
@@ -43,15 +41,15 @@ namespace BizDataLayerGen
 
             string Password = "";
 
-            if (clsRegister.LoadUserIdAndPassword(ref UserId,ref Password))
+            if (clsRegister.LoadUserIdAndPassword(ref UserId, ref Password))
             {
                 tbUserID.Text = UserId;
                 tbPassword.Text = Password;
 
-                
+
 
                 this.AcceptButton = btnLogin;
-                
+
                 //btnLogin.Checked = true;
             }
         }
@@ -62,7 +60,7 @@ namespace BizDataLayerGen
             if (tbUserID.Text == "" || tbPassword.Text == "")
             {
                 MessageBox.Show("Please Enter The UserName/Password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return; 
+                return;
             }
 
 
@@ -98,7 +96,7 @@ namespace BizDataLayerGen
             }
             else
             {
-                MessageBox.Show("Error Connecting","Please Enter A True Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error Connecting", "Please Enter A True Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 tbUserID.Focus();
             }
 
@@ -107,7 +105,7 @@ namespace BizDataLayerGen
         private void tbUserID_Validating(object sender, CancelEventArgs e)
         {
             if (string.IsNullOrEmpty(tbUserID.Text))
-                errorProvider1.SetError(tbUserID,"Please Enter UserID");
+                errorProvider1.SetError(tbUserID, "Please Enter UserID");
             else
             {
                 errorProvider1.SetError(tbUserID, "");
@@ -151,7 +149,7 @@ namespace BizDataLayerGen
 
             if (e.KeyCode == Keys.Tab)
             {
-                
+
                 e.SuppressKeyPress = true; // Prevents the 'Tab' from adding whitespace in the textbox
                 tbUserID.Focus(); // Move focus to the next textbox
             }

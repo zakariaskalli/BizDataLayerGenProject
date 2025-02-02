@@ -5,8 +5,12 @@ using System.IO;
 using System.Windows.Forms;
 using BizDataLayerGen.GeneralClasses;
 using System.Data;
-//using GymDB_DataAccess;
-using Project_DataAccessLayer;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+using System.Text;
+//using GymDB_DataLayer;
 //using GymDB_BusinessLayer;
 
 namespace BizDataLayerGen
@@ -32,14 +36,14 @@ namespace BizDataLayerGen
                 {
                     LBTables.SetItemChecked(i, true); // Select each item in the ListBox
                 }
-
-                LBTables.Enabled = false;
+                
+                //LBTables.Enabled = false;
 
             }
             else
             {
 
-                LBTables.Enabled = true;
+                //LBTables.Enabled = true;
 
                 for (int i = 0; i < LBTables.Items.Count; i++)
                 {
@@ -69,7 +73,7 @@ namespace BizDataLayerGen
                 LBTables.SetItemChecked(i, true); // Select each item in the ListBox
             }
 
-            LBTables.Enabled = false;
+            //LBTables.Enabled = false;
 
 
         }
@@ -79,6 +83,40 @@ namespace BizDataLayerGen
             //guna2CheckBox1.Visible = true;
 
         }
+
+
+        /*
+                public static void ShowDataTableContents(DataTable dt)
+        {
+            if (dt == null)
+            {
+                MessageBox.Show("DataTable is null.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Use StringBuilder for efficient string concatenation
+            var result = new StringBuilder();
+            result.AppendLine("DataTable Contents:");
+            result.AppendLine(); // Optional: add a blank line after the title
+
+            // Loop through each row and column to build the output string
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn column in dt.Columns)
+                {
+                    result.AppendFormat("{0}: {1}\t", column.ColumnName, row[column]);
+                }
+                result.AppendLine(); // End the current row
+                result.AppendLine(); // Extra blank line between rows
+            }
+
+            // Display the results in a MessageBox
+            MessageBox.Show(result.ToString(), "DataTable Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+         
+         */
+
         private void btnGenerate_Click(object sender, EventArgs e)
         {
 
@@ -134,6 +172,7 @@ namespace BizDataLayerGen
                 }
             }
 
+
             // Test NameTables
 
             // the CreatebyUseName in People in GymDB is Not Nullable
@@ -141,12 +180,21 @@ namespace BizDataLayerGen
             // Adding Record
 
             /*
-            MessageBox.Show(clsPeopleData.AddNewPeople("Khalid", "bibo", "nan", "Malki", "Arzaz@gmail.com",
-                                   "060044456", DateTime.Now, true, "Fes", 125, DateTime.Now, DateTime.Now,
-                                   null, 1).ToString());
+            MessageBox.Show(clsPeopleData.AddNewPeople(" Zamil Moha     ", "  Zomala  ", "nan", "Malki", "Arzaz@gmail.com",
+                                   "   064545125455  ", DateTime.Now, true, "Fes", 123, DateTime.Now, DateTime.Now,
+                                   null).ToString());
             */
 
+
+            /*
+            MessageBox.Show(clsUsersData.AddNewUsers(74, "  Zakaria Ziko  ", "1212 ", DateTime.Now, null, true).ToString());
+            */
+
+
+
+
             //GetPeopleInfoByID
+
 
             /*
             int PersonID = 56;
@@ -157,62 +205,226 @@ namespace BizDataLayerGen
             string? Email = "";
             string? Phone = "";
             DateTime? DateOfBirth = DateTime.Now;
-            bool Gender =  false;
+            bool Gender = false;
             string? Address = "";
             int CityID = -1;
             DateTime CreatedTime = DateTime.Now;
-            DateTime LastUpdat = DateTime.Now;
+            DateTime LastUpdate = DateTime.Now; // Corrected variable name
             string? ProfilePicture = "";
-            int? CreatedByUserID = -1;
-
-
-            clsPeopleData.GetPeopleInfoByID(PersonID,ref FirstName, ref SecondName, ref ThirdName,
+            
+           clsPeopleData.GetPeopleInfoByID(PersonID, ref FirstName, ref SecondName, ref ThirdName,
                ref LastName, ref Email, ref Phone, ref DateOfBirth, ref Gender, ref Address, ref CityID,
-               ref CreatedTime, ref LastUpdat, ref ProfilePicture, ref CreatedByUserID);
+               ref CreatedTime, ref LastUpdate, ref ProfilePicture); // Removed extra paramet
+            
+            
+
+
+            // GetAllPeople
+
+
+            /*
+            DataTable dt = clsPeopleData.GetAllPeople();
+
+            // تأكد من أن الجدول يحتوي على بيانات
+            if (dt.Rows.Count == 0)
+            {
+                MessageBox.Show("No data available.");
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            // إضافة أسماء الأعمدة
+            foreach (DataColumn column in dt.Columns)
+            {
+                sb.Append(column.ColumnName).Append("\t");
+            }
+            sb.AppendLine();
+
+            // إضافة الصفوف
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (var item in row.ItemArray)
+                {
+                    sb.Append(item.ToString()).Append("\t");
+                }
+                sb.AppendLine();
+            }
+
+            // عرض البيانات في رسالة
+            MessageBox.Show(sb.ToString(), "People Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             */
+
+
+
+
+            // First Mythologic to read Last Error from JsonFile
+
+            /*
+            
+            // Path to the JSON file provided by the user
+            string userProvidedPath = "C:\\Programation Level 2\\BizDataLayerGen\\TestCodeGenerator\\GymDB_DataAccess\\ErrorHandler\\JsonFile\\ErrorHandling_JsonFile.json"; 
+
+            
+            try
+            {
+                // Read the JSON file
+                string jsonContent = File.ReadAllText(userProvidedPath);
+
+                // Deserialize the JSON content into a list of ErrorLog objects
+                List<Log> errorLogs = JsonConvert.DeserializeObject<List<Log>>(jsonContent);
+
+                // Check if there are any errors in the file
+                if (errorLogs == null || errorLogs.Count == 0)
+                {
+                    MessageBox.Show("No errors found in the file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Replace the problematic line with the following code
+                Log lastError = errorLogs.Last(); // Retrieves the last element
+
+                // Prepare the message to display
+                string errorMessage = $"Error Message: {lastError.ErrorMessage}\n" +
+                                      $"Severity: {lastError.Severity}\n" +
+                                      $"Additional Info: {lastError.AdditionalInfo}\n" +
+                                      $"Stack Trace: {lastError.StackTrace}";
+
+                // Display the error in a MessageBox
+                MessageBox.Show(errorMessage, "Last Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (FileNotFoundException)
+            {
+                MessageBox.Show($"The file was not found at the provided path: {userProvidedPath}", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (JsonException)
+            {
+                MessageBox.Show("The file does not contain valid JSON data.", "Invalid JSON", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+
+            */
+
+            // Second Mythologic to read Last Error from JsonFile
+
+            /*
+
+           // Path to the JSON file provided by the user
+           string userProvidedPath = "C:\\Programation Level 2\\BizDataLayerGen\\TestCodeGenerator\\GymDB_DataAccess\\ErrorHandler\\JsonFile\\ErrorHandling_JsonFile.json"; 
+
+
+           try
+           {
+               // Open the file for reading
+               using (StreamReader file = File.OpenText(userProvidedPath))
+               using (JsonTextReader reader = new JsonTextReader(file))
+               {
+                   // Parse the JSON file as a JArray
+                   JArray errorsArray = JArray.Load(reader);
+
+                   // Check if the JSON array has any errors
+                   if (errorsArray.Count == 0)
+                   {
+                       MessageBox.Show("No errors found in the file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                       return;
+                   }
+
+                   // Get the last error as a JObject
+                   JObject lastError = (JObject)errorsArray.Last;
+
+                   // Extract error details
+                   string errorMessage = lastError["ErrorMessage"]?.ToString();
+                   string stackTrace = lastError["StackTrace"]?.ToString();
+                   string severity = lastError["Severity"]?.ToString();
+                   string additionalInfo = lastError["AdditionalInfo"]?.ToString();
+
+                   // Prepare the message to display
+                   string displayMessage = $"Error Message: {errorMessage}\n" +
+                                           $"Severity: {severity}\n" +
+                                           $"Additional Info: {additionalInfo}\n" +
+                                           $"Stack Trace: {stackTrace}";
+
+                   // Display the error in a MessageBox
+                   MessageBox.Show(displayMessage, "Last Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+               }
+           }
+           catch (FileNotFoundException)
+           {
+               MessageBox.Show($"The file was not found at the provided path: {userProvidedPath}", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+           }
+           catch (JsonException)
+           {
+               MessageBox.Show("The file does not contain valid JSON data.", "Invalid JSON", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+           }
+           catch (Exception ex)
+           {
+               MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+           }
+
+           */
+
+
 
             // Update Person
 
             /*
-            MessageBox.Show(clsPeopleData.UpdatePeopleByID(57, "Ziko", "zaki", "nan", "Malki", "Arzaz@gmail.com",
-                                   "060044456", DateTime.Now, true, "Fes hakma l3alam", 125, DateTime.Now, DateTime.Now,
-                                   null, 1).ToString());
+            MessageBox.Show(clsPeopleData.UpdatePeopleByID(74, "Zakaria", "zaki", "nan", "Malki", "Arzaz@gmail.com",
+                                   "  06454556 ", DateTime.Now, true, "Fes hakma l3alam", 125, DateTime.Now, DateTime.Now,
+                                   null).ToString());
             */
 
             // Update Payment
 
-            //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, null, true, 2).ToString());
+            //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, DateTime.Now, true, 2).ToString());
+
+
+
 
             // Tests For Delete 
 
-            /*
-            MessageBox.Show(clsPeopleData.deletePeople(57).ToString());
 
-            MessageBox.Show(clsPaymentsData.deletePayments(4).ToString());
-            */
+            //MessageBox.Show(clsPeopleData.DeletePeople(28).ToString());
+            //MessageBox.Show(clsPeople.DeletePeople(30).ToString());
+
+
+
+            //MessageBox.Show(clsPayments.DeletePayments(7).ToString());
+
 
             // Test SearchData
 
             /*
-            int x = 0;
-            DataTable dt = clsPeopleData.SearchData("Gender", "1");
-            x = 5;
+            
+            DataTable dt = clsUsers.SearchData(clsUsers.UsersColumn.CreatedDate, "-");
+            ShowDataTableContents(dt);
 
-            // تحويل محتويات DataTable إلى نص لعرضه في MessageBox
-            string result = "DataTable Contents:\n";
-            foreach (DataRow row in dt.Rows)
-            {
-                foreach (DataColumn column in dt.Columns)
-                {
-                    result += $"{column.ColumnName}: {row[column]} \t";
-                }
-                result += "\n";
-            }
+            
+            //string result = "DataTable Contents:\n";
+            //foreach (DataRow row in dt.Rows)
+            //{
+                //foreach (DataColumn column in dt.Columns)
+                //{
+                    //result += $"{column.ColumnName}: {row[column]} \t";
+                //}
+                //result += "\n";
+            //}
 
-            MessageBox.Show(result, "DataTable Data");
+            //MessageBox.Show(result, "DataTable Data");
+            
+
+
             */
 
 
+
+
+
+            
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
             bool AddingStaticMethods = rbAddingStaticMethodsYes.Checked == true && rbAddingStaticMethodsNo.Checked == false;
@@ -221,11 +433,18 @@ namespace BizDataLayerGen
 
             if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
+
+
+
+
+
+
             //else
             //    MessageBox.Show("Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                
 
-            
+
+
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -258,6 +477,48 @@ namespace BizDataLayerGen
 
         private void LBTables_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // Assume all items are selected initially
+            bool IsSelectedAll = true;
+
+            // Create lists to store checked and unchecked items
+            List<string> checkedItems = new List<string>();
+            List<string> uncheckedItems = new List<string>();
+
+            for (int i = 0; i < LBTables.Items.Count; i++)
+            {
+                // Check if the item is selected (adjust the property based on your ListBox or item type)
+                if (LBTables.GetItemChecked(i)) // Assuming you are using a CheckedListBox
+                {
+                    // Add to checked items list
+                    checkedItems.Add(LBTables.Items[i].ToString());
+                }
+                else
+                {
+                    // Add to unchecked items list
+                    uncheckedItems.Add(LBTables.Items[i].ToString());
+                    IsSelectedAll = false; // If any item is not selected, set to false
+                }
+            }
+
+            // Update the checkbox based on whether all items are selected
+            chBAllTables.Checked = IsSelectedAll;
+
+            // Display the state of each item
+            for (int i = 0; i < LBTables.Items.Count; i++)
+            {
+                if (checkedItems.Contains(LBTables.Items[i].ToString()))
+                {
+                    LBTables.SetItemChecked(i, true);
+                }
+                else if (uncheckedItems.Contains(LBTables.Items[i].ToString()))
+                {
+                    LBTables.SetItemChecked(i, false);
+
+                }
+
+
+            }
+
 
         }
 

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using BizDataLayerGen.DataAccessLayer;
+using Newtonsoft.Json;
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -139,44 +143,126 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
+        /*
+         SP_Get_TableName_ByID
+
+            SP_Get_All_TableName
+            
+            SP_Add_TableName
+            
+            SP_Update_TableName_ByID
+            
+            SP_Delete_TableName_ByID
+            
+            SP_Search_TableName_ByColumn
+         
+         */
+
 
         public string AddGetTableInfoByIDMethod()
+        {
+            string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
+{{
+    bool isFound = false;
+
+    try
+    {{
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+        {{
+            string query = ""SP_Get_{_TableName}_ByID"";
+
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {{
+                command.CommandType = CommandType.StoredProcedure;
+
+                // Ensure correct parameter assignment
+                command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
+
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {{ 
+                    if (reader.Read())
+                    {{
+                        // The record was found
+                        isFound = true;
+
+                        {AddDataReaderToVariables()}
+                    }}
+                }}
+            }}
+        }}
+    }}
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(Get{_TableName}InfoByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
+
+    return isFound;
+}}";
+
+            return GetTableByIDCode;
+        }
+
+
+
+
+        // For Error Handling
+
+        /*
+                public string AddGetTableInfoByIDMethod()
         {
             string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
             {{
                 bool isFound = false;
 
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                try
                 {{
-                    string query = ""SELECT * FROM {_TableName} WHERE {_Columns[0]} = @{_Columns[0]}"";
-
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                     {{
-                        command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
+                        string query = ""SP_Get_{_TableName}_ByID;"";
 
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {{ 
-                            if (reader.Read())
+                        using (SqlCommand command = new SqlCommand(query, connection))
+                        {{
+                            command.CommandType = CommandType.StoredProcedure;
+
+                            // Add the parameter for ID
+                            command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
+
+                            connection.Open();
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {{
+                                if (reader.Read())
+                                {{
+                                    // The record was found
+                                    isFound = true;
 
-                                // The record was found
-                                isFound = true;
-
-{AddDataReaderToVariables()}
-
-
+        {AddDataReaderToVariables()}
+                                }}
                             }}
                         }}
-
                     }}
                 }}
-                return isFound;
+                catch (SqlException sqlEx)
+                {{
+                    // Log SQL exception (database-related issue)
+                    clsLogger.Log(sqlEx); // افترض وجود دالة Log
+                    throw new DataAccessException(""An error occurred while accessing the database."", sqlEx);
+                }}
+                catch (Exception ex)
+                {{
+                    // Log general exceptions
+                    clsLogger.Log(ex);
+                    throw new ApplicationException(""An unexpected error occurred."", ex);
+                }}
 
+                return isFound;
             }}";
 
             return GetTableByIDCode;
         }
+        */
+
 
         public string AddGetAllDataMethod()
         {
@@ -184,98 +270,175 @@ namespace BizDataLayerGen.GeneralClasses
 {{
     DataTable dt = new DataTable();
 
-    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    try
     {{
-        string query = ""SELECT * FROM {_TableName}"";
-
-        using (SqlCommand command = new SqlCommand(query, connection))
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
+            string query = ""SP_Get_All_{_TableName}"";
 
-            connection.Open();
-
-            using (SqlDataReader reader = command.ExecuteReader())
+            using (SqlCommand command = new SqlCommand(query, connection))
             {{
-                if (reader.HasRows)
-                    dt.Load(reader);
+                command.CommandType = CommandType.StoredProcedure; 
+
+                connection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {{
+                    if (reader.HasRows)
+                    {{
+                        dt.Load(reader);
+                    }}
+                }}
             }}
         }}
     }}
-    return dt;
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(GetAll{_TableName}), ""No parameters for this method."");
+    }}
 
+    return dt;
 }}";
 
             return GetTableByIDCode;
         }
 
+
         public string AddAddingNewRecordMethod()
         {
+            // First Query Is Dynamic Query
+
+            /*
+             string query = @""Insert Into {_TableName} ({parameterForInsertQueryBuilder(_Columns)})
+                                Values ({parameterForInsertQueryBuilderValue(_Columns)})
+                                SELECT SCOPE_IDENTITY();"";
+
+             */
 
 
-            string GetTableByIDCode = @$" public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
+            string GetTableByIDCode = @$"public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
+    {{
+        int? {_Columns[0]} = null;
+
+        try
         {{
-            int? {_Columns[0]} = null;
-
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
-                string query = @""Insert Into {_TableName} ({parameterForInsertQueryBuilder(_Columns)})
-                            Values ({parameterForInsertQueryBuilderValue(_Columns)})
-                            SELECT SCOPE_IDENTITY();"";
+                string query = @""SP_Add_{_TableName}"";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {{
+                    command.CommandType = CommandType.StoredProcedure;
+
 {clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns)}
 
-                    connection.Open();
-
-                    object result = command.ExecuteScalar();
-
-                    if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                    SqlParameter outputIdParam = new SqlParameter(""@NewID"", SqlDbType.Int)
                     {{
-                        {_Columns[0]} = insertedID;
+                        Direction = ParameterDirection.Output
+                    }};
+                    command.Parameters.Add(outputIdParam);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+
+                    // Bring added value
+                    if (outputIdParam.Value != DBNull.Value)
+                    {{
+                        {_Columns[0]} = (int)outputIdParam.Value;
                     }}
+
                 }}
-
             }}
-            return {_Columns[0]};
-
         }}
-";
+        catch (Exception ex)
+        {{
+            // Handle all exceptions in a general way
+            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName}), $""Parameters: {ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
+        }}
+
+        return {_Columns[0]};
+    }}";
 
             return GetTableByIDCode;
         }
 
         public string AddUpdatingRecordMethod()
         {
+            // First Code Dynamic query
 
+            /*
+            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+{{
+    int rowsAffected = 0;
 
-            string GetTableByIDCode = @$" public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+    try
+    {{
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            int rowsAffected = 0;
-
-            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-            {{
-                string query = @""Update {_TableName}
-                                    set 
+            string query = $@""UPDATE {_TableName}
+                              SET 
 {parameterForUpdateQuery(_Columns)}
-                                  where [{_Columns[0]}]= @{_Columns[0]}"";
+                              WHERE [{_Columns[0]}] = @{_Columns[0]}"";
 
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {{
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {{
 {clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns, 0)}
 
-                    connection.Open();
+                connection.Open();
 
-                    rowsAffected = command.ExecuteNonQuery();
-                }}
-
+                rowsAffected = command.ExecuteNonQuery();
             }}
-
-            return (rowsAffected > 0);
         }}
-";
+    }}
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
+
+    return (rowsAffected > 0);
+}}";
+            */
+
+            // Second With SP
+
+
+            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+{{
+    int rowsAffected = 0;
+
+    try
+    {{
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+        {{
+            string query = $@""SP_Update_{_TableName}_ByID""; 
+
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {{
+                command.CommandType = CommandType.StoredProcedure;
+
+                // Create the parameters for the stored procedure
+{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns, 0)}
+
+                // Open the connection and execute the update
+                connection.Open();
+                rowsAffected = command.ExecuteNonQuery();
+            }}
+        }}
+    }}
+    catch (Exception ex)
+    {{
+        // Handle exceptions
+        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
+
+    return (rowsAffected > 0);
+}}";
+
+
 
             return GetTableByIDCode;
-
         }
 
         public string AddDeleteByIDMethod()
@@ -284,61 +447,75 @@ namespace BizDataLayerGen.GeneralClasses
 {{
     int rowsAffected = 0;
 
-    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    try
     {{
-        string query = @""Delete {_TableName} 
-                        where {_Columns[0]} = @{_Columns[0]}"";
-
-        using (SqlCommand command = new SqlCommand(query, connection))
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
+            string query = $@""SP_Delete_{_TableName}_ByID"";  
 
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {{
+                command.CommandType = CommandType.StoredProcedure;
 
-            connection.Open();
-            
-            rowsAffected = command.ExecuteNonQuery();
+                command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
 
+                connection.Open();
 
+                rowsAffected = command.ExecuteNonQuery();
+            }}
         }}
-
     }}
-    
-    return (rowsAffected > 0);
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way, this includes errors from SP_HandleError if any
+        ErrorHandler.HandleException(ex, nameof(Delete{_TableName}), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+    }}
 
+    return (rowsAffected > 0);
 }}";
 
             return GetTableByIDCode;
         }
 
+
         public string AddSearchMethod()
         {
-            string GetTableByIDCode = @$"public static DataTable SearchData(string ColumnName, string Data)
+            string GetTableByIDCode = @$"public static DataTable SearchData(string ColumnName, string SearchValue, string Mode = ""Anywhere"")
 {{
     DataTable dt = new DataTable();
 
-    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+    try
     {{
-        string query = $@""select * from {_TableName}
-                    where {{ColumnName}} Like '' + @Data + '%';"";
-
-        using (SqlCommand Command = new SqlCommand(query, connection))
+        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            Command.Parameters.AddWithValue(""@Data"", Data);
+            string query = $@""SP_Search_{_TableName}_ByColumn"";
 
-
-            connection.Open();
-
-            using (SqlDataReader reader = Command.ExecuteReader())
+            using (SqlCommand command = new SqlCommand(query, connection))
             {{
-                if (reader.HasRows)
-                {{
-                    dt.Load(reader);
-                }}
+                command.CommandType = CommandType.StoredProcedure;
 
-                reader.Close();
+                command.Parameters.AddWithValue(""@ColumnName"", ColumnName);
+                command.Parameters.AddWithValue(""@SearchValue"", SearchValue);
+                command.Parameters.AddWithValue(""@Mode"", Mode);  // Added Mode parameter
+
+                connection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {{
+                    if (reader.HasRows)
+                    {{
+                        dt.Load(reader);
+                    }}
+
+                    reader.Close();
+                }}
             }}
         }}
-        
+    }}
+    catch (Exception ex)
+    {{
+        // Handle all exceptions in a general way
+        ErrorHandler.HandleException(ex, nameof(SearchData), $""ColumnName: {{ColumnName}}, SearchValue: {{SearchValue}}, Mode: {{Mode}}"");
     }}
 
     return dt;
@@ -350,27 +527,37 @@ namespace BizDataLayerGen.GeneralClasses
 
         public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
         {
+
+
+
+            // First Code 
+
+            /*
+             
+            string GenerateClassFileForErrorLog = Path.Combine(_filePath, "clsErrorHandlingManager.cs");
+
+            GenerateErrorLogClassesFile(GenerateClassFileForErrorLog);
+             
+             */
+
+
+
+
             // Define the full path for the file
             string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
 
-            // if you use PK in AllTables, but we have tables Don't have it
 
-            /*
-            string PKColmnNameInTable = "";
             
-            if (!clsGeneralWithData.GetPrimaryKeyColumnNameFromTable(TableName,ref PKColmnNameInTable))
-            {
-                return clsGlobal.enTypeRaisons.enTableDontHavePK;
-            }
-            */
-
 
             // Define the code to be written in the file
             string code = $@"
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data;
+using System.Linq;
 using {clsGlobal.DataBaseName}_DataAccess;
+using Newtonsoft.Json;
 
 namespace {clsGlobal.DataBaseName}_DataLayer
 {{
@@ -395,7 +582,7 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 
             // Write the code to the file
             File.WriteAllText(fullPath, code);
-
+            
             return clsGlobal.enTypeRaisons.enPerfect;
 
         }
