@@ -1,0 +1,27 @@
+
+#### **Enhancements to the Project:**
+1. **Error Handling:**  
+   - Implement logging in a `TableLog` table within the database.  
+   - Generate a JSON file for error tracking and log new errors automatically.  
+
+2. **Query Execution Flexibility:**  
+   - Allow users to switch between dynamic SQL queries and stored procedures for all methods.  
+
+#### **Basic Future Improvements:**
+1. **Automated Stored Procedure Execution:**  
+   - Develop a method to automatically execute all stored procedure files and store the results in the database.  
+   - Provide an option in the UI to enable this feature, allowing users to decide whether they want to activate it.  
+
+2. **Customizable Error Handling:**  
+   - Offer users the ability to enable or disable error handling via a **Checked List Box** in the UI.  
+   - If the user selects **JSON-based logging**, prompt them to install `Newtonsoft.Json` if it is not already available.  
+
+#### **Advanced Future Improvements (Pro Level):**
+1. **Multi-threading Optimization:**  
+   - Implement multi-threading to speed up the generation of Data Access Layer (DAL) and Business Logic Layer (BL).  
+
+2. **Progress Indicator:**  
+   - Add a progress bar to visually track the file generation process.  
+
+3. **Enhanced Documentation and Guidance:**  
+   - Automatically insert structured comments for each generated method in DAL and BL to provide usage advice and best practices for developers.  
