@@ -45,74 +45,46 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
         public string AddAllFields(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns,
-            string[] _ColumnNamesHasFK, string[] _TablesNameHasFK)
+    string[] _ColumnNamesHasFK, string[] _TablesNameHasFK)
         {
-            
+
             StringBuilder sb = new StringBuilder();
-            // This For the First Column in Any Function (PK) Because He is null in AddNewPerson Methode In DataAccessLayer
-            sb.AppendLine($"        public {_DataTypes[0]}? {_Columns[0]} {{ get; set; }}");
 
-
-            // The old Algorithm
-
-            /*
-            
-            // Loop through all the columns and create the properties dynamically
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                string dataType = _DataTypes[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                // Generate property declaration
-                sb.AppendLine($"        public {dataType}{(isNullable ? "?" : "")} {columnName} {{ get; set; }}");
-
-                if (_ColumnNamesHasFK.Length > 0 && _TablesNameHasFK.Length > 0)
-                {
-                    // You can to more diminue this loop 
-                    for (int j = 0; j < _ColumnNamesHasFK.Length; j++)
-                    {
-                        // edit columnName is not string is variable
-                        if (_ColumnNamesHasFK[j] == columnName)
-                        {
-                            sb.AppendLine($"        public cls{_TablesNameHasFK[j]} {_TablesNameHasFK[j]}Info;");
-                        }
-                    }
-                }
-            
-            
-            }
-            */
-
-
-                        // The New Algotithm More Optimze Use Dicationary 
-
+            // For the first column (PK) - in your DataAccessLayer AddNewPerson method it's null
+            // Here we assume the primary key is always nullable (you can adjust if needed)
+            sb.AppendLine($"        public {_DataTypes[0]}? {_Columns[0]} {{ get; set; }};");
 
             // Create a dictionary for FK columns and their corresponding table names for faster lookup
             var foreignKeys = _ColumnNamesHasFK
                 .Zip(_TablesNameHasFK, (column, table) => new { column, table })
                 .ToDictionary(x => x.column, x => x.table);
 
-            // Loop through all the columns to create properties
+            // Loop through all the columns starting from index 1
             for (int i = 1; i < _Columns.Length; i++)
             {
                 string columnName = _Columns[i];
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
 
-                // Add the property for the column
-                sb.AppendLine($"        public {dataType}{(isNullable ? "?" : "")} {columnName} {{ get; set; }}");
+                // Check if the type itself can accept null (for example, reference types or nullable value types)
+                bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
+
+                string nullableIndicator = canAcceptNull ? "?" : "";
+
+                string defaultValue = (isNullable && !canAcceptNull) ? " = null" : "";
+
+                // Append the property declaration with the default value (if applicable)
+                sb.AppendLine($"        public {dataType}{nullableIndicator} {columnName} {{ get; set; }}{defaultValue};");
 
                 // Check if the column has a foreign key and add the corresponding property
                 if (foreignKeys.TryGetValue(columnName, out string relatedTable))
                 {
                     sb.AppendLine($"        public cls{relatedTable}? {relatedTable}Info {{ get; set; }}");
                 }
+
             }
 
             return sb.ToString();
-
-            
         }
 
         // Consturctors
@@ -123,86 +95,47 @@ namespace BizDataLayerGen.GeneralClasses
 
             // Constructor signature
             sb.AppendLine($"        public cls{_TableName}()");
-
-            // Constructor body
             sb.AppendLine("        {");
 
+            // For the primary key (first column), always assign null.
             sb.AppendLine($"            this.{_Columns[0]} = null;");
 
-            // The old Algorithm
-
-            /*
-            // Loop through all the columns and generate the assignments
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                string dataType = _DataTypes[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                // Check if the column is nullable and assign default value
-                if (isNullable)
-                {
-                    sb.AppendLine($"    this.{columnName} = null;");
-                }
-                else
-                {
-                    // Assign default values based on data type
-                    if (dataType == "int" || dataType == "short" || dataType == "long" || dataType == "float" || dataType == "double" || dataType == "decimal")
-                    {
-                        sb.AppendLine($"    this.{columnName} = 0;");
-                    }
-                    else if (dataType == "string")
-                    {
-                        sb.AppendLine($"    this.{columnName} = \"\";");
-                    }
-                    else if (dataType == "DateTime")
-                    {
-                        sb.AppendLine($"    this.{columnName} = DateTime.Now;");
-                    }
-                    else if (dataType == "bool")
-                    {
-                        sb.AppendLine($"    this.{columnName} = false;");
-                    }
-                    else
-                    {
-                        sb.AppendLine($"    this.{columnName} = default({dataType});");
-                    }
-                }
-            }
-            */
-
-                        // The New Algotithm More Optimze Use Dicationary 
-
+            // Dictionary for default values based on data type.
             var defaultValues = new Dictionary<string, string>
-            {
-                { "int", "0" },
-                { "short", "0" },
-                { "long", "0" },
-                { "float", "0f" },
-                { "double", "0.0" },
-                { "decimal", "0m" },
-                { "string", "\"\"" },
-                { "DateTime", "DateTime.Now" },
-                { "bool", "false" }
-            };
+    {
+        { "int", "0" },
+        { "short", "0" },
+        { "long", "0" },
+        { "float", "0f" },
+        { "double", "0.0" },
+        { "decimal", "0m" },
+        { "string", "\"\"" },
+        { "DateTime", "DateTime.Now" },
+        { "bool", "false" }
+    };
 
-            // تعيين قيمة العمود الأول (Primary Key) إلى null دائمًا
-            sb.AppendLine($"            this.{_Columns[0]} = null;");
-
-            // إنشاء القيم الافتراضية لباقي الأعمدة
+            // Loop through the remaining columns to assign default values.
             for (int i = 1; i < _Columns.Length; i++)
             {
                 string columnName = _Columns[i];
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
 
-                // تحديد القيمة الافتراضية باستخدام القاموس
-                if (isNullable)
+                // Use the TypeChecker to check if the data type itself can accept null.
+                bool canAcceptNull = clsGenDataBizLayerMethods.CanAcceptNull(dataType);
+
+                // Combine the _NullibietyColumns flag and the type's capability.
+                bool isNullableAndCanAcceptNull = isNullable && canAcceptNull;
+
+                if (isNullableAndCanAcceptNull)
                 {
+                    // If the column is marked as nullable and its type can accept null,
+                    // assign null as the default value.
                     sb.AppendLine($"            this.{columnName} = null;");
                 }
                 else
                 {
+                    // Otherwise, assign the default value based on the data type.
                     string defaultValue = defaultValues.ContainsKey(dataType)
                         ? defaultValues[dataType]
                         : $"default({dataType})";
@@ -210,7 +143,6 @@ namespace BizDataLayerGen.GeneralClasses
                 }
             }
 
-            // Closing the constructor
             sb.AppendLine("            Mode = enMode.AddNew;");
             sb.AppendLine("        }");
 
@@ -226,65 +158,15 @@ namespace BizDataLayerGen.GeneralClasses
             // Constructor signature with parameters
             sb.AppendLine($"        private cls{_TableName}(");
 
-            sb.Append($"{_DataTypes[0]}? {_Columns[0]},");
-
-            // Loop through columns and generate constructor parameters
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                string dataType = _DataTypes[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                // Add parameter to the constructor
-                sb.Append($"{dataType}{(isNullable ? "?" : "")} {columnName}");
-
-                if (i < _Columns.Length - 1)
-                {
-                    sb.Append(", ");
-                }
-            }
-
-            // Close the parameter list and open the constructor body
-            sb.AppendLine("          )");
+            sb.Append($"{_DataTypes[0]}? {_Columns[0]}, {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})");
 
             sb.AppendLine("        {");
 
-            // The old Algorithm
 
-            /*
-             
-            // Loop through the columns and generate the assignments to fields
-            for (int i = 0; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-
-                sb.AppendLine($"    this.{columnName} = {columnName};");
-
-
-                if (_ColumnNamesHasFK.Length > 0 && _TablesNameHasFK.Length > 0)
-                {
-                    for (int j = 0; j < _ColumnNamesHasFK.Length; j++)
-                    {
-                        // edit columnName is not string is variable
-                        if (_ColumnNamesHasFK[j] == columnName)
-                        {
-                            sb.AppendLine($"    this.{_TablesNameHasFK[j]}Info = cls{_TablesNameHasFK[j]}.FindBy{columnName}(this.{columnName});");
-                        }
-                    }
-                }
-            }
-
-            */
-
-            // The New Algotithm More Optimze Use Dicationary 
-
-
-            // إنشاء خريطة للمفاتيح الخارجية لسهولة الوصول
             var foreignKeyMap = _ColumnNamesHasFK
                 .Select((fkColumn, index) => new { fkColumn, tableName = _TablesNameHasFK[index], referencedColumn = _ReferencedColumn[index] })
                 .ToDictionary(x => x.fkColumn, x => new { x.tableName, x.referencedColumn });
 
-            // تعيين الحقول الداخلية من المعاملات
             foreach (var columnName in _Columns)
             {
                 sb.AppendLine($"            this.{columnName} = {columnName};");
@@ -353,31 +235,9 @@ namespace BizDataLayerGen.GeneralClasses
             // Constructor signature with parameters
             sb.AppendLine($"       public static bool AddNew{_TableName}(");
 
-            sb.Append($"ref {_DataTypes[0]}? {_Columns[0]},");
-
-            // Loop through columns and generate constructor parameters
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                string dataType = _DataTypes[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                // Add parameter to the constructor
-                sb.Append($"{dataType}{(isNullable ? "?" : "")} {columnName}");
-
-                if (i < _Columns.Length - 1)
-                {
-                    sb.Append(", ");
-                }
-            }
-
-            // Close the parameter list and open the constructor body
-            sb.AppendLine(")");
+            sb.Append($"ref {_DataTypes[0]}? {_Columns[0]}, {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})");
 
             sb.AppendLine("        {");
-
-
-
 
             sb.AppendLine($"        {_Columns[0]} = cls{_TableName}Data.AddNew{_TableName}(");
 
@@ -444,26 +304,8 @@ namespace BizDataLayerGen.GeneralClasses
             // Constructor signature with parameters
             sb.AppendLine($"       public static bool Update{_TableName}ByID(");
 
-            sb.Append($"{_DataTypes[0]}? {_Columns[0]},");
 
-            // Loop through columns and generate constructor parameters
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                string dataType = _DataTypes[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                // Add parameter to the constructor
-                sb.Append($"{dataType}{(isNullable ? "?" : "")} {columnName}");
-
-                if (i < _Columns.Length - 1)
-                {
-                    sb.Append(", ");
-                }
-            }
-
-            // Close the parameter list and open the constructor body
-            sb.AppendLine("          )");
+            sb.Append($"{_DataTypes[0]}? {_Columns[0]}, {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})");
 
             sb.AppendLine("        {");
 
@@ -529,19 +371,32 @@ namespace BizDataLayerGen.GeneralClasses
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
 
-                // تحديد القيمة الافتراضية باستخدام القاموس
-                if (isNullable)
+
+
+                // Use the TypeChecker to check if the data type itself can accept null.
+                bool canAcceptNull = clsGenDataBizLayerMethods.CanAcceptNull(dataType);
+
+                // Combine the _NullibietyColumns flag and the type's capability.
+                bool isNullableAndCanAcceptNull = isNullable && canAcceptNull;
+
+                if (isNullableAndCanAcceptNull)
                 {
-                    sb.AppendLine($"            {dataType}? {columnName} = null;");
+                    // If the column is marked as nullable and its type can accept null,
+                    // assign null as the default value.
+                    sb.AppendLine($"            {dataType} {columnName} = null;");
                 }
                 else
                 {
+                    // Otherwise, assign the default value based on the data type.
                     string defaultValue = defaultValues.ContainsKey(dataType)
                         ? defaultValues[dataType]
                         : $"default({dataType})";
                     sb.AppendLine($"            {dataType} {columnName} = {defaultValue};");
                 }
             }
+
+
+
 
             sb.AppendLine($"            bool IsFound = cls{_TableName}Data.Get{_TableName}InfoByID({_Columns[0]},");
 
@@ -797,21 +652,8 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
             string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
 
 
-            // Methods in dataAccesLayer
-
-            //{AddGetTableInfoByIDMethod()}
-
-            //{AddGetAllDataMethod()}
-
-            //{AddAddingNewRecordMethod()}
-
-            //{AddUpdatingRecordMethod()}
-
-            //{AddDeleteByIDMethod()}
-
-            //{AddSearchMethod()}
-
             // Add File SqlHelper
+
             AddCheckedTheDataIsSafeMethod();
 
 
@@ -831,7 +673,7 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 {{
     public class cls{_TableName}
     {{
-        #nullable enable
+        //#nullable enable
 
         public enum enMode {{ AddNew = 0, Update = 1 }};
         public enMode Mode = enMode.AddNew;

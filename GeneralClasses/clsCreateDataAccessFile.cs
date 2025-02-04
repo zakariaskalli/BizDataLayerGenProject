@@ -29,27 +29,7 @@ namespace BizDataLayerGen.GeneralClasses
             this._NullibietyColumns = NullibietyColumns;
         }
 
-        public static string ParameterCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, int StartBy = 1)
-        {
-            var parameterCodeBuilder = new StringBuilder();
 
-
-
-            for (int i = StartBy; i < Columns.Length; i++)
-            {
-                // Add "?" if the column is nullable
-                string nullableIndicator = NullibietyColumns[i] ? "?" : "";
-                parameterCodeBuilder.Append($"{DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "")}, ");
-            }
-
-            // Remove the trailing comma and space
-            if (parameterCodeBuilder.Length > 0)
-            {
-                parameterCodeBuilder.Length -= 2;
-            }
-
-            return parameterCodeBuilder.ToString();
-        }
 
         public static string parameterForInsertQueryBuilder(string[] Columns)
         {
@@ -186,7 +166,7 @@ namespace BizDataLayerGen.GeneralClasses
                         // The record was found
                         isFound = true;
 
-                        {AddDataReaderToVariables()}
+{AddDataReaderToVariables()}
                     }}
                 }}
             }}
@@ -317,7 +297,7 @@ namespace BizDataLayerGen.GeneralClasses
              */
 
 
-            string GetTableByIDCode = @$"public static int? AddNew{_TableName}({ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
+            string GetTableByIDCode = @$"public static int? AddNew{_TableName}({clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns)})
     {{
         int? {_Columns[0]} = null;
 
@@ -354,7 +334,7 @@ namespace BizDataLayerGen.GeneralClasses
         catch (Exception ex)
         {{
             // Handle all exceptions in a general way
-            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName}), $""Parameters: {ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
+            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName}), $""Parameters: {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
         }}
 
         return {_Columns[0]};
@@ -365,46 +345,8 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddUpdatingRecordMethod()
         {
-            // First Code Dynamic query
 
-            /*
-            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
-{{
-    int rowsAffected = 0;
-
-    try
-    {{
-        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-        {{
-            string query = $@""UPDATE {_TableName}
-                              SET 
-{parameterForUpdateQuery(_Columns)}
-                              WHERE [{_Columns[0]}] = @{_Columns[0]}"";
-
-            using (SqlCommand command = new SqlCommand(query, connection))
-            {{
-{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns, 0)}
-
-                connection.Open();
-
-                rowsAffected = command.ExecuteNonQuery();
-            }}
-        }}
-    }}
-    catch (Exception ex)
-    {{
-        // Handle all exceptions in a general way
-        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
-    }}
-
-    return (rowsAffected > 0);
-}}";
-            */
-
-            // Second With SP
-
-
-            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
 {{
     int rowsAffected = 0;
 
@@ -563,7 +505,7 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 {{
     public class cls{_TableName}Data
     {{
-        #nullable enable
+        //#nullable enable
 
         {AddGetTableInfoByIDMethod()}
 
