@@ -81,58 +81,56 @@ public interface IErrorSubscriber
     void HandleError(Log log); // Defines how each subscriber handles the error
 }}
 
-// Subscriber for logging errors to the database (implementation is currently empty)
+// Subscriber for logging errors to the database
 public class DatabaseErrorLogger : IErrorSubscriber
 {{
     public void HandleError(Log log)
     {{
-
         string query = @""INSERT INTO ErrorLog (ErrorMessage, StackTrace, Severity, AdditionalInfo)
                 VALUES (@ErrorMessage, @StackTrace, @Severity, @AdditionalInfo);"";
 
-            try
+        try
+        {{
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {{
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {{
-                        // Add parameters
-                        command.Parameters.AddWithValue(""@ErrorMessage"", log.ErrorMessage ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue(""@StackTrace"", log.StackTrace ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue(""@Severity"", log.Severity ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue(""@AdditionalInfo"", log.AdditionalInfo ?? (object)DBNull.Value);
+                    // Add parameters
+                    command.Parameters.AddWithValue(""@ErrorMessage"", log.ErrorMessage ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue(""@StackTrace"", log.StackTrace ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue(""@Severity"", log.Severity ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue(""@AdditionalInfo"", log.AdditionalInfo ?? (object)DBNull.Value);
 
-                        // Open connection and execute the query
-                        connection.Open();
-                        command.ExecuteNonQuery();
-                    }}
+                    // Open connection and execute the query
+                    connection.Open();
+                    command.ExecuteNonQuery();
                 }}
             }}
-            catch (Exception ex)
-            {{
-            }}
-
+        }}
+        catch (Exception ex)
+        {{
+            // Handle exceptions if needed
+        }}
     }}
 }}
 
-// Subscriber for logging errors to a JSON file (implementation is currently empty)
+// Subscriber for logging errors to a JSON file
 public class JsonErrorLogger : IErrorSubscriber
 {{
-
-    public void HandleError(Log log)
+    public void HandleError(Log log1) // Renamed 'log' to 'log1'
     {{
-        //For Example
+
+        // Example path (replace with your desired path)
         /*
-         string userProvidedPath = @""C:\Programation Level 2\BizDataLayerGen\TestCodeGenerator\GymDB_DataAccess\ErrorHandler\JsonFile\"";
+        string userProvidedPath = @""C:\Programation Level 2\BizDataLayerGen\TestCodeGenerator\GymDB_DataAccess\ErrorHandler\JsonFile\"";
         */
 
+        // Enter the path where you want to save the JSON file
+        string userProvidedPath = ???; // Replace with the actual path
 
-
-        // Enter The Path When you save the the JsonFile
-        string userProvidedPath = ???;
-
+        // Append the file name to the path
         userProvidedPath += ""ErrorHandling_JsonFile.json"";
-        
+
         // Validate the path
         if (string.IsNullOrWhiteSpace(userProvidedPath) || !Directory.Exists(Path.GetDirectoryName(userProvidedPath)))
         {{
@@ -146,26 +144,30 @@ public class JsonErrorLogger : IErrorSubscriber
         }}
 
         // Define the method to save the new log
-        void SaveNewLog(Log log)
+        void SaveNewLog(Log log2) // Renamed 'log' to 'log2'
         {{
             try
             {{
-                // Create a new list containing only the new log
-                var newLogList = new List<Log> {{ log }};
+                // Read the existing JSON content (if any)
+                var existingLogs = JsonConvert.DeserializeObject<List<Log>>(File.ReadAllText(userProvidedPath)) ?? new List<Log>();
 
-                // Serialize the list to JSON with indentation
-                string newJsonContent = JsonConvert.SerializeObject(newLogList, Formatting.Indented);
+                // Add the new log entry to the list
+                existingLogs.Add(log2);
 
-                // Write the new JSON content to the file (replacing old content)
-                File.WriteAllText(userProvidedPath, newJsonContent);
+                // Serialize the updated log list back to JSON
+                string updatedJsonContent = JsonConvert.SerializeObject(existingLogs, Formatting.Indented);
+
+                // Write the updated JSON content to the file
+                File.WriteAllText(userProvidedPath, updatedJsonContent);
             }}
             catch
             {{
+                // Handle exceptions if needed
             }}
         }}
 
         // Pass the new log to the method
-        SaveNewLog(log);
+        SaveNewLog(log1); // Pass 'log1' to 'SaveNewLog'
 
 
 
@@ -202,10 +204,7 @@ public class JsonErrorLogger : IErrorSubscriber
         {{
         }}
         */
-
-
     }}
-    
 }}
 
 // Publisher that distributes errors to all registered subscribers
@@ -215,15 +214,15 @@ public class ErrorPublisher
 
     // Register a new subscriber
     public void Subscribe(IErrorSubscriber subscriber)
-        {{
-            subscribers.Add(subscriber);
-        }}
+    {{
+        subscribers.Add(subscriber);
+    }}
 
     // Unsubscribe a subscriber
     public void Unsubscribe(IErrorSubscriber subscriber)
-        {{
-            subscribers.Remove(subscriber);
-        }}
+    {{
+        subscribers.Remove(subscriber);
+    }}
 
     // Notify all subscribers about an error
     public void Notify(Log log)
@@ -258,7 +257,7 @@ public static class ErrorHandler
     {{
         // Determine severity based on exception type
         string severity = ex is SqlException ? ""High"" : ""Medium"";
-    
+
         // Create a log entry
         var log = new Log(
             errorMessage: $""An error occurred in {{methodName}}."",
@@ -266,29 +265,23 @@ public static class ErrorHandler
             severity: severity,
             additionalInfo: $""{{additionalInfo}}, Error: {{ex.Message}}""
         );
-    
+
         // Send the log to the error handler
         ErrorHandler.HandleError(log);
     }}
-
-}}
-
-";
-
-            // Combine both classes' contents into one
-            string fullClassContent = Code;
+}}";
 
             // Write the content to the file
             try
             {
                 // Create or overwrite the file
-                System.IO.File.WriteAllText(filePath, fullClassContent);
+                System.IO.File.WriteAllText(filePath, Code);
             }
             catch
             {
+                // Handle exceptions if needed
             }
         }
-
         private static void CreateJsonFile(string FilePath)
         {
 
