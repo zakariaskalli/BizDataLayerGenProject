@@ -83,43 +83,65 @@ namespace BizDataLayerGen.GeneralClasses
                 // Add the nullable indicator (if the column is nullable and the type accepts null)
                 string nullableIndicator = canAcceptNull ? "?" : "";
 
-                // If it's nullable, we set the default value to null
-                string defaultValue = (NullibietyColumns[i] && !canAcceptNull) ? " = null" : "";
+                //string defaultValue = (NullibietyColumns[i] && !canAcceptNull) ? " = null" : "";
 
-                // Append the column, type with nullable indicator and default value (if applicable)
-                referencesCodeBuilder.Append($", ref {DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "").Trim()}{defaultValue}");
+                //referencesCodeBuilder.Append($", ref {DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "").Trim()}{defaultValue}");
+
+                referencesCodeBuilder.Append($", ref {DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "").Trim()}");
             }
 
             return referencesCodeBuilder.ToString();
         }
-        
+
         public static string ParameterCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, int StartBy = 1)
         {
             var parameterCodeBuilder = new StringBuilder();
 
+            // إنشاء قائمة لتخزين المعاملات غير nullable
+            var nonNullableParams = new List<string>();
+            // إنشاء قائمة لتخزين المعاملات nullable
+            var nullableParams = new List<string>();
+
             for (int i = StartBy; i < Columns.Length; i++)
             {
-                // Use CanAcceptNull to check if the type can accept null
+                // هل نوع البيانات يمكن أن يكون null؟
                 bool canAcceptNull = !(CanAcceptNull(DataTypes[i]));
 
-                // Add the nullable indicator (if the column is nullable and the type accepts null)
+                // إضافة `?` إذا كان النوع يدعم null
                 string nullableIndicator = canAcceptNull ? "?" : "";
 
-                // If it's nullable, we set the default value to null
+                // إذا كان الحقل nullable، نضيف `= null`
                 string defaultValue = (NullibietyColumns[i] && !canAcceptNull) ? " = null" : "";
 
-                // Append the parameter code, including the nullable indicator and default value (if applicable)
-                parameterCodeBuilder.Append($"{DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "")}{defaultValue}, ");
+                // تكوين كود المعامل
+                string parameter = $"{DataTypes[i]}{nullableIndicator} {Columns[i].Replace(" ", "")}{defaultValue}";
+
+                // إذا لم يكن nullable، أضفه إلى قائمة nonNullableParams
+                if (string.IsNullOrEmpty(defaultValue))
+                {
+                    nonNullableParams.Add(parameter);
+                }
+                else
+                {
+                    nullableParams.Add(parameter);
+                }
             }
 
-            // Remove the trailing comma and space
-            if (parameterCodeBuilder.Length > 0)
+            // ضم المعاملات غير nullable أولًا، ثم nullable
+            parameterCodeBuilder.Append(string.Join(", ", nonNullableParams));
+
+            if (nullableParams.Count > 0)
             {
-                parameterCodeBuilder.Length -= 2;
+                if (parameterCodeBuilder.Length > 0)
+                {
+                    parameterCodeBuilder.Append(", ");
+                }
+                parameterCodeBuilder.Append(string.Join(", ", nullableParams));
             }
 
             return parameterCodeBuilder.ToString();
         }
+
 
         public static string CreatingCommandParameter(string[] Columns, bool[] NullibietyColumns, int StartBy = 1)
         {
