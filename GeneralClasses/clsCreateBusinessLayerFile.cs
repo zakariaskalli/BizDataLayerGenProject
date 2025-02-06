@@ -79,7 +79,7 @@ namespace BizDataLayerGen.GeneralClasses
                 // Check if the column has a foreign key and add the corresponding property
                 if (foreignKeys.TryGetValue(columnName, out string relatedTable))
                 {
-                    sb.AppendLine($"        public cls{relatedTable}? {relatedTable}Info {{ get; set; }}");
+                    sb.AppendLine($"        public cls{relatedTable} {relatedTable}Info {{ get; set; }}");
                 }
 
             }
@@ -361,9 +361,7 @@ namespace BizDataLayerGen.GeneralClasses
                 }
             }
 
-            sb.AppendLine($@");
-
-        return (true);");
+            sb.AppendLine($@");");
             sb.AppendLine("       }");
 
             return sb.ToString();
@@ -390,7 +388,7 @@ namespace BizDataLayerGen.GeneralClasses
             bool isFirstParameter = true;
 
             // First, add non-nullable parameters
-            for (int i = 1; i < _Columns.Length; i++)
+            for (int i = 0; i < _Columns.Length; i++)
             {
                 string columnName = _Columns[i];
                 bool isNullable = _NullibietyColumns[i];
@@ -408,7 +406,7 @@ namespace BizDataLayerGen.GeneralClasses
             }
 
             // Then, add nullable parameters
-            for (int i = 1; i < _Columns.Length; i++)
+            for (int i = 0; i < _Columns.Length; i++)
             {
                 string columnName = _Columns[i];
                 bool isNullable = _NullibietyColumns[i];
@@ -437,7 +435,7 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static cls{_TableName}? FindBy{_Columns[0]}({_DataTypes[0]}? {_Columns[0]})");
+            sb.AppendLine($"       public static cls{_TableName} FindBy{_Columns[0]}({_DataTypes[0]}? {_Columns[0]})");
             sb.AppendLine(@$"
         {{
             if ({_Columns[0]} == null)
@@ -470,25 +468,15 @@ namespace BizDataLayerGen.GeneralClasses
 
 
                 // Use the TypeChecker to check if the data type itself can accept null.
-                bool canAcceptNull = clsGenDataBizLayerMethods.CanAcceptNull(dataType);
+                bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
 
-                // Combine the _NullibietyColumns flag and the type's capability.
-                bool isNullableAndCanAcceptNull = isNullable && canAcceptNull;
+                string nullableIndicator = canAcceptNull ? "?" : "";
 
-                if (isNullableAndCanAcceptNull)
-                {
-                    // If the column is marked as nullable and its type can accept null,
-                    // assign null as the default value.
-                    sb.AppendLine($"            {dataType} {columnName} = null;");
-                }
-                else
-                {
-                    // Otherwise, assign the default value based on the data type.
-                    string defaultValue = defaultValues.ContainsKey(dataType)
-                        ? defaultValues[dataType]
-                        : $"default({dataType})";
-                    sb.AppendLine($"            {dataType} {columnName} = {defaultValue};");
-                }
+                // Otherwise, assign the default value based on the data type.
+                string defaultValue = defaultValues.ContainsKey(dataType)
+                    ? defaultValues[dataType]
+                    : $"default({dataType})";
+                sb.AppendLine($"            {dataType}{nullableIndicator} {columnName} = {defaultValue};");
             }
 
 
@@ -518,7 +506,7 @@ namespace BizDataLayerGen.GeneralClasses
             bool isFirstParameter = true;
 
             // First, add non-nullable parameters
-            for (int i = 1; i < _Columns.Length; i++)
+            for (int i = 0; i < _Columns.Length; i++)
             {
                 string columnName = _Columns[i];
                 bool isNullable = _NullibietyColumns[i];
@@ -536,7 +524,7 @@ namespace BizDataLayerGen.GeneralClasses
             }
 
             // Then, add nullable parameters
-            for (int i = 1; i < _Columns.Length; i++)
+            for (int i = 0; i < _Columns.Length; i++)
             {
                 string columnName = _Columns[i];
                 bool isNullable = _NullibietyColumns[i];
@@ -567,7 +555,7 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static DataTable? GetAll{_TableName}()");
+            sb.AppendLine($"       public static DataTable GetAll{_TableName}()");
             sb.AppendLine("       {");
             sb.AppendLine("");
 
@@ -682,7 +670,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             // Constructor signature with parameters
             sb.AppendLine($@"
-        public static DataTable? SearchData({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere)
+        public static DataTable SearchData({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere)
         {{
             if (string.IsNullOrWhiteSpace(SearchValue) || !SqlHelper.IsSafeInput(SearchValue))
                 return new DataTable();
