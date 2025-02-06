@@ -191,6 +191,7 @@ namespace BizDataLayerGen.DataAccessLayer
 
             try
             {
+
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
                     connection.Open();
