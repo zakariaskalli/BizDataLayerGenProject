@@ -194,11 +194,12 @@ namespace BizDataLayerGen.DataAccessLayer
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
                     connection.Open();
-                    string query = $@"USE [{DBName}] 
-                                        SELECT name AS TableName
-                                        FROM sys.tables
-                                        WHERE is_ms_shipped = 0
-                                          AND name NOT IN ('sysdiagrams', 'ErrorLog'); ";
+                    string query = $@"
+                            USE [{DBName}]
+                                SELECT name AS TableName
+                                FROM sys.tables
+                                WHERE is_ms_shipped = 0
+                                  AND name NOT IN ('sysdiagrams');";
 
                     SqlCommand command = new SqlCommand(query, connection);
 
