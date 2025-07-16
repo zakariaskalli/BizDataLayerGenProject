@@ -69,9 +69,9 @@ namespace BizDataLayerGen.GeneralClasses
                 // Check if the type itself can accept null (for example, reference types or nullable value types)
                 bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
 
-                string nullableIndicator = canAcceptNull ? "?" : "";
+                string nullableIndicator = (canAcceptNull && isNullable) ? "?" : "";
 
-                string defaultValue = (isNullable && !canAcceptNull) ? " = null;" : "";
+                string defaultValue = (isNullable && canAcceptNull) ? " = null;" : "";
 
                 // Append the property declaration with the default value (if applicable)
                 sb.AppendLine($"        public {dataType}{nullableIndicator} {columnName} {{ get; set; }}{defaultValue}");
@@ -125,7 +125,7 @@ namespace BizDataLayerGen.GeneralClasses
                 bool canAcceptNull = clsGenDataBizLayerMethods.CanAcceptNull(dataType);
 
                 // Combine the _NullibietyColumns flag and the type's capability.
-                bool isNullableAndCanAcceptNull = isNullable && canAcceptNull;
+                bool isNullableAndCanAcceptNull = (isNullable && canAcceptNull);
 
                 if (isNullableAndCanAcceptNull)
                 {
@@ -206,40 +206,7 @@ namespace BizDataLayerGen.GeneralClasses
             // First, add non-nullable parameters
             bool isFirstParameter = true; // Track if it's the first parameter to avoid adding a comma at the start
 
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                if (!isNullable)  // If not nullable, add it first
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"this.{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
-
-            // Then, add nullable parameters
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                if (isNullable)  // If nullable, add it after non-nullables
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"this.{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
+            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, false, 1));
 
             sb.AppendLine(");");
 
@@ -249,6 +216,11 @@ namespace BizDataLayerGen.GeneralClasses
 
             return sb.ToString();
         }
+
+        
+
+
+
         public string AddStaticAddingNewRow(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
         {
             StringBuilder sb = new StringBuilder();
@@ -263,6 +235,8 @@ namespace BizDataLayerGen.GeneralClasses
 
             // Start adding the AddNew call
             sb.AppendLine($"        {_Columns[0]} = cls{_TableName}Data.AddNew{_TableName}(");
+
+            /*
 
             // First, add non-nullable parameters
             bool isFirstParameter = true; // Track if it's the first parameter to avoid adding a comma at the start
@@ -302,6 +276,10 @@ namespace BizDataLayerGen.GeneralClasses
                 }
             }
 
+            */
+
+            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 1));
+
             sb.AppendLine($@");
 
         return ({_Columns[0]} != null);
@@ -322,44 +300,8 @@ namespace BizDataLayerGen.GeneralClasses
             // Start adding the Update call
             sb.AppendLine($"        return cls{_TableName}Data.Update{_TableName}ByID(");
 
-            // Track if it's the first parameter to avoid adding a comma at the start
-            bool isFirstParameter = true;
+            sb.Append(clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 0));
 
-            // First, add non-nullable parameters
-            for (int i = 0; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                if (!isNullable)  // If not nullable, add it first
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"this.{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
-
-            // Then, add nullable parameters
-            for (int i = 0; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                if (isNullable)  // If nullable, add it after non-nullables
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"this.{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
 
             sb.AppendLine($@");");
             sb.AppendLine("       }");
@@ -387,41 +329,8 @@ namespace BizDataLayerGen.GeneralClasses
             // Track if it's the first parameter to avoid adding a comma at the start
             bool isFirstParameter = true;
 
-            // First, add non-nullable parameters
-            for (int i = 0; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
+            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 0));
 
-                if (!isNullable)  // If not nullable, add it first
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
-
-            // Then, add nullable parameters
-            for (int i = 0; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                if (isNullable)  // If nullable, add it after non-nullables
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
 
             sb.AppendLine($@");
 
@@ -470,7 +379,7 @@ namespace BizDataLayerGen.GeneralClasses
                 // Use the TypeChecker to check if the data type itself can accept null.
                 bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
 
-                string nullableIndicator = canAcceptNull ? "?" : "";
+                string nullableIndicator = (canAcceptNull && isNullable) ? "?" : "";
 
                 // Otherwise, assign the default value based on the data type.
                 string defaultValue = defaultValues.ContainsKey(dataType)
@@ -502,44 +411,8 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine($@"           if (IsFound)");
             sb.AppendLine($@"               return new cls{_TableName}(");
 
-            // Track if it's the first parameter to avoid adding a comma at the start
-            bool isFirstParameter = true;
+            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 0));
 
-            // First, add non-nullable parameters
-            for (int i = 0; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                if (!isNullable)  // If not nullable, add it first
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
-
-            // Then, add nullable parameters
-            for (int i = 0; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                if (isNullable)  // If nullable, add it after non-nullables
-                {
-                    if (!isFirstParameter)
-                    {
-                        sb.Append(", "); // Add a comma only if it's not the first parameter
-                    }
-
-                    sb.Append($"{columnName}");
-                    isFirstParameter = false; // After the first parameter, set this to false
-                }
-            }
 
             sb.AppendLine($@");
             else

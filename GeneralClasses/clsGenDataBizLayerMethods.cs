@@ -10,6 +10,7 @@ namespace BizDataLayerGen.GeneralClasses
     {
         public static bool CanAcceptNull(string typeName)
         {
+
             if (string.IsNullOrWhiteSpace(typeName))
                 throw new ArgumentNullException(nameof(typeName), "Type name cannot be null or empty.");
 
@@ -66,7 +67,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public static string ReferencesCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
-            var referencesCodeBuilder = new StringBuilder();
+            StringBuilder referencesCodeBuilder = new StringBuilder();
 
             // Ensure that all arrays have the same length
             if (Columns.Length != DataTypes.Length || Columns.Length != NullibietyColumns.Length)
@@ -81,7 +82,7 @@ namespace BizDataLayerGen.GeneralClasses
                 bool canAcceptNull = !(CanAcceptNull(DataTypes[i]));
 
                 // Add the nullable indicator (if the column is nullable and the type accepts null)
-                string nullableIndicator = canAcceptNull ? "?" : "";
+                string nullableIndicator = (NullibietyColumns[i] && canAcceptNull) ? "?" : "";
 
                 //string defaultValue = (NullibietyColumns[i] && !canAcceptNull) ? " = null" : "";
 
@@ -108,7 +109,7 @@ namespace BizDataLayerGen.GeneralClasses
                 bool canAcceptNull = !(CanAcceptNull(DataTypes[i]));
 
                 // إضافة `?` إذا كان النوع يدعم null
-                string nullableIndicator = canAcceptNull ? "?" : "";
+                string nullableIndicator = (NullibietyColumns[i] && canAcceptNull) ? "?" : "";
 
                 // إذا كان الحقل nullable، نضيف `= null`
                 string defaultValue = (NullibietyColumns[i] && !canAcceptNull) ? " = null" : "";
@@ -142,6 +143,22 @@ namespace BizDataLayerGen.GeneralClasses
             return parameterCodeBuilder.ToString();
         }
 
+        public static string ParameterCodeBL(string[] Columns, bool IsStatic, int StartBy = 0)
+        {
+            var parameterCodeBuilder = new StringBuilder();
+
+            for (int i = StartBy; i < Columns.Length; i++)
+            {
+                string theStatic = IsStatic ? "" : "this.";
+                string parameter = theStatic + Columns[i].Replace(" ", "");
+                parameterCodeBuilder.Append(parameter);
+
+                if (i < Columns.Length - 1)
+                    parameterCodeBuilder.Append(", ");
+            }
+
+            return parameterCodeBuilder.ToString();
+        }
 
         public static string CreatingCommandParameter(string[] Columns, bool[] NullibietyColumns, int StartBy = 1)
         {
