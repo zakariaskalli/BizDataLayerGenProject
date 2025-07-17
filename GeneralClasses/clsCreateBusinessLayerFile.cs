@@ -206,7 +206,7 @@ namespace BizDataLayerGen.GeneralClasses
             // First, add non-nullable parameters
             bool isFirstParameter = true; // Track if it's the first parameter to avoid adding a comma at the start
 
-            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, false, 1));
+            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, _DataTypes, _NullibietyColumns, false, 1));
 
             sb.AppendLine(");");
 
@@ -278,7 +278,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             */
 
-            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 1));
+            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, _DataTypes, _NullibietyColumns, true, 1));
 
             sb.AppendLine($@");
 
@@ -300,7 +300,7 @@ namespace BizDataLayerGen.GeneralClasses
             // Start adding the Update call
             sb.AppendLine($"        return cls{_TableName}Data.Update{_TableName}ByID(");
 
-            sb.Append(clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 0));
+            sb.Append(clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, _DataTypes, _NullibietyColumns, true, 0));
 
 
             sb.AppendLine($@");");
@@ -329,7 +329,7 @@ namespace BizDataLayerGen.GeneralClasses
             // Track if it's the first parameter to avoid adding a comma at the start
             bool isFirstParameter = true;
 
-            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 0));
+            sb.Append(clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, _DataTypes, _NullibietyColumns, true, 0));
 
 
             sb.AppendLine($@");
@@ -411,7 +411,7 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine($@"           if (IsFound)");
             sb.AppendLine($@"               return new cls{_TableName}(");
 
-            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, true, 0));
+            sb.Append( clsGenDataBizLayerMethods.ParameterCodeBL(_Columns, _DataTypes, _NullibietyColumns, true, 0));
 
 
             sb.AppendLine($@");

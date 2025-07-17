@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -59,6 +60,27 @@ namespace BizDataLayerGen.DataAccessLayer
 
         }
 
+        public static bool CanUseTrim(string fullSqlDataType)
+        {
+            if (string.IsNullOrWhiteSpace(fullSqlDataType))
+                return false;
+
+            // استخراج الاسم الأساسي للنوع (مثلاً: nvarchar من nvarchar(100))
+            string baseType = fullSqlDataType
+                .Trim()
+                .ToLowerInvariant()
+                .Split('(')[0];  // مثلاً: "nvarchar(100)" → "nvarchar"
+
+            // قائمة الأنواع النصية التي تقبل LTRIM/RTRIM
+            HashSet<string> trimCompatibleTypes = new HashSet<string>
+    {
+        "char", "nchar", "varchar", "nvarchar", "text", "ntext"
+    };
+
+            return trimCompatibleTypes.Contains(baseType);
+        }
+
+
         private string CreateSP_GetByID()
         {
             string primaryKey = _columns[0]; // Assuming the first column is the primary key
@@ -117,11 +139,17 @@ GO
                 string safeColumnName = $"[{columnName}]"; // وضع الاسم بين [ ]
                 string paramName = $"@{columnName.Replace(" ", "")}"; // إزالة الفراغات من اسم المعامل فقط في VALUES
 
-                // إضافة المعاملات مع التحقق من القيم null
-                parameters.AppendLine($"    {paramName} {_dataTypes[i]}{(_nullabilityColumns[i] ? " = NULL" : "")},");
+                // إضافة المعاملات (parameters)
+                parameters.AppendLine(
+                    $"    {paramName} {_dataTypes[i]}{(_nullabilityColumns[i] ? " = NULL" : "")},"
+                );
 
-                // إعداد القيم للإدخال مع إضافة التحقق من الفراغات
-                values.AppendLine($"    LTRIM(RTRIM({paramName})){(i < _columns.Length - 1 ? "," : "")}");
+                // إضافة القيم (values)
+                string valuePart = CanUseTrim(_dataTypes[i])
+                    ? $"LTRIM(RTRIM({paramName}))"
+                    : paramName;
+
+                values.AppendLine($"    {valuePart}{(i < _columns.Length - 1 ? "," : "")}");
 
                 // إضافة الأعمدة إلى القائمة
                 columnsList.Append($"{safeColumnName}{(i < _columns.Length - 1 ? "," : "")}");
@@ -143,7 +171,7 @@ AS
 BEGIN
     BEGIN TRY
         -- Check if any required parameters are NULL
-        IF {string.Join(" OR ", _columns.Skip(1).Where((col, i) => !_nullabilityColumns[i + 1]).Select(col => $"LTRIM(RTRIM(@{col.Replace(" ", "")})) IS NULL"))}
+            IF {string.Join(" OR ", _columns.Skip(1).Select((col, i) => !_nullabilityColumns[i + 1] ? (CanUseTrim(_dataTypes[i + 1]) ? $"LTRIM(RTRIM(@{col.Replace(" ", "")})) IS NULL" : $"@{col.Replace(" ", "")} IS NULL") : null).Where(condition => condition != null))}
         BEGIN
             RAISERROR('One or more required parameters are NULL or have only whitespace.', 16, 1);
             RETURN;
@@ -176,11 +204,25 @@ GO
                 string safeColumnName = $"[{columnName}]"; // Wrap column name in [ ]
                 string paramName = $"@{columnName.Replace(" ", "")}"; // Remove spaces from parameter name
 
-                // Add the SET clause with nullability check
-                setClauses.AppendLine($"    {safeColumnName} = LTRIM(RTRIM({paramName})){(i < _columns.Length - 1 ? "," : "")}");
+                // Add the SET clause with nullability check// Parameters
+                parameters.AppendLine(
+                    $"    {paramName} {_dataTypes[i]}{(_nullabilityColumns[i] ? " = NULL" : "")}{(i < _columns.Length - 1 ? "," : "")}"
+                );
 
-                // Add parameters with nullability check and trim data for string columns
-                parameters.AppendLine($"    {paramName} {_dataTypes[i]}{(_nullabilityColumns[i] ? " = NULL" : "")}{(i < _columns.Length - 1 ? "," : "")}");
+                // Set Clauses
+                if (CanUseTrim(_dataTypes[i]))
+                {
+                    setClauses.AppendLine(
+                        $"    {safeColumnName} = LTRIM(RTRIM({paramName})){(i < _columns.Length - 1 ? "," : "")}"
+                    );
+                }
+                else
+                {
+                    setClauses.AppendLine(
+                        $"    {safeColumnName} = {paramName}{(i < _columns.Length - 1 ? "," : "")}"
+                    );
+                }
+
             }
 
             // Add the primary key parameter for the WHERE clause
@@ -200,7 +242,15 @@ AS
 BEGIN
     BEGIN TRY
         -- Check if required parameters are NULL or contain only whitespace after trimming
-        IF {string.Join(" OR ", _columns.Skip(1).Where((col, i) => !_nullabilityColumns[i + 1]).Select(col => $"LTRIM(RTRIM(@{col.Replace(" ", "")})) IS NULL OR LTRIM(RTRIM(@{col.Replace(" ", "")})) = ''"))}
+
+        IF {string.Join(" OR ", _columns.Skip(1)
+    .Zip(_dataTypes.Skip(1), (col, dt) => new { col, dt })
+    .Zip(_nullabilityColumns.Skip(1), (cd, nullable) => new { cd.col, cd.dt, nullable })
+    .Where(x => !x.nullable)
+    .Select(x => CanUseTrim(x.dt)
+        ? $"(LTRIM(RTRIM(@{x.col.Replace(" ", "")})) IS NULL OR LTRIM(RTRIM(@{x.col.Replace(" ", "")})) = '')"
+        : $"(@{x.col.Replace(" ", "")} IS NULL OR @{x.col.Replace(" ", "")} = '')"))}
+
         BEGIN
             RAISERROR('One or more required parameters are NULL or have only whitespace.', 16, 1);
             RETURN;

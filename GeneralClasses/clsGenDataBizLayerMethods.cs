@@ -143,18 +143,35 @@ namespace BizDataLayerGen.GeneralClasses
             return parameterCodeBuilder.ToString();
         }
 
-        public static string ParameterCodeBL(string[] Columns, bool IsStatic, int StartBy = 0)
+        public static string ParameterCodeBL(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, bool IsStatic, int StartBy = 0)
         {
             var parameterCodeBuilder = new StringBuilder();
+            var nonNullableList = new List<string>();
+            var nullableList = new List<string>();
 
             for (int i = StartBy; i < Columns.Length; i++)
             {
                 string theStatic = IsStatic ? "" : "this.";
                 string parameter = theStatic + Columns[i].Replace(" ", "");
-                parameterCodeBuilder.Append(parameter);
 
-                if (i < Columns.Length - 1)
+                bool canAcceptNull = !(CanAcceptNull(DataTypes[i]));
+
+                if (NullibietyColumns[i] && !canAcceptNull)
+                    nullableList.Add(parameter);
+                else
+                    nonNullableList.Add(parameter);
+            }
+
+            // ضم العناصر غير nullable أولاً
+            parameterCodeBuilder.Append(string.Join(", ", nonNullableList));
+
+            // ثم nullable إذا وجدت
+            if (nullableList.Count > 0)
+            {
+                if (parameterCodeBuilder.Length > 0)
                     parameterCodeBuilder.Append(", ");
+
+                parameterCodeBuilder.Append(string.Join(", ", nullableList));
             }
 
             return parameterCodeBuilder.ToString();
