@@ -10,59 +10,52 @@ namespace BizDataLayerGen.GeneralClasses
     {
         public static bool CanAcceptNull(string typeName)
         {
-
             if (string.IsNullOrWhiteSpace(typeName))
                 throw new ArgumentNullException(nameof(typeName), "Type name cannot be null or empty.");
 
-            // Map common C# aliases to their fully qualified names
+            // Map C# aliases to .NET types
             var aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "int", "System.Int32" },
-                { "uint", "System.UInt32" },
-                { "long", "System.Int64" },
-                { "ulong", "System.UInt64" },
-                { "short", "System.Int16" },
-                { "ushort", "System.UInt16" },
-                { "byte", "System.Byte" },
-                { "sbyte", "System.SByte" },
-                { "char", "System.Char" },
-                { "bool", "System.Boolean" },
-                { "float", "System.Single" },
-                { "double", "System.Double" },
-                { "decimal", "System.Decimal" },
-                { "string", "System.String" },
-                { "object", "System.Object" },
-                { "datetime", "System.DateTime" },
-                { "timespan", "System.TimeSpan" },
-                { "guid", "System.Guid" }
-            };
+    {
+        { "int", "System.Int32" },
+        { "uint", "System.UInt32" },
+        { "long", "System.Int64" },
+        { "ulong", "System.UInt64" },
+        { "short", "System.Int16" },
+        { "ushort", "System.UInt16" },
+        { "byte", "System.Byte" },
+        { "sbyte", "System.SByte" },
+        { "char", "System.Char" },
+        { "bool", "System.Boolean" },
+        { "float", "System.Single" },
+        { "double", "System.Double" },
+        { "decimal", "System.Decimal" },
+        { "string", "System.String" },
+        { "object", "System.Object" },
+        { "datetime", "System.DateTime" },
+        { "timespan", "System.TimeSpan" },
+        { "guid", "System.Guid" },
+        { "int?", "System.Nullable`1[System.Int32]" }, // <-- دعم nullable
+        { "datetime?", "System.Nullable`1[System.DateTime]" } // يمكنك إضافة المزيد حسب الحاجة
+    };
 
             if (aliases.TryGetValue(typeName, out string systemTypeName))
             {
                 typeName = systemTypeName;
             }
 
-            // Try to get the type of the variable from the provided name
             Type type = Type.GetType(typeName);
 
             if (type == null)
                 throw new ArgumentException("Invalid type name provided.");
 
-            // If the type is a reference type (e.g., string or object)
-            if (type.IsClass || type == typeof(string) || type.IsInterface)
-            {
-                return true; // All reference types accept null by default
-            }
+            // Reference types always accept null
+            if (!type.IsValueType || type == typeof(string))
+                return true;
 
-            // If the type is a value type (e.g., int or bool) and is not nullable
-            if (type.IsValueType)
-            {
-                // If the type is a nullable value type (e.g., int? or bool?)
-                return Nullable.GetUnderlyingType(type) != null;
-            }
-
-            return false;
+            // Nullable value types
+            return Nullable.GetUnderlyingType(type) != null;
         }
+
 
 
         public static string ReferencesCode(string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
