@@ -1,4 +1,4 @@
-![Code Generator Screenshot](assets/CodeGenerator%20Screen.png)
+![Code Generator Screenshot](CodeGeneratorScreen.png)
 # Code Generator
 
 ## Project Overview
