@@ -69,6 +69,8 @@ For example, generating DAL and BL for 20 tables manually might take around 60 h
 For questions, support, or contributions, feel free to reach out via LinkedIn:  
 [Zakaria Sakalli Housaini](https://www.linkedin.com/in/zakaria-sakalli-housaini-1a782b289)
 
+📹 **Project Demo Video:** [Watch Here](https://drive.google.com/file/d/1UoHtK0V07jpzq3qof5heyD3q9Zz2l4VT/view?usp=drive_link)
+
 ---
 
 *This tool significantly reduces development time and errors in database-driven applications by automating repetitive code generation tasks with professional quality.*
