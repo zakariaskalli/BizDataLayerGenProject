@@ -1,5 +1,5 @@
-![Code Generator Screenshot](CodeGeneratorScreen.png)
 # Code Generator
+![Code Generator Screenshot](CodeGeneratorScreen.png)
 
 ## Project Overview
 Code Generator is a powerful tool designed to automate the generation of Data Access Layer (DAL) and Business Layer (BL) code for CRUD operations. Instead of manually writing repetitive methods for each database table, this project generates the complete DAL and BL classes in seconds, saving hours of development time and minimizing human errors.
