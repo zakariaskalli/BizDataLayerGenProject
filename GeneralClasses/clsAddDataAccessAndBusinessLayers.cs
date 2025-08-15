@@ -164,7 +164,7 @@ END;
         }
 
 
-        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods )
+        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP)
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
 
@@ -241,7 +241,7 @@ END;
 
                 string[] DataTypesForCreating = clsGeneralWithData.GetDataTypesForCreating(NameTables[i], clsGlobal.DataBaseName);
                 // Create the instance of clsCreatingSPsForTable with the new folder path
-                clsCreatingSPsForTable AddSPs = new clsCreatingSPsForTable(spTablesFolderPath, NameTables[i], Columns, DataTypesForCreating, NullibietyColumns);
+                clsCreatingSPsForTable AddSPs = new clsCreatingSPsForTable(spTablesFolderPath, NameTables[i], Columns, DataTypesForCreating, NullibietyColumns, AutoExcuteSP);
 
                 // Generate the stored procedures
                 clsGlobal.enTypeRaisons enRaisonForProjectSPs = AddSPs.GenerateAllSPs();

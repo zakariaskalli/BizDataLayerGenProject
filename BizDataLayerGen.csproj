@@ -65,7 +65,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup />
@@ -79,7 +79,7 @@
       <HintPath>..\..\..\Users\Zakaria Skalli\OneDrive\Bureau\ClassLibrary1\bin\Debug\ClassLibrary1.dll</HintPath>
     </Reference>
     <Reference Include="Guna.UI2">
-      <HintPath>..\..\..\..\..\..\Programation Level 2\BizDataLayerGen\bin\Debug\Guna.UI2.dll</HintPath>
+      <HintPath>..\zakariaskalli\DVLDProject\AllPackages\Guna.UI2.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.VisualBasic" />
@@ -148,7 +148,6 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="BizDataLayerGen_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -192,7 +191,7 @@
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 et x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

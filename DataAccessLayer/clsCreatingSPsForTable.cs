@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,14 +14,40 @@ namespace BizDataLayerGen.DataAccessLayer
         private string[] _columns;
         private string[] _dataTypes;
         private bool[] _nullabilityColumns;
+        private bool AutoExcuteSP;
 
-        public clsCreatingSPsForTable(string filePath, string tableName, string[] columns, string[] dataTypes, bool[] nullabilityColumns)
+        public clsCreatingSPsForTable(string filePath, string tableName, string[] columns,
+            string[] dataTypes, bool[] nullabilityColumns, bool autoExcuteSP)
         {
             this._filePath = filePath;
             this._tableName = tableName;
             this._columns = columns;
             this._dataTypes = dataTypes;
             this._nullabilityColumns = nullabilityColumns;
+            AutoExcuteSP = autoExcuteSP;
+        }
+
+        public static void ExecuteSqlFile(string filePath)
+        {
+            string script = File.ReadAllText(filePath);
+
+            // Split script on "GO" (case-insensitive) with trimming
+            string[] commands = script
+                .Split(new[] { "GO", "go", "Go", "gO" }, StringSplitOptions.RemoveEmptyEntries);
+
+            using (SqlConnection conn = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {
+                conn.Open();
+                foreach (string cmd in commands)
+                {
+                    if (string.IsNullOrWhiteSpace(cmd)) continue;
+
+                    using (SqlCommand sqlCmd = new SqlCommand(cmd, conn))
+                    {
+                        sqlCmd.ExecuteNonQuery();
+                    }
+                }
+            }
         }
 
         public clsGlobal.enTypeRaisons GenerateAllSPs()
@@ -55,6 +82,12 @@ namespace BizDataLayerGen.DataAccessLayer
 
             // Write all SPs to the dynamically generated .sql file
             File.WriteAllText(fullPath, sb.ToString());
+
+            if (AutoExcuteSP)
+            {
+                ExecuteSqlFile(fullPath);
+            }
+
 
             return clsGlobal.enTypeRaisons.enPerfect;
 

@@ -1,15 +1,16 @@
 ﻿using BizDataLayerGen.DataAccessLayer;
+using BizDataLayerGen.GeneralClasses;
+using Guna.UI2.WinForms;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
-using BizDataLayerGen.GeneralClasses;
-using System.Data;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using System.Text;
+using System.Windows.Forms;
 //using GymDB_DataLayer;
 //using GymDB_BusinessLayer;
 
@@ -429,19 +430,11 @@ namespace BizDataLayerGen
 
             bool AddingStaticMethods = rbAddingStaticMethodsYes.Checked == true && rbAddingStaticMethodsNo.Checked == false;
 
+            bool AutoExcuteSP = switchAutoExcuteSP.Checked;
 
-
-            if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods) == clsGlobal.enTypeRaisons.enPerfect)
+            if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
-
-
-
-
-
-
-            //else
-            //    MessageBox.Show("Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
 
 
@@ -527,9 +520,10 @@ namespace BizDataLayerGen
             this.Close();
         }
 
-        private void guna2HtmlLabel2_Click(object sender, EventArgs e)
-        {
 
+        private void guna2ToggleSwitch2_CheckedChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("This Feature is Not Available Yet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
