@@ -29,6 +29,9 @@ For example, generating DAL and BL for 20 tables manually might take around 60 h
   Captures runtime errors from methods or SPs and logs them into an `ErrorLog` table inside the database.  
   Also stores detailed error information in JSON files using a Publisher-Subscriber design pattern, allowing easy future extensions for error tracking or notification.
 
+- **Auto Execute SP**  
+  Toggle the Auto Execute switch to instantly run generated CREATE or ALTER stored procedures in the database.
+
 - **User-Friendly UI**  
   Simple and clean interface for:  
   - Connecting to SQL Server by entering credentials  
