@@ -25,7 +25,7 @@ For example, generating DAL and BL for 20 tables manually might take around 60 h
 - **Robust Stored Procedure (SP) Handling**  
   Produces professional SP code for complex data operations.
 
-- **Error Handling and Logging**  
+- **Error Handling and Logging (Publisher-Subscriber design pattern)**  
   Captures runtime errors from methods or SPs and logs them into an `ErrorLog` table inside the database.  
   Also stores detailed error information in JSON files using a Publisher-Subscriber design pattern, allowing easy future extensions for error tracking or notification.
 
