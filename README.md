@@ -32,6 +32,10 @@ For example, generating DAL and BL for 20 tables manually might take around 60 h
 - **Auto Execute SP**  
   Toggle the Auto Execute switch to instantly run generated CREATE or ALTER stored procedures in the database.
 
+- **Lazy Load Support for Related Entities (Lazy Load Design Pattern)**  
+  The generated classes now initialize foreign key references (e.g., Reservations, Guests, Users) using **Lazy<T>**, 
+  so related data is loaded **only when accessed**. This improves performance and reduces unnecessary database calls.
+ 
 - **User-Friendly UI**  
   Simple and clean interface for:  
   - Connecting to SQL Server by entering credentials  
