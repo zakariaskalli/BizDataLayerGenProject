@@ -54,15 +54,76 @@ namespace BizDataLayerGen.GeneralClasses
             // Here we assume the primary key is always nullable (you can adjust if needed)
             sb.AppendLine($"        public {_DataTypes[0]}? {_Columns[0]} {{ get; set; }}");
 
-            // Create a dictionary for FK columns and their corresponding table names for faster lookup
-            var foreignKeys = _ColumnNamesHasFK
-                .Zip(_TablesNameHasFK, (column, table) => new { column, table })
-                .ToDictionary(x => x.column, x => x.table);
+            var foreignKeyMap = _ColumnNamesHasFK
+                .Select((fkColumn, index) => new { fkColumn, tableName = _TablesNameHasFK[index], referencedColumn = _ReferencedColumn[index] })
+                .ToDictionary(x => x.fkColumn, x => new { x.tableName, x.referencedColumn });
 
             // Loop through all the columns starting from index 1
             for (int i = 1; i < _Columns.Length; i++)
             {
                 string columnName = _Columns[i];
+
+
+                // Check if the column has a foreign key and add the corresponding property
+                if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
+                {
+                    /*
+                        First:
+                        
+                        public int ReservationID { get; set; }
+                        public clsReservations ReservationsInfo { get; set; }
+                     
+
+                        Second:
+                    
+                        public int ReservationID { get; set; }
+                        private Lazy<clsReservations> _reservationsInfo;
+                        public clsReservations ReservationsInfo => _reservationsInfo.Value;
+                     
+                    
+                        Third:
+                    
+                        private int _reservationID;
+                        public int ReservationID
+                        {
+                            get => _reservationID;
+                            set
+                            {
+                                _reservationID = value;
+                                _ReservationsInfo = new Lazy<clsReservations>(() =>
+                                    _reservationID > 0 ? clsReservations.FindByReservationID(_reservationID) : null);
+                            }
+                        }
+                        private Lazy<clsReservations> _ReservationsInfo;
+                        public clsReservations ReservationsInfo => _ReservationsInfo.Value;
+
+                     */
+
+                    sb.AppendLine("");
+
+                    sb.AppendLine($"        private {_DataTypes[i]} _{columnName};");
+                    sb.AppendLine($"        public {_DataTypes[i]} {columnName}");
+                    sb.AppendLine($"        {{");
+                    sb.AppendLine($"            get => _{columnName};");
+                    sb.AppendLine($"            set");
+                    sb.AppendLine($"            {{");
+                    sb.AppendLine($"                _{columnName} = value;");
+                    sb.AppendLine($"                _{foreignKey.tableName}Info = new Lazy<cls{foreignKey.tableName}>(() =>");
+
+
+                    // إذا كان العمود مفتاح خارجي، أضف البحث مع استخدام العمود المرجعي
+                    sb.AppendLine($"                    _{columnName} > 0 ? cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}(_{columnName}) : null);");
+                    sb.AppendLine($"            }}");
+                    sb.AppendLine($"        }}");
+
+                    sb.AppendLine($"        private Lazy<cls{foreignKey.tableName}> _{foreignKey.tableName}Info;");
+                    sb.AppendLine($"        public cls{foreignKey.tableName} {foreignKey.tableName}Info => _{foreignKey.tableName}Info.Value;");
+
+                    sb.AppendLine("");
+
+                    continue;
+                }
+
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
 
@@ -73,14 +134,9 @@ namespace BizDataLayerGen.GeneralClasses
 
                 string defaultValue = (isNullable && canAcceptNull) ? " = null;" : "";
 
+
                 // Append the property declaration with the default value (if applicable)
                 sb.AppendLine($"        public {dataType}{nullableIndicator} {columnName} {{ get; set; }}{defaultValue}");
-
-                // Check if the column has a foreign key and add the corresponding property
-                if (foreignKeys.TryGetValue(columnName, out string relatedTable))
-                {
-                    sb.AppendLine($"        public cls{relatedTable} {relatedTable}Info {{ get; set; }}");
-                }
 
             }
 
@@ -89,7 +145,8 @@ namespace BizDataLayerGen.GeneralClasses
 
         // Consturctors
 
-        public string AddNormalConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
+        public string AddNormalConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns,
+            string[] _ColumnNamesHasFK, string[] _TablesNameHasFK, string _TableName)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -143,11 +200,34 @@ namespace BizDataLayerGen.GeneralClasses
                 }
             }
 
+            // The Lazy Load
+            sb.AppendLine("\n");
+
+            //var foreignKeyMap = _ColumnNamesHasFK
+            //    .Select((fkColumn, index) => new { fkColumn, tableName = _TablesNameHasFK[index], referencedColumn = _ReferencedColumn[index] })
+            //    .ToDictionary(x => x.fkColumn, x => new { x.tableName, x.referencedColumn });
+            //
+            //foreach (var columnName in _Columns)
+            //{
+            //    // If the column is a foreign key, add the lookup using the reference column.
+            //    if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
+            //    {
+            //        // Replace with the corresponding referenced column
+            //        sb.AppendLine($"            _{foreignKey.tableName}Info = new Lazy<cls{foreignKey.tableName}>(() => null);");
+            //    }
+            //}
+            //sb.AppendLine("");
+
+
+            //sb.AppendLine("            InitLazyLoaders();");
+
+
             sb.AppendLine("            Mode = enMode.AddNew;");
             sb.AppendLine("        }");
 
             return sb.ToString();
         }
+
 
         public string AddUpdateConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName,
             string[] _ColumnNamesHasFK, string[] _TablesNameHasFK, string[] _ReferencedColumn)
@@ -172,12 +252,20 @@ namespace BizDataLayerGen.GeneralClasses
                 sb.AppendLine($"            this.{columnName} = {columnName};");
 
                 // إذا كان العمود مفتاح خارجي، أضف البحث مع استخدام العمود المرجعي
-                if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
-                {
-                    // Replace with the corresponding referenced column
-                    sb.AppendLine($"            this.{foreignKey.tableName}Info = cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}({columnName});");
-                }
+                //if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
+                //{
+                //    // Replace with the corresponding referenced column
+                //    //sb.AppendLine($"            this.{foreignKey.tableName}Info = cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}({columnName});");
+                //
+                //
+                //    //Lazy Load
+                //    sb.AppendLine($"            _{foreignKey.tableName}Info = new Lazy<cls{foreignKey.tableName}>(() => {columnName} > 0 ? cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}({columnName}) : null);");
+                //
+                //}
             }
+
+            //sb.AppendLine("            InitLazyLoaders();");
+
 
             // Add the additional logic for nullable fields and other specific assignments
             sb.AppendLine("            Mode = enMode.Update;");
@@ -187,6 +275,41 @@ namespace BizDataLayerGen.GeneralClasses
 
             return sb.ToString();
 
+        }
+
+        public string InitLazyLoaders(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns,
+            string[] _ColumnNamesHasFK, string[] _TablesNameHasFK, string _TableName)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Constructor signature
+            sb.AppendLine($"        private void InitLazyLoaders()");
+            sb.AppendLine("        {");
+
+            
+            // The Lazy Load
+            sb.AppendLine("\n");
+
+            var foreignKeyMap = _ColumnNamesHasFK
+                .Select((fkColumn, index) => new { fkColumn, tableName = _TablesNameHasFK[index], referencedColumn = _ReferencedColumn[index] })
+                .ToDictionary(x => x.fkColumn, x => new { x.tableName, x.referencedColumn });
+
+            foreach (var columnName in _Columns)
+            {
+                // If the column is a foreign key, add the lookup using the reference column.
+                if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
+                {
+                    sb.AppendLine();
+
+                    // Replace with the corresponding referenced column
+                    sb.AppendLine($"            _{foreignKey.tableName}Info = new Lazy<cls{foreignKey.tableName}>(() => _{columnName} > 0 ? cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}(_{columnName}) : null);");
+                }
+            }
+            sb.AppendLine("");
+
+            sb.AppendLine("        }");
+
+            return sb.ToString();
         }
 
 
@@ -663,7 +786,7 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 
 {AddAllFields(_Columns, _DataTypes, _NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK)}
 
-{AddNormalConstructor(_Columns, _DataTypes, _NullibietyColumns, _TableName)}
+{AddNormalConstructor(_Columns, _DataTypes, _NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _TableName)}
 
 {AddUpdateConstructor(_Columns,_DataTypes, _NullibietyColumns, _TableName, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn)}
 
