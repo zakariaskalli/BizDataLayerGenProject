@@ -85,9 +85,12 @@ namespace BizDataLayerGen.GeneralClasses
 
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public class cls{_TableName}DetailsDTO");
+            sb.AppendLine($"       public class cls{_TableName}DetailsDTO : cls{_TableName}DTO");
             sb.AppendLine("       {");
 
+            // Inheritance 
+
+            /*
             sb.AppendLine($"        public {_DataTypes[0]}? {_Columns[0]} {{ get; set; }}");
 
 
@@ -114,6 +117,7 @@ namespace BizDataLayerGen.GeneralClasses
 
 
             }
+            */
 
 
             var foreignKeyMap = _ColumnNamesHasFK
