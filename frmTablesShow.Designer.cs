@@ -43,7 +43,7 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.guna2ToggleSwitch2 = new Guna.UI2.WinForms.Guna2ToggleSwitch();
+            this.switchUsingDTO = new Guna.UI2.WinForms.Guna2ToggleSwitch();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -60,7 +60,7 @@
             this.btnGenerate.HoverState.Parent = this.btnGenerate;
             this.btnGenerate.Image = global::BizDataLayerGen.Properties.Resources.magic_wand;
             this.btnGenerate.ImageAlign = System.Windows.Forms.HorizontalAlignment.Left;
-            this.btnGenerate.Location = new System.Drawing.Point(70, 334);
+            this.btnGenerate.Location = new System.Drawing.Point(79, 333);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.ShadowDecoration.Parent = this.btnGenerate;
             this.btnGenerate.Size = new System.Drawing.Size(161, 48);
@@ -219,7 +219,7 @@
             // 
             this.groupBox3.Controls.Add(this.label2);
             this.groupBox3.Controls.Add(this.label1);
-            this.groupBox3.Controls.Add(this.guna2ToggleSwitch2);
+            this.groupBox3.Controls.Add(this.switchUsingDTO);
             this.groupBox3.Controls.Add(this.switchAutoExcuteSP);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(387, 260);
@@ -247,31 +247,30 @@
             this.label1.TabIndex = 28;
             this.label1.Text = "Auto Excute SP";
             // 
-            // guna2ToggleSwitch2
+            // switchUsingDTO
             // 
-            this.guna2ToggleSwitch2.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.guna2ToggleSwitch2.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.guna2ToggleSwitch2.CheckedState.InnerBorderColor = System.Drawing.Color.White;
-            this.guna2ToggleSwitch2.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.guna2ToggleSwitch2.CheckedState.Parent = this.guna2ToggleSwitch2;
-            this.guna2ToggleSwitch2.Location = new System.Drawing.Point(14, 74);
-            this.guna2ToggleSwitch2.Name = "guna2ToggleSwitch2";
-            this.guna2ToggleSwitch2.ShadowDecoration.Parent = this.guna2ToggleSwitch2;
-            this.guna2ToggleSwitch2.Size = new System.Drawing.Size(35, 20);
-            this.guna2ToggleSwitch2.TabIndex = 27;
-            this.guna2ToggleSwitch2.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.guna2ToggleSwitch2.UncheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.guna2ToggleSwitch2.UncheckedState.InnerBorderColor = System.Drawing.Color.White;
-            this.guna2ToggleSwitch2.UncheckedState.InnerColor = System.Drawing.Color.White;
-            this.guna2ToggleSwitch2.UncheckedState.Parent = this.guna2ToggleSwitch2;
-            this.guna2ToggleSwitch2.CheckedChanged += new System.EventHandler(this.guna2ToggleSwitch2_CheckedChanged);
+            this.switchUsingDTO.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.switchUsingDTO.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.switchUsingDTO.CheckedState.InnerBorderColor = System.Drawing.Color.White;
+            this.switchUsingDTO.CheckedState.InnerColor = System.Drawing.Color.White;
+            this.switchUsingDTO.CheckedState.Parent = this.switchUsingDTO;
+            this.switchUsingDTO.Location = new System.Drawing.Point(14, 74);
+            this.switchUsingDTO.Name = "switchUsingDTO";
+            this.switchUsingDTO.ShadowDecoration.Parent = this.switchUsingDTO;
+            this.switchUsingDTO.Size = new System.Drawing.Size(35, 20);
+            this.switchUsingDTO.TabIndex = 27;
+            this.switchUsingDTO.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.switchUsingDTO.UncheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.switchUsingDTO.UncheckedState.InnerBorderColor = System.Drawing.Color.White;
+            this.switchUsingDTO.UncheckedState.InnerColor = System.Drawing.Color.White;
+            this.switchUsingDTO.UncheckedState.Parent = this.switchUsingDTO;
             // 
             // frmTablesShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.HighlightText;
-            this.ClientSize = new System.Drawing.Size(608, 394);
+            this.ClientSize = new System.Drawing.Size(608, 391);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.guna2CircleButton1);
             this.Controls.Add(this.groupBox2);
@@ -311,7 +310,7 @@
         private Guna.UI2.WinForms.Guna2ToggleSwitch switchAutoExcuteSP;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label1;
-        private Guna.UI2.WinForms.Guna2ToggleSwitch guna2ToggleSwitch2;
+        private Guna.UI2.WinForms.Guna2ToggleSwitch switchUsingDTO;
         private System.Windows.Forms.Label label2;
     }
 }

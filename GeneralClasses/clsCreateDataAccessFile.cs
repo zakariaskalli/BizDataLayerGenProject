@@ -535,5 +535,6 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 
             return Files.CreateDataAccessClassFile();
         }
+
     }
 }

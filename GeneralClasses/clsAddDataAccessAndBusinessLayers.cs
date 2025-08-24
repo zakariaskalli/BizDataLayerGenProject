@@ -22,15 +22,16 @@ namespace BizDataLayerGen.GeneralClasses
 
                 string dataAccessLayerPath = "";
                 string businessLayerPath = "";
-
+                string dtoLayerPath = "";
 
                 // Define folder names for Data Access Layer and Business Layer
                 clsGlobal.dataAccessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DataAccess");
                 clsGlobal.businessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Business");
+                clsGlobal.DTOLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DTO");
 
                 dataAccessLayerPath = clsGlobal.dataAccessLayerPath;
                 businessLayerPath = clsGlobal.businessLayerPath;
-
+                dtoLayerPath = clsGlobal.DTOLayerPath;
 
                 // Check if the folders already exist, if not, create them
                 if (!Directory.Exists(dataAccessLayerPath))
@@ -43,7 +44,11 @@ namespace BizDataLayerGen.GeneralClasses
                 else
                     return false;
 
-                
+
+                if (!Directory.Exists(dtoLayerPath))
+                    Directory.CreateDirectory(dtoLayerPath);
+                else
+                    return false;
             }
             catch (Exception ex)
             {
@@ -164,7 +169,7 @@ END;
         }
 
 
-        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP)
+        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO)
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
 
@@ -223,6 +228,8 @@ END;
                 bool[] NullibietyColumns = clsGeneralWithData.GetColumnNullabilityFromTable(NameTables[i], clsGlobal.DataBaseName);
 
 
+
+
                 clsCreateDataAccessFile AddDataAccessLayer = new clsCreateDataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
 
                 clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
@@ -269,6 +276,18 @@ END;
                     DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
 
                 clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
+
+                if (UseDTO)
+                {
+                    clsCreateDTOFile AddDTOLayer = new clsCreateDTOFile(clsGlobal.DTOLayerPath, NameTables[i], Columns,
+                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn);
+
+                    clsGlobal.enTypeRaisons enRaisonForProjectDTO = AddDTOLayer.CreateDTOLayerFile();
+                    if (enRaisonForProjectDTO != clsGlobal.enTypeRaisons.enPerfect)
+                    {
+                        return enRaisonForProjectDTO;
+                    }
+                }
 
 
                 if (enRaisonForProjectBusiness != clsGlobal.enTypeRaisons.enPerfect)

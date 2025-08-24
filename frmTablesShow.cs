@@ -432,7 +432,10 @@ namespace BizDataLayerGen
 
             bool AutoExcuteSP = switchAutoExcuteSP.Checked;
 
-            if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP) == clsGlobal.enTypeRaisons.enPerfect)
+            bool UseDTO = switchUsingDTO.Checked;
+
+
+            if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
 
@@ -520,10 +523,5 @@ namespace BizDataLayerGen
             this.Close();
         }
 
-
-        private void guna2ToggleSwitch2_CheckedChanged(object sender, EventArgs e)
-        {
-            MessageBox.Show("This Feature is Not Available Yet", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
     }
 }
