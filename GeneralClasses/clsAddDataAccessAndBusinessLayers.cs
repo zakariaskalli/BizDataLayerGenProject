@@ -228,14 +228,68 @@ END;
                 bool[] NullibietyColumns = clsGeneralWithData.GetColumnNullabilityFromTable(NameTables[i], clsGlobal.DataBaseName);
 
 
+                string[] _ColumnNamesHasFK = { };
+                string[] _TablesNameHasFK = { };
+                string[] _ReferencedColumn = { };
+
+                clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName, FKOfAll, ref _ColumnNamesHasFK, ref _TablesNameHasFK, ref _ReferencedColumn);
+
+                if (!UseDTO)
+                {
+                    // DAL
+                    clsCreateDataAccessFile AddDataAccessLayer = new clsCreateDataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
+
+                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
 
 
-                clsCreateDataAccessFile AddDataAccessLayer = new clsCreateDataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
 
-                clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
+                    // handle types of error enRaison and return
+                    if (enRaisonForProjectDataAccess != clsGlobal.enTypeRaisons.enPerfect)
+                    {
+                        return enRaisonForProjectDataAccess;
+                    }
+
+                    // BL
+                    clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
+                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
+
+                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
+
+                }
+                else if (UseDTO)
+                {
+                    // DAL
+                    clsCreateDataAccessFile AddDataAccessLayer = new clsCreateDataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
+
+                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
+
+                    // handle types of error enRaison and return
+                    if (enRaisonForProjectDataAccess != clsGlobal.enTypeRaisons.enPerfect)
+                    {
+                        return enRaisonForProjectDataAccess;
+                    }
+
+                    // BL
+
+                    clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
+                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
+
+                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
+
+                    // DTO
+
+                    clsCreateDTOFile AddDTOLayer = new clsCreateDTOFile(clsGlobal.DTOLayerPath, NameTables[i], Columns,
+                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn);
+
+                    clsGlobal.enTypeRaisons enRaisonForProjectDTO = AddDTOLayer.CreateDTOLayerFile();
+                    if (enRaisonForProjectDTO != clsGlobal.enTypeRaisons.enPerfect)
+                    {
+                        return enRaisonForProjectDTO;
+                    }
+                }
 
 
-
+                // SP
 
                 // Build the path to the new folder "SPTables"
                 string spTablesFolderPath = Path.Combine(clsGlobal.dataAccessLayerPath, "SPTables");
@@ -254,56 +308,6 @@ END;
                 clsGlobal.enTypeRaisons enRaisonForProjectSPs = AddSPs.GenerateAllSPs();
 
 
-
-
-
-                // Test "GetForeignKeys"
-
-                // handle types of error enRaison and return
-                if (enRaisonForProjectDataAccess != clsGlobal.enTypeRaisons.enPerfect)
-                {
-                    return enRaisonForProjectDataAccess;
-                }
-
-                string[] _ColumnNamesHasFK = { };
-                string[] _TablesNameHasFK = { };
-                string[] _ReferencedColumn = { };
-
-                clsGeneralWithData.GetForeignKeysByTableName(NameTables[i], NameTables, clsGlobal.DataBaseName, FKOfAll, ref _ColumnNamesHasFK,ref _TablesNameHasFK, ref _ReferencedColumn);
-
-                
-                clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
-                    DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
-
-                clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
-
-                if (UseDTO)
-                {
-                    clsCreateDTOFile AddDTOLayer = new clsCreateDTOFile(clsGlobal.DTOLayerPath, NameTables[i], Columns,
-                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn);
-
-                    clsGlobal.enTypeRaisons enRaisonForProjectDTO = AddDTOLayer.CreateDTOLayerFile();
-                    if (enRaisonForProjectDTO != clsGlobal.enTypeRaisons.enPerfect)
-                    {
-                        return enRaisonForProjectDTO;
-                    }
-                }
-
-
-                if (enRaisonForProjectBusiness != clsGlobal.enTypeRaisons.enPerfect)
-                {
-                    return enRaisonForProjectBusiness;
-                }
-
-
-                //if (!clsGeneralWithData.HasForeignKey(NameTables[i]))
-                //{
-                //    
-                //}
-                //else
-                //{
-                //
-                //}
 
             }
 

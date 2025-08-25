@@ -115,6 +115,7 @@
     <Compile Include="GeneralClasses\clsAddDataAccessAndBusinessLayers.cs" />
     <Compile Include="GeneralClasses\clsCreateBusinessLayerFile.cs" />
     <Compile Include="GeneralClasses\clsCreateDataAccessFile.cs" />
+    <Compile Include="GeneralClasses\clsCreateDTOBusinessLayerFile.cs" />
     <Compile Include="GeneralClasses\clsCreateDTOFile.cs" />
     <Compile Include="GeneralClasses\clsGenDataBizLayerMethods.cs" />
     <Compile Include="GeneralClasses\clsGeneraleThings.cs" />

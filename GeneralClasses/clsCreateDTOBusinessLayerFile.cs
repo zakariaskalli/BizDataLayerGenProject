@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BizDataLayerGen.GeneralClasses
 {
-    public class clsCreateBusinessLayerFile
+    public class clsCreateDTOBusinessLayerFile
     {
         private string _filePath;
         private string _TableName;
@@ -23,7 +23,7 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _ReferencedColumn;
         private bool _AddingStaticMethods;
 
-        public clsCreateBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
+        public clsCreateDTOBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
                                     bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] 
                                     ReferencedColumn, bool AddingStaticMethods)
         {
@@ -64,17 +64,6 @@ namespace BizDataLayerGen.GeneralClasses
                 string columnName = _Columns[i];
 
 
-                string dataType = _DataTypes[i];
-                bool isNullable = _NullibietyColumns[i];
-
-                // Check if the type itself can accept null (for example, reference types or nullable value types)
-                bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
-
-                string nullableIndicator = (canAcceptNull && isNullable) ? "?" : "";
-
-                string defaultValue = (isNullable && canAcceptNull) ? " = null;" : "";
-
-
                 // Check if the column has a foreign key and add the corresponding property
                 if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
                 {
@@ -112,8 +101,8 @@ namespace BizDataLayerGen.GeneralClasses
 
                     sb.AppendLine("");
 
-                    sb.AppendLine($"        private {_DataTypes[i]}{nullableIndicator} _{columnName};");
-                    sb.AppendLine($"        public {_DataTypes[i]}{nullableIndicator} {columnName}");
+                    sb.AppendLine($"        private {_DataTypes[i]} _{columnName};");
+                    sb.AppendLine($"        public {_DataTypes[i]} {columnName}");
                     sb.AppendLine($"        {{");
                     sb.AppendLine($"            get => _{columnName};");
                     sb.AppendLine($"            set");
@@ -134,6 +123,16 @@ namespace BizDataLayerGen.GeneralClasses
 
                     continue;
                 }
+
+                string dataType = _DataTypes[i];
+                bool isNullable = _NullibietyColumns[i];
+
+                // Check if the type itself can accept null (for example, reference types or nullable value types)
+                bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
+
+                string nullableIndicator = (canAcceptNull && isNullable) ? "?" : "";
+
+                string defaultValue = (isNullable && canAcceptNull) ? " = null;" : "";
 
 
                 // Append the property declaration with the default value (if applicable)
