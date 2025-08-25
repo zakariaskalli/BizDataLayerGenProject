@@ -271,10 +271,10 @@ END;
 
                     // BL
 
-                    clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
+                    clsCreateDTOBusinessLayerFile AddBusinessAccessLayer = new clsCreateDTOBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
                         DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
 
-                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
+                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateDTOBusinessLayerFile();
 
                     // DTO
 

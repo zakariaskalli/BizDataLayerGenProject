@@ -23,6 +23,20 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _ReferencedColumn;
         private bool _AddingStaticMethods;
 
+
+        Dictionary<string, string> defaultValues = new Dictionary<string, string>
+        {
+            { "int", "0" },
+            { "short", "0" },
+            { "long", "0" },
+            { "float", "0f" },
+            { "double", "0.0" },
+            { "decimal", "0m" },
+            { "string", "\"\"" },
+            { "DateTime", "DateTime.Now" },
+            { "bool", "false" }
+        };
+
         public clsCreateBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
                                     bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] 
                                     ReferencedColumn, bool AddingStaticMethods)
@@ -43,6 +57,7 @@ namespace BizDataLayerGen.GeneralClasses
             this._ReferencedColumn = ReferencedColumn;
             this._AddingStaticMethods = AddingStaticMethods;
         }
+
 
         public string AddAllFields(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns,
     string[] _ColumnNamesHasFK, string[] _TablesNameHasFK)
@@ -158,19 +173,6 @@ namespace BizDataLayerGen.GeneralClasses
             // For the primary key (first column), always assign null.
             sb.AppendLine($"            this.{_Columns[0]} = null;");
 
-            // Dictionary for default values based on data type.
-            var defaultValues = new Dictionary<string, string>
-    {
-        { "int", "0" },
-        { "short", "0" },
-        { "long", "0" },
-        { "float", "0f" },
-        { "double", "0.0" },
-        { "decimal", "0m" },
-        { "string", "\"\"" },
-        { "DateTime", "DateTime.Now" },
-        { "bool", "false" }
-    };
 
             // Loop through the remaining columns to assign default values.
             for (int i = 1; i < _Columns.Length; i++)
@@ -475,20 +477,6 @@ namespace BizDataLayerGen.GeneralClasses
             {{
                 return null;
             }}");
-
-
-            var defaultValues = new Dictionary<string, string>
-            {
-                { "int", "0" },
-                { "short", "0" },
-                { "long", "0" },
-                { "float", "0f" },
-                { "double", "0.0" },
-                { "decimal", "0m" },
-                { "string", "\"\"" },
-                { "DateTime", "DateTime.Now" },
-                { "bool", "false" }
-            };
 
 
             // Create Default value for The Variables
