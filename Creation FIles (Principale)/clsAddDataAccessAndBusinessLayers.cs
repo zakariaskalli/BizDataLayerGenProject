@@ -259,9 +259,9 @@ END;
                 else if (UseDTO)
                 {
                     // DAL
-                    clsCreateDataAccessFile AddDataAccessLayer = new clsCreateDataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
+                    clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
 
-                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
+                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDTODataAccessClassFile();
 
                     // handle types of error enRaison and return
                     if (enRaisonForProjectDataAccess != clsGlobal.enTypeRaisons.enPerfect)

@@ -102,8 +102,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataAccessLayer\clsCreatingSPsForTable.cs" />
-    <Compile Include="DataAccessLayer\clsErrorHandling.cs" />
+    <Compile Include="Creation DataAccessLayer\clsCreateDTODataAccessFile.cs" />
+    <Compile Include="Creation StoredProcedure\clsCreatingSPsForTable.cs" />
+    <Compile Include="ErrorHandler\clsErrorHandling.cs" />
     <Compile Include="ErrorHandler\ErrorHandler.cs" />
     <Compile Include="ConnectingWithRegister\clsRegister.cs" />
     <Compile Include="frmTablesShow.cs">
@@ -112,16 +113,16 @@
     <Compile Include="frmTablesShow.Designer.cs">
       <DependentUpon>frmTablesShow.cs</DependentUpon>
     </Compile>
-    <Compile Include="GeneralClasses\clsAddDataAccessAndBusinessLayers.cs" />
-    <Compile Include="GeneralClasses\clsCreateBusinessLayerFile.cs" />
-    <Compile Include="GeneralClasses\clsCreateDataAccessFile.cs" />
-    <Compile Include="GeneralClasses\clsCreateDTOBusinessLayerFile.cs" />
-    <Compile Include="GeneralClasses\clsCreateDTOFile.cs" />
-    <Compile Include="GeneralClasses\clsGenDataBizLayerMethods.cs" />
-    <Compile Include="GeneralClasses\clsGeneraleThings.cs" />
-    <Compile Include="GeneralClasses\clsGlobal.cs" />
-    <Compile Include="DataAccessLayer\clsDataAccessSettings.cs" />
-    <Compile Include="DataAccessLayer\clsGeneralWithData.cs" />
+    <Compile Include="Creation FIles %28Principale%29\clsAddDataAccessAndBusinessLayers.cs" />
+    <Compile Include="Creation BusinessLayer\clsCreateBusinessLayerFile.cs" />
+    <Compile Include="Creation DataAccessLayer\clsCreateDataAccessFile.cs" />
+    <Compile Include="Creation BusinessLayer\clsCreateDTOBusinessLayerFile.cs" />
+    <Compile Include="Creation DTO\clsCreateDTOFile.cs" />
+    <Compile Include="Creation FIles %28Principale%29\clsGenDataBizLayerMethods.cs" />
+    <Compile Include="Creation FIles %28Principale%29\clsGeneraleThings.cs" />
+    <Compile Include="Creation FIles %28Principale%29\clsGlobal.cs" />
+    <Compile Include="Creation DataAccessLayer\clsDataAccessSettings.cs" />
+    <Compile Include="Creation DataAccessLayer\clsGeneralWithData.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,9 +203,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Guna\" />
-    <Folder Include="TestCodeGenerator\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

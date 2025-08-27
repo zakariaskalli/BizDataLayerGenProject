@@ -197,6 +197,32 @@ namespace BizDataLayerGen.GeneralClasses
             return parameterCommandsBuilder.ToString();
         }
 
+        public static string CreatingCommandParameterDTO(string[] Columns, bool[] NullibietyColumns,string TableName, int StartBy = 1)
+        {
+            var parameterCommandsBuilder = new StringBuilder();
+
+            for (int i = StartBy; i < Columns.Length; i++) // Start With Second Item
+            {
+                // Remove Spaces to Add @
+                string cleanedColumn = Columns[i].Replace(" ", "");
+
+                // Check if the column is nullable
+                if (NullibietyColumns[i])
+                {
+                    parameterCommandsBuilder.AppendLine(
+                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {TableName}DTO.{cleanedColumn} ?? (object)DBNull.Value);"
+                    );
+                }
+                else
+                {
+                    parameterCommandsBuilder.AppendLine(
+                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {TableName}DTO.{cleanedColumn});"
+                    );
+                }
+            }
+
+            return parameterCommandsBuilder.ToString();
+        }
 
         public static string[] ConvertSqlDataTypesToCSharp(string[] sqlDataTypes)
         {
