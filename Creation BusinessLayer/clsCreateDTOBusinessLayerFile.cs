@@ -230,10 +230,10 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine("       {");
 
             // Start adding the AddNew call
-            sb.AppendLine($"        this.{_Columns[0]} = cls{_TableName}Data.AddNew{_TableName}(Data);");
+            sb.AppendLine($"           Data.{_Columns[0]} = cls{_TableName}Data.AddNew{_TableName}(Data);");
 
             // Return a condition checking if the object is not null
-            sb.AppendLine($"        return (this.{_Columns[0]} != null);");
+            sb.AppendLine($"           return (Data.{_Columns[0]} != null);");
             sb.AppendLine("       }");
 
             return sb.ToString();
@@ -541,6 +541,7 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 using System;
 using System.Data;
 using {clsGlobal.DataBaseName}_DataLayer;
+using {clsGlobal.DataBaseName}.DTO;
 
 namespace {clsGlobal.DataBaseName}_BusinessLayer
 {{

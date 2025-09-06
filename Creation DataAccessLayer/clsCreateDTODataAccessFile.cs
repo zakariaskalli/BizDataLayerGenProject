@@ -175,7 +175,8 @@ namespace BizDataLayerGen.GeneralClasses
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
 
-                GetReaderExpression(column, dataType, isNullable);
+                dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) );
+
 
             }
 
@@ -322,7 +323,7 @@ namespace BizDataLayerGen.GeneralClasses
              */
 
 
-            string GetTableByIDCode = @$"public static int? AddNew{_TableName}( cls{_TableName}DTO {_TableName}DTO)
+            string GetTableByIDCode = @$"public static int? AddNew{_TableName}(cls{_TableName}DTO {_TableName}DTO)
     {{
         int? {_Columns[0]} = null;
 
@@ -371,7 +372,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddUpdatingRecordMethod()
         {
 
-            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID({_DataTypes[0]}? {_Columns[0]}, {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})
+            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID(cls{_TableName}DTO {_TableName}DTO)
 {{
     int rowsAffected = 0;
 
@@ -511,6 +512,7 @@ using System.Data;
 using System.Linq;
 using {clsGlobal.DataBaseName}_DataAccess;
 using Newtonsoft.Json;
+using {clsGlobal.DataBaseName}.DTO;
 
 namespace {clsGlobal.DataBaseName}_DataLayer
 {{
