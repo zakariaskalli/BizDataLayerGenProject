@@ -249,6 +249,11 @@ namespace BizDataLayerGen.GeneralClasses
 
             return sb.ToString();
         }
+
+        
+
+
+
         public string AddStaticAddingNewRow(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns, string _TableName)
         {
             StringBuilder sb = new StringBuilder();

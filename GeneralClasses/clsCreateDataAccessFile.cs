@@ -79,26 +79,83 @@ namespace BizDataLayerGen.GeneralClasses
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
 
-                if (isNullable)
+            // لو النوع مش موجود في dictionary → fallback إلى GetValue
+            string readerMethod = typeMapping.ContainsKey(lowerType) ? typeMapping[lowerType] : "GetValue";
+
+            // بناء التعبير مع Nullability
+            if (isNullable)
+            {
+                switch (lowerType)
                 {
-                    // Handle nullable columns
-                    if (dataType == "string")
-                    {
-                        dataReaderCodeBuilder.AppendLine(
-                            $"                                {column} = reader[\"{_Columns[i]}\"] != DBNull.Value ? reader[\"{_Columns[i]}\"].ToString() : null;");
-                    }
-                    else
-                    {
-                        dataReaderCodeBuilder.AppendLine(
-                            $"                                {column} = reader[\"{_Columns[i]}\"] != DBNull.Value ? ({dataType}?)reader[\"{_Columns[i]}\"] : null;");
-                    }
+                    case "int": return $"reader.IsDBNull({ordinal}) ? (int?)null : reader.{readerMethod}({ordinal})";
+                    case "bigint": return $"reader.IsDBNull({ordinal}) ? (long?)null : reader.{readerMethod}({ordinal})";
+                    case "smallint": return $"reader.IsDBNull({ordinal}) ? (short?)null : reader.{readerMethod}({ordinal})";
+                    case "tinyint": return $"reader.IsDBNull({ordinal}) ? (byte?)null : reader.{readerMethod}({ordinal})";
+                    case "bit":
+                    case "bool":
+                    case "boolean": return $"reader.IsDBNull({ordinal}) ? (bool?)null : reader.{readerMethod}({ordinal})";
+                    case "decimal":
+                    case "numeric":
+                    case "money":
+                    case "smallmoney": return $"reader.IsDBNull({ordinal}) ? (decimal?)null : reader.{readerMethod}({ordinal})";
+                    case "float": return $"reader.IsDBNull({ordinal}) ? (double?)null : reader.{readerMethod}({ordinal})";
+                    case "real": return $"reader.IsDBNull({ordinal}) ? (float?)null : reader.{readerMethod}({ordinal})";
+                    case "char":
+                    case "varchar":
+                    case "text":
+                    case "nchar":
+                    case "nvarchar":
+                    case "ntext": return $"reader.IsDBNull({ordinal}) ? null : reader.{readerMethod}({ordinal})";
+                    case "datetime":
+                    case "date":
+                    case "datetime2":
+                    case "smalldatetime": return $"reader.IsDBNull({ordinal}) ? (DateTime?)null : reader.{readerMethod}({ordinal})";
+                    case "time": return $"reader.IsDBNull({ordinal}) ? (TimeSpan?)null : reader.{readerMethod}({ordinal})";
+                    case "uniqueidentifier": return $"reader.IsDBNull({ordinal}) ? (Guid?)null : reader.{readerMethod}({ordinal})";
+                    case "timestamp":
+                    case "binary":
+                    case "varbinary": return $"reader.IsDBNull({ordinal}) ? null : (byte[])reader.GetValue({ordinal})";
+                    case "xml": return $"reader.IsDBNull({ordinal}) ? null : (XDocument)reader.GetValue({ordinal})";
+                    default: return $"reader.IsDBNull({ordinal}) ? null : reader.GetValue({ordinal})";
+                }
+            }
+            else
+            {
+                // Non-nullable → مباشرة reader method أو fallback
+                switch (lowerType)
+                {
+                    case "time": return $"({readerMethod}?)reader.{readerMethod}({ordinal})"; // أو reader.GetValue
+                    case "timestamp":
+                    case "binary":
+                    case "varbinary": return $"(byte[])reader.GetValue({ordinal})";
+                    case "xml": return $"(XDocument)reader.GetValue({ordinal})";
+                    default: return $"reader.{readerMethod}({ordinal})";
+                }
+            }
+        }
+
+
+        private string AddDataReaderToVariablesDTO()
+        {
+            var dataReaderCodeBuilder = new StringBuilder();
+
+            for (int i = 1; i < _Columns.Length; i++) // Start from 1 to skip the first column
+            {
+                string column = _Columns[i].Replace(" ", "");
+                string dataType = _DataTypes[i];
+                bool isNullable = _NullibietyColumns[i];
+
+                if (i < _Columns.Length - 1)
+                {
+                    dataReaderCodeBuilder.AppendLine($"                {GetReaderExpression(column, dataType, isNullable)},");
+
                 }
                 else
                 {
-                    // Handle non-nullable columns
-                    dataReaderCodeBuilder.AppendLine(
-                        $"                                {column} = ({dataType})reader[\"{_Columns[i]}\"];");
+                    dataReaderCodeBuilder.Append($"                {GetReaderExpression(column, dataType, isNullable)}");
                 }
+
+
             }
 
             return dataReaderCodeBuilder.ToString();
@@ -163,10 +220,14 @@ namespace BizDataLayerGen.GeneralClasses
                 {{ 
                     if (reader.Read())
                     {{
-                        // The record was found
-                        isFound = true;
-
-{AddDataReaderToVariables()}
+                        return new cls{_TableName}DTO
+                        (
+                            {AddDataReaderToVariablesDTO()}
+                        );
+                    }}
+                    else
+                    {{
+                        return null;
                     }}
                 }}
             }}
@@ -176,65 +237,8 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         // Handle all exceptions in a general way
         ErrorHandler.HandleException(ex, nameof(Get{_TableName}InfoByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
-    }}
-
-    return isFound;
-}}";
-
-            return GetTableByIDCode;
-        }
-
-
-
-
-        // For Error Handling
-
-        /*
-                public string AddGetTableInfoByIDMethod()
-        {
-            string GetTableByIDCode = @$"public static bool Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]} {clsGenDataBizLayerMethods.ReferencesCode(_Columns, _DataTypes, _NullibietyColumns)})
-            {{
-                bool isFound = false;
-
-                try
-                {{
-                    using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
-                    {{
-                        string query = ""SP_Get_{_TableName}_ByID;"";
-
-                        using (SqlCommand command = new SqlCommand(query, connection))
-                        {{
-                            command.CommandType = CommandType.StoredProcedure;
-
-                            // Add the parameter for ID
-                            command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
-
-                            connection.Open();
-                            using (SqlDataReader reader = command.ExecuteReader())
-                            {{
-                                if (reader.Read())
-                                {{
-                                    // The record was found
-                                    isFound = true;
-
-        {AddDataReaderToVariables()}
-                                }}
-                            }}
-                        }}
-                    }}
-                }}
-                catch (SqlException sqlEx)
-                {{
-                    // Log SQL exception (database-related issue)
-                    clsLogger.Log(sqlEx); // افترض وجود دالة Log
-                    throw new DataAccessException(""An error occurred while accessing the database."", sqlEx);
-                }}
-                catch (Exception ex)
-                {{
-                    // Log general exceptions
-                    clsLogger.Log(ex);
-                    throw new ApplicationException(""An unexpected error occurred."", ex);
-                }}
+        return null;    
+}}
 
                 return isFound;
             }}";
