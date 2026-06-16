@@ -8,7 +8,7 @@ namespace BizDataLayerGen.DataAccessLayer
         //public static string UserId = "";
         //public static string Password = "";
 
-        public static string ConnectionString = $"Server=.;User Id={clsGlobal.UserId};Password={clsGlobal.Password};";
+        public static string ConnectionString = $"Server=.;User Id={clsGlobal.UserId};Password={clsGlobal.Password};TrustServerCertificate=True;Encrypt=False;";
 
         //static public string ConnectionString = ConfigurationManager.AppSettings["add"];
 

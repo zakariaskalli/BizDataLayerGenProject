@@ -94,7 +94,7 @@ namespace {ProjectName}_DataAccess
 {{
     static class clsDataAccessSettings
     {{
-        public static string ConnectionString = ""Server=.;Database={clsGlobal.DataBaseName};User Id={clsGlobal.UserId};Password={clsGlobal.Password}"";
+        public static string ConnectionString = ""Server=.;Database={clsGlobal.DataBaseName};User Id={clsGlobal.UserId};Password={clsGlobal.Password};TrustServerCertificate=True;Encrypt=False;"";
 
 
     }}
