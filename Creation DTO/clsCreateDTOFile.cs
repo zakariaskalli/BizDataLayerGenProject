@@ -28,6 +28,7 @@ namespace BizDataLayerGen.GeneralClasses
     { "double", "0.0" },
     { "decimal", "0m" },
     { "string", "string.Empty" },
+    { "string?", "null" },
     { "DateTime", "DateTime.Now" },
     { "DateTime?", "null" }, // حماية لتواريخ النهاية والتواريخ الاختيارية
     { "bool", "false" },
@@ -75,9 +76,14 @@ namespace BizDataLayerGen.GeneralClasses
                 bool isNullable = _NullibietyColumns[i];
 
                 // Check if the type itself can accept null (for example, reference types or nullable value types)
+                
+                // Auto
+                /*
                 bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
-
                 string nullableIndicator = (canAcceptNull && isNullable) ? "?" : "";
+                */
+
+                string nullableIndicator = isNullable ? "?" : "";
 
                 //string defaultValue = (isNullable && canAcceptNull) ? " = null;" : "";
 
@@ -118,9 +124,15 @@ namespace BizDataLayerGen.GeneralClasses
                 string columnName = _Columns[i];
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
-
+                
+                /*
                 bool canAcceptNull = !(clsGenDataBizLayerMethods.CanAcceptNull(dataType));
                 string nullableIndicator = (canAcceptNull && isNullable) ? "?" : "";
+                */
+
+
+                string nullableIndicator = isNullable ? "?" : "";
+
 
                 // إضافة النوع والاسم فقط كـ Field عادي
                 parametersList.Add($"{dataType}{nullableIndicator} {columnName}");
@@ -178,7 +190,7 @@ namespace BizDataLayerGen.GeneralClasses
                 {
 
 
-                    sb.AppendLine($"        public cls{foreignKey.tableName}DTO {foreignKey.tableName} {{ get; set; }}");
+                    sb.AppendLine($"        public cls{foreignKey.tableName}DTO? {foreignKey.tableName} {{ get; set; }} = null;");
                     
 
                     continue;

@@ -20,6 +20,7 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _Columns;
         private string[] _DataTypes;
         private bool[] _NullibietyColumns;
+
         public clsCreateDTODataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
             this._filePath = filePath;
@@ -73,15 +74,21 @@ namespace BizDataLayerGen.GeneralClasses
         public static string GetReaderExpression(string columnName, string dataType, bool isNullable)
         {
             string ordinal = $"reader.GetOrdinal(\"{columnName}\")";
-            string lowerType = dataType.ToLower();
 
-            // Dictionary يربط أنواع SQL ↔ reader methods أو C# types
+            // 1. معالجة مشكلة الـ Normalize للأحجام مثل nvarchar(100) أو decimal(18,2)
+            string lowerType = dataType.ToLower().Split('(')[0].Trim();
+
+            // القاموس الموحد لربط الأنواع
             var typeMapping = new Dictionary<string, string>
     {
         { "int", "GetInt32" },
+        { "int32", "GetInt32" },
         { "bigint", "GetInt64" },
+        { "int64", "GetInt64" },
         { "smallint", "GetInt16" },
+        { "int16", "GetInt16" },
         { "tinyint", "GetByte" },
+        { "byte", "GetByte" },
         { "bit", "GetBoolean" },
         { "bool", "GetBoolean" },
         { "boolean", "GetBoolean" },
@@ -90,6 +97,7 @@ namespace BizDataLayerGen.GeneralClasses
         { "money", "GetDecimal" },
         { "smallmoney", "GetDecimal" },
         { "float", "GetDouble" },
+        { "double", "GetDouble" },
         { "real", "GetFloat" },
         { "char", "GetString" },
         { "varchar", "GetString" },
@@ -97,30 +105,35 @@ namespace BizDataLayerGen.GeneralClasses
         { "nchar", "GetString" },
         { "nvarchar", "GetString" },
         { "ntext", "GetString" },
+        { "string", "GetString" },
         { "date", "GetDateTime" },
         { "datetime", "GetDateTime" },
         { "datetime2", "GetDateTime" },
         { "smalldatetime", "GetDateTime" },
-        { "time", "GetTimeSpan" },       // يجب تعريف GetTimeSpan أو fallback لـ GetValue
-        { "timestamp", "GetValue" },     // byte[]
-        { "binary", "GetValue" },        // byte[]
-        { "varbinary", "GetValue" },     // byte[]
+        { "time", "GetTimeSpan" },
+        { "timestamp", "GetValue" },
+        { "binary", "GetValue" },
+        { "varbinary", "GetValue" },
         { "uniqueidentifier", "GetGuid" },
-        { "xml", "GetValue" },           // XDocument أو string
+        { "guid", "GetGuid" },
+        { "xml", "GetValue" }
     };
 
-            // لو النوع مش موجود في dictionary → fallback إلى GetValue
             string readerMethod = typeMapping.ContainsKey(lowerType) ? typeMapping[lowerType] : "GetValue";
 
-            // بناء التعبير مع Nullability
+            // بناء التعبير بناءً على Nullability
             if (isNullable)
             {
                 switch (lowerType)
                 {
-                    case "int": return $"reader.IsDBNull({ordinal}) ? (int?)null : reader.{readerMethod}({ordinal})";
-                    case "bigint": return $"reader.IsDBNull({ordinal}) ? (long?)null : reader.{readerMethod}({ordinal})";
-                    case "smallint": return $"reader.IsDBNull({ordinal}) ? (short?)null : reader.{readerMethod}({ordinal})";
-                    case "tinyint": return $"reader.IsDBNull({ordinal}) ? (byte?)null : reader.{readerMethod}({ordinal})";
+                    case "int":
+                    case "int32": return $"reader.IsDBNull({ordinal}) ? (int?)null : reader.{readerMethod}({ordinal})";
+                    case "bigint":
+                    case "int64": return $"reader.IsDBNull({ordinal}) ? (long?)null : reader.{readerMethod}({ordinal})";
+                    case "smallint":
+                    case "int16": return $"reader.IsDBNull({ordinal}) ? (short?)null : reader.{readerMethod}({ordinal})";
+                    case "tinyint":
+                    case "byte": return $"reader.IsDBNull({ordinal}) ? (byte?)null : reader.{readerMethod}({ordinal})";
                     case "bit":
                     case "bool":
                     case "boolean": return $"reader.IsDBNull({ordinal}) ? (bool?)null : reader.{readerMethod}({ordinal})";
@@ -128,33 +141,48 @@ namespace BizDataLayerGen.GeneralClasses
                     case "numeric":
                     case "money":
                     case "smallmoney": return $"reader.IsDBNull({ordinal}) ? (decimal?)null : reader.{readerMethod}({ordinal})";
-                    case "float": return $"reader.IsDBNull({ordinal}) ? (double?)null : reader.{readerMethod}({ordinal})";
+                    case "float":
+                    case "double": return $"reader.IsDBNull({ordinal}) ? (double?)null : reader.{readerMethod}({ordinal})";
                     case "real": return $"reader.IsDBNull({ordinal}) ? (float?)null : reader.{readerMethod}({ordinal})";
                     case "char":
                     case "varchar":
                     case "text":
                     case "nchar":
                     case "nvarchar":
-                    case "ntext": return $"reader.IsDBNull({ordinal}) ? null : reader.{readerMethod}({ordinal})";
+                    case "ntext":
+                    case "string": return $"reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal})";
                     case "datetime":
                     case "date":
                     case "datetime2":
                     case "smalldatetime": return $"reader.IsDBNull({ordinal}) ? (DateTime?)null : reader.{readerMethod}({ordinal})";
                     case "time": return $"reader.IsDBNull({ordinal}) ? (TimeSpan?)null : reader.{readerMethod}({ordinal})";
-                    case "uniqueidentifier": return $"reader.IsDBNull({ordinal}) ? (Guid?)null : reader.{readerMethod}({ordinal})";
+                    case "uniqueidentifier":
+                    case "guid": return $"reader.IsDBNull({ordinal}) ? (Guid?)null : reader.{readerMethod}({ordinal})";
                     case "timestamp":
                     case "binary":
                     case "varbinary": return $"reader.IsDBNull({ordinal}) ? null : (byte[])reader.GetValue({ordinal})";
                     case "xml": return $"reader.IsDBNull({ordinal}) ? null : (XDocument)reader.GetValue({ordinal})";
+
+                    // إصلاح مشكلة الـ Default لتعيد القيمة الأصلية الخام دون تحويل نصي مكسور
                     default: return $"reader.IsDBNull({ordinal}) ? null : reader.GetValue({ordinal})";
                 }
             }
             else
             {
-                // Non-nullable → مباشرة reader method أو fallback
+                // Non-nullable
                 switch (lowerType)
                 {
-                    case "time": return $"({readerMethod}?)reader.{readerMethod}({ordinal})"; // أو reader.GetValue
+                    case "char":
+                    case "varchar":
+                    case "text":
+                    case "nchar":
+                    case "nvarchar":
+                    case "ntext":
+                    case "string": return $"reader.GetString({ordinal})";
+
+                    // إصلاح خطأ الـ Cast المكسور للـ time ليصبح تعبيراً سليماً ومباشراً
+                    case "time": return $"reader.{readerMethod}({ordinal})";
+
                     case "timestamp":
                     case "binary":
                     case "varbinary": return $"(byte[])reader.GetValue({ordinal})";
@@ -164,10 +192,11 @@ namespace BizDataLayerGen.GeneralClasses
             }
         }
 
-
         private string AddDataReaderToVariablesDTO()
         {
             var dataReaderCodeBuilder = new StringBuilder();
+
+            dataReaderCodeBuilder.AppendLine(GetReaderExpression(_Columns[0].Replace(" ", ""), _DataTypes[0], false) + ",");
 
             for (int i = 1; i < _Columns.Length; i++) // Start from 1 to skip the first column
             {
@@ -175,7 +204,14 @@ namespace BizDataLayerGen.GeneralClasses
                 string dataType = _DataTypes[i];
                 bool isNullable = _NullibietyColumns[i];
 
-                dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) );
+                if (i == _Columns.Length - 1)
+                {
+                    dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) );
+                }
+                else
+                {
+                    dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) + "," );
+                }
 
 
             }
@@ -223,7 +259,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddGetTableInfoByIDMethod()
         {
-            string GetTableByIDCode = @$"public static cls{_TableName}DTO Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]})
+            string GetTableByIDCode = @$"public static cls{_TableName}DTO? Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]})
 {{
     try
     {{
@@ -261,6 +297,7 @@ namespace BizDataLayerGen.GeneralClasses
         // Handle all exceptions in a general way
         ErrorHandler.HandleException(ex, nameof(Get{_TableName}InfoByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
     }}
+        return null;
 
 }}";
 
@@ -303,6 +340,7 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         // Handle all exceptions in a general way
         ErrorHandler.HandleException(ex, nameof(GetAll{_TableName}), ""No parameters for this method."");
+    
     }}
 
     return {_TableName}List;
@@ -398,7 +436,7 @@ namespace BizDataLayerGen.GeneralClasses
     catch (Exception ex)
     {{
         // Handle exceptions
-        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
     }}
 
     return (rowsAffected > 0);
@@ -447,7 +485,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddSearchMethod()
         {
-            string GetTableByIDCode = @$"public static List<cls{_TableName}DTO> SearchData(string ColumnName, string SearchValue, string Mode = ""Anywhere"")
+            string GetTableByIDCode = @$"public static List<cls{_TableName}DTO>? SearchData(string ColumnName, string SearchValue, string Mode = ""Anywhere"")
 {{
     var {_TableName}List = new List<cls{_TableName}DTO>();
 
@@ -484,6 +522,7 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         // Handle all exceptions in a general way
         ErrorHandler.HandleException(ex, nameof(SearchData), $""ColumnName: {{ColumnName}}, SearchValue: {{SearchValue}}, Mode: {{Mode}}"");
+        return null;
     }}
 
     return {_TableName}List;
@@ -507,7 +546,7 @@ namespace BizDataLayerGen.GeneralClasses
             string code = $@"
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using {clsGlobal.DataBaseName}_DataAccess;

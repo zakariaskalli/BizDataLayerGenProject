@@ -82,8 +82,8 @@ namespace BizDataLayerGen.GeneralClasses
 
                     sb.AppendLine("");
 
-                    sb.AppendLine($"        private Lazy<cls{foreignKey.tableName}> _{foreignKey.tableName}Info;");
-                    sb.AppendLine($"        public cls{foreignKey.tableName} {foreignKey.tableName}Info =>  _{foreignKey.tableName}Info.Value;");
+                    sb.AppendLine($"        private Lazy<cls{foreignKey.tableName}?> _{foreignKey.tableName}Info = null!;");
+                    sb.AppendLine($"        public cls{foreignKey.tableName}? {foreignKey.tableName}Info =>  _{foreignKey.tableName}Info.Value;");
                     
                     sb.AppendLine("");
 
@@ -104,29 +104,31 @@ namespace BizDataLayerGen.GeneralClasses
             // Constructor signature
             sb.AppendLine($"        public cls{_TableName}()");
             sb.AppendLine("        {");
-            sb.AppendLine($"            Data = new cls{_TableName}DTO");
-            sb.AppendLine("        {");
+            sb.AppendLine($"            Data = new cls{_TableName}DTO {{}};");
+            
+            //sb.AppendLine("        {");
+            //
+            //// For the primary key (first column), always assign null.
+            //sb.AppendLine($"            {_Columns[0]} = null,");
+            //
+            //
+            //// Loop through the remaining columns to assign default values.
+            //for (int i = 1; i < _Columns.Length; i++)
+            //{
+            //    string columnName = _Columns[i];
+            //    string dataType = _DataTypes[i];
+            //    bool isNullableAndCanAcceptNull = _NullibietyColumns[i] && clsGenDataBizLayerMethods.CanAcceptNull(dataType);
+            //
+            //    string value = isNullableAndCanAcceptNull
+            //        ? "null"
+            //        : (defaultValues.ContainsKey(dataType) ? defaultValues[dataType] : $"default({dataType})");
+            //
+            //    // Append comma only if it's not the last column
+            //    sb.AppendLine($"            {columnName} = {value}{(i < _Columns.Length - 1 ? "," : "")}");
+            //}
+            //
+            //sb.AppendLine("        };");
 
-            // For the primary key (first column), always assign null.
-            sb.AppendLine($"            {_Columns[0]} = null,");
-
-
-            // Loop through the remaining columns to assign default values.
-            for (int i = 1; i < _Columns.Length; i++)
-            {
-                string columnName = _Columns[i];
-                string dataType = _DataTypes[i];
-                bool isNullableAndCanAcceptNull = _NullibietyColumns[i] && clsGenDataBizLayerMethods.CanAcceptNull(dataType);
-
-                string value = isNullableAndCanAcceptNull
-                    ? "null"
-                    : (defaultValues.ContainsKey(dataType) ? defaultValues[dataType] : $"default({dataType})");
-
-                // Append comma only if it's not the last column
-                sb.AppendLine($"            {columnName} = {value}{(i < _Columns.Length - 1 ? "," : "")}");
-            }
-
-            sb.AppendLine("        };");
 
             // The Lazy Load
             sb.AppendLine("\n");
@@ -208,7 +210,7 @@ namespace BizDataLayerGen.GeneralClasses
                     sb.AppendLine();
 
                     // Replace with the corresponding referenced column
-                    sb.AppendLine($"            _{foreignKey.tableName}Info = new Lazy<cls{foreignKey.tableName}>(() => Data.{columnName} > 0 ? cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}(Data.{columnName}) : null);");
+                    sb.AppendLine($"            _{foreignKey.tableName}Info = new Lazy<cls{foreignKey.tableName}?>(() => Data.{columnName} > 0 ? cls{foreignKey.tableName}.FindBy{foreignKey.referencedColumn}(Data.{columnName}) : null);");
                 }
             }
             sb.AppendLine("");
@@ -250,7 +252,7 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine("        {");
 
             // Start adding the AddNew call
-            sb.AppendLine($"            return cls{_TableName}Data.AddNew{_TableName}(dto);");
+            sb.AppendLine($"            return cls{_TableName}Data.AddNew{_TableName}(dto) != null;");
 
             sb.AppendLine("        }");
 
@@ -295,12 +297,12 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static cls{_TableName} FindBy{_Columns[0]}({_DataTypes[0]}? {_Columns[0]})");
+            sb.AppendLine($"       public static cls{_TableName}? FindBy{_Columns[0]}({_DataTypes[0]}? {_Columns[0]})");
             sb.AppendLine(@$"
         {{
             if ({_Columns[0]} == null) return null;");
 
-            sb.AppendLine($"            cls{_TableName}DTO = cls{_TableName}Data.Get{_TableName}InfoByID({_Columns[0]});");
+            sb.AppendLine($"            cls{_TableName}DTO? dto = cls{_TableName}Data.Get{_TableName}InfoByID({_Columns[0]});");
 
 
             sb.AppendLine($"                        if (dto == null) return null;\n");
@@ -433,10 +435,10 @@ namespace BizDataLayerGen.GeneralClasses
 
             // Constructor signature with parameters
             sb.AppendLine($@"
-        public static List<cls{_TableName}DTO> SearchData({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere)
+        public static List<cls{_TableName}DTO>? SearchData({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere)
         {{
             if (string.IsNullOrWhiteSpace(SearchValue) || !SqlHelper.IsSafeInput(SearchValue))
-                return new List<cls{_TableName}DTO>();
+                return null;
 
             string modeValue = Mode.ToString(); // Get the mode as string for passing to the stored procedure
 
