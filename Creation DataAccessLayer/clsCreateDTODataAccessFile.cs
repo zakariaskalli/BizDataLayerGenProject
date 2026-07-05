@@ -1,4 +1,8 @@
-﻿using System;
+﻿using BizDataLayerGen.AI;
+using BizDataLayerGen.DataAccessLayer;
+using Newtonsoft.Json;
+using BizDataLayerGen.AI;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -8,8 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using BizDataLayerGen.DataAccessLayer;
-using Newtonsoft.Json;
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -532,7 +534,7 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
-        public clsGlobal.enTypeRaisons CreateDTODataAccessClassFile()
+        public async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile()
         {
 
 
@@ -549,11 +551,11 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Linq;
-using {clsGlobal.DataBaseName}_DataAccess;
+using {clsGlobal.ProjectName}_DataAccess;
 using Newtonsoft.Json;
-using {clsGlobal.DataBaseName}.DTO;
+using {clsGlobal.ProjectName}.DTO;
 
-namespace {clsGlobal.DataBaseName}_DataLayer
+namespace {clsGlobal.ProjectName}_DataLayer
 {{
     public class cls{_TableName}Data
     {{
@@ -574,6 +576,7 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 }}
 ";
 
+            
             // Write the code to the file
             File.WriteAllText(fullPath, code);
 
@@ -581,11 +584,11 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 
         }
 
-        public static clsGlobal.enTypeRaisons CreateDTODataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
+        public static async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
             clsCreateDTODataAccessFile Files = new clsCreateDTODataAccessFile(filePath, TableName, Columns, DataTypes, NullibietyColumns);
 
-            return Files.CreateDTODataAccessClassFile();
+            return await Files.CreateDTODataAccessClassFile();
         }
 
     }

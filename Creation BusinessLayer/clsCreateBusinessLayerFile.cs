@@ -1,4 +1,5 @@
-﻿using BizDataLayerGen.DataAccessLayer;
+﻿using BizDataLayerGen.AI;
+using BizDataLayerGen.DataAccessLayer;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -42,7 +43,7 @@ namespace BizDataLayerGen.GeneralClasses
                                     ReferencedColumn, bool AddingStaticMethods)
         {
             this._filePath = filePath;
-            this._TableName = TableName;
+            this._TableName = clsGeneraleThings.Singularize( TableName);
             this._Columns = Columns;
 
             for (int i = 0; i < _Columns.Length; i++)
@@ -670,15 +671,15 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
-        public void AddCheckedTheDataIsSafeMethod()
+        public async void AddCheckedTheDataIsSafeMethod()
         {
 
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.DataBaseName}_DataLayer;
+using {clsGlobal.ProjectName}_DataLayer;
 
-namespace {clsGlobal.DataBaseName}_BusinessLayer
+namespace {clsGlobal.ProjectName}_BusinessLayer
 {{
     public class SqlHelper
     {{
@@ -736,12 +737,15 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 
             string fullPath = Path.Combine(_filePath, $"SqlHelper.cs");
 
+
+
+
             File.WriteAllText(fullPath, code);
 
         }
 
 
-        public clsGlobal.enTypeRaisons CreateBusinessLayerFile()
+        public async Task<clsGlobal.enTypeRaisons> CreateBusinessLayerFile()
         {
             // Define the full path for the file
             string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
@@ -762,9 +766,9 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.DataBaseName}_DataLayer;
+using {clsGlobal.ProjectName}_DataLayer;
 
-namespace {clsGlobal.DataBaseName}_BusinessLayer
+namespace {clsGlobal.ProjectName}_BusinessLayer
 {{
     public class cls{_TableName}
     {{
@@ -801,21 +805,23 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 }}
 ";
 
+
+
             // Write the code to the file
-            File.WriteAllText(fullPath, code);
+            File.WriteAllText(fullPath, code); 
 
             return clsGlobal.enTypeRaisons.enPerfect;
 
         }
 
-        public static clsGlobal.enTypeRaisons CreateBusinessLayerFile(string filePath, string TableName, string[] Columns,
+        public static async Task<clsGlobal.enTypeRaisons> CreateBusinessLayerFile(string filePath, string TableName, string[] Columns,
             string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] ReferencedColumn, bool AddingStaticMethods)
         {
             clsCreateBusinessLayerFile Files = new clsCreateBusinessLayerFile(filePath, TableName, Columns, DataTypes,
                                                                         NullibietyColumns, ColumnNamesHasFK, TablesNameHasFK,
                                                                         ReferencedColumn,AddingStaticMethods);
 
-            return Files.CreateBusinessLayerFile();
+            return await Files.CreateBusinessLayerFile();
         }
 
 

@@ -1,4 +1,6 @@
-﻿using BizDataLayerGen.DataAccessLayer;
+﻿using BizDataLayerGen.AI;
+using BizDataLayerGen.DataAccessLayer;
+using BizDataLayerGen.DocumentationGenerator;
 using BizDataLayerGen.GeneralClasses;
 using Guna.UI2.WinForms;
 using Newtonsoft.Json;
@@ -9,10 +11,13 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 //using GymDB_DataLayer;
 //using GymDB_BusinessLayer;
+
 
 namespace BizDataLayerGen
 {
@@ -118,7 +123,7 @@ namespace BizDataLayerGen
          
          */
 
-        private void btnGenerate_Click(object sender, EventArgs e)
+        private async  void btnGenerate_Click(object sender, EventArgs e)
         {
 
             bool SelectItem = false;
@@ -425,6 +430,9 @@ namespace BizDataLayerGen
 
 
 
+
+            clsGlobal.AICodeDocsEnabled = ckAiCodeDocs.Checked;
+
             
             bool FkOfAll = rbJustThis.Checked == false && rbAll.Checked == true;
 
@@ -435,12 +443,44 @@ namespace BizDataLayerGen
             bool UseDTO = switchUsingDTO.Checked;
 
 
-            if (clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO) == clsGlobal.enTypeRaisons.enPerfect)
-                MessageBox.Show($"Created Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
+            if (await clsAddLayers.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO) == clsGlobal.enTypeRaisons.enPerfect)
+                MessageBox.Show($"Code Generated Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
+            if (ckAiCodeDocs.Checked)
+            {
 
+                await GenerateDocumentationAsync();
+
+            }
+
+
+        }
+
+
+        private async Task GenerateDocumentationAsync()
+        {
+            AIDocumentationGenerator aiDocumentationService = new AIDocumentationGenerator();
+            DocumentationProcessor documentationProcessor = new DocumentationProcessor(aiDocumentationService);
+
+            var progress = new Progress<DocumentationProgress>(p =>
+            {
+                progressBar.Maximum = p.TotalFiles;
+                progressBar.Value = p.ProcessedFiles;
+
+                lbCurrentFile.Text =
+                    $"Processing: {p.CurrentFile} ({p.ProcessedFiles}/{p.TotalFiles}) - {p.Percentage:F2}%";
+            });
+
+            await documentationProcessor.ProcessDirectoryAsync(
+                clsGlobal.PathFilesToGenerate,
+                progress);
+
+            MessageBox.Show(
+                "Documentation generated successfully :)",
+                "Done",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -523,5 +563,9 @@ namespace BizDataLayerGen
             this.Close();
         }
 
+        private void guna2HtmlLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

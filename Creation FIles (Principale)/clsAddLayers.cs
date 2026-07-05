@@ -1,17 +1,19 @@
-﻿using BizDataLayerGen.DataAccessLayer;
+﻿using BizDataLayerGen.Creating_MigrationLayer;
+using BizDataLayerGen.DataAccessLayer;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
 
 namespace BizDataLayerGen.GeneralClasses
 {
-    public class clsAddDataAccessAndBusinessLayers
+    public class clsAddLayers
     {
         
         public static bool CreateProjectFolders(string ProjectName)
@@ -28,6 +30,8 @@ namespace BizDataLayerGen.GeneralClasses
                 clsGlobal.dataAccessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DataAccess");
                 clsGlobal.businessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Business");
                 clsGlobal.DTOLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DTO");
+                clsGlobal.MigrationLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Migration");
+
 
                 dataAccessLayerPath = clsGlobal.dataAccessLayerPath;
                 businessLayerPath = clsGlobal.businessLayerPath;
@@ -47,6 +51,11 @@ namespace BizDataLayerGen.GeneralClasses
 
                 if (!Directory.Exists(dtoLayerPath))
                     Directory.CreateDirectory(dtoLayerPath);
+                else
+                    return false;
+
+                if (!Directory.Exists(clsGlobal.MigrationLayerPath))
+                    Directory.CreateDirectory(clsGlobal.MigrationLayerPath);
                 else
                     return false;
             }
@@ -169,7 +178,7 @@ END;
         }
 
 
-        public static clsGlobal.enTypeRaisons AddDataAndBusinessLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO)
+        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO)
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
 
@@ -178,7 +187,7 @@ END;
                 return clsGlobal.enTypeRaisons.enError;
             }
 
-            if (!CreateProjectFolders(clsGlobal.DataBaseName))
+            if (!CreateProjectFolders(clsGlobal.ProjectName))
             {
                 return clsGlobal.enTypeRaisons.enError;
             }
@@ -188,7 +197,7 @@ END;
                 return clsGlobal.enTypeRaisons.enError;
             }
 
-            if (!CreateDataAccessSettingsClassFile(clsGlobal.DataBaseName))
+            if (!CreateDataAccessSettingsClassFile(clsGlobal.ProjectName))
             {
                 return clsGlobal.enTypeRaisons.enError;
             }
@@ -202,9 +211,6 @@ END;
             {
                 return clsGlobal.enTypeRaisons.enError;
             }
-
-
-
 
             for (int i = 0; NameTables.Length > i; i++)
             {
@@ -239,7 +245,7 @@ END;
                     // DAL
                     clsCreateDataAccessFile AddDataAccessLayer = new clsCreateDataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
 
-                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDataAccessClassFile();
+                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess =await AddDataAccessLayer.CreateDataAccessClassFile();
 
 
 
@@ -253,7 +259,7 @@ END;
                     clsCreateBusinessLayerFile AddBusinessAccessLayer = new clsCreateBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
                         DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
 
-                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateBusinessLayerFile();
+                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = await AddBusinessAccessLayer.CreateBusinessLayerFile();
 
                 }
                 else if (UseDTO)
@@ -261,7 +267,7 @@ END;
                     // DAL
                     clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
 
-                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = AddDataAccessLayer.CreateDTODataAccessClassFile();
+                    clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = await AddDataAccessLayer.CreateDTODataAccessClassFile();
 
                     // handle types of error enRaison and return
                     if (enRaisonForProjectDataAccess != clsGlobal.enTypeRaisons.enPerfect)
@@ -274,14 +280,14 @@ END;
                     clsCreateDTOBusinessLayerFile AddBusinessAccessLayer = new clsCreateDTOBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
                         DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
 
-                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = AddBusinessAccessLayer.CreateDTOBusinessLayerFile();
+                    clsGlobal.enTypeRaisons enRaisonForProjectBusiness = await AddBusinessAccessLayer.CreateDTOBusinessLayerFile();
 
                     // DTO
 
                     clsCreateDTOFile AddDTOLayer = new clsCreateDTOFile(clsGlobal.DTOLayerPath, NameTables[i], Columns,
                         DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn);
 
-                    clsGlobal.enTypeRaisons enRaisonForProjectDTO = AddDTOLayer.CreateDTOLayerFile();
+                    clsGlobal.enTypeRaisons enRaisonForProjectDTO = await AddDTOLayer.CreateDTOLayerFile();
                     if (enRaisonForProjectDTO != clsGlobal.enTypeRaisons.enPerfect)
                     {
                         return enRaisonForProjectDTO;
@@ -308,6 +314,7 @@ END;
                 clsGlobal.enTypeRaisons enRaisonForProjectSPs = AddSPs.GenerateAllSPs();
 
 
+               await clsCreateMigrationLayer.CreateMigrationLayer(clsGlobal.MigrationLayerPath);
 
             }
 

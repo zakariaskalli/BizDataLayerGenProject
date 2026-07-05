@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BizDataLayerGen.AI;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace BizDataLayerGen.GeneralClasses
     { "DateTime", "DateTime.Now" },
     { "DateTime?", "null" }, // حماية لتواريخ النهاية والتواريخ الاختيارية
     { "bool", "false" },
-    { "Guid", "Guid.Empty" } // إضافة مفيدة للأنواع الحديثة
+    { "Guid", "Guid.Empty" } // إضافة مفيدة للأنواع الحديثة 
 };
 
         public clsCreateDTOFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
@@ -237,7 +238,7 @@ namespace BizDataLayerGen.GeneralClasses
         }
         */
 
-        public clsGlobal.enTypeRaisons CreateDTOLayerFile()
+        public async Task<clsGlobal.enTypeRaisons> CreateDTOLayerFile()
         {
             // Define the full path for the file
             string fullPath = Path.Combine(_filePath, $"cls{_TableName}DTO.cs");

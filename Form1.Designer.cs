@@ -45,6 +45,8 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.guna2CircleButton1 = new Guna.UI2.WinForms.Guna2CircleButton();
+            this.guna2HtmlLabel7 = new Guna.UI2.WinForms.Guna2HtmlLabel();
+            this.txtProjectName = new Guna.UI2.WinForms.Guna2TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox1)).BeginInit();
@@ -89,15 +91,11 @@
             // btnBrowse
             // 
             this.btnBrowse.BorderRadius = 20;
-            this.btnBrowse.CheckedState.Parent = this.btnBrowse;
-            this.btnBrowse.CustomImages.Parent = this.btnBrowse;
             this.btnBrowse.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(98)))), ((int)(((byte)(81)))));
             this.btnBrowse.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnBrowse.ForeColor = System.Drawing.Color.White;
-            this.btnBrowse.HoverState.Parent = this.btnBrowse;
             this.btnBrowse.Location = new System.Drawing.Point(820, 262);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.ShadowDecoration.Parent = this.btnBrowse;
             this.btnBrowse.Size = new System.Drawing.Size(130, 40);
             this.btnBrowse.TabIndex = 6;
             this.btnBrowse.Text = "Browse";
@@ -108,7 +106,7 @@
             this.guna2HtmlLabel4.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel4.Font = new System.Drawing.Font("Microsoft Tai Le", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(98)))), ((int)(((byte)(81)))));
-            this.guna2HtmlLabel4.Location = new System.Drawing.Point(776, 376);
+            this.guna2HtmlLabel4.Location = new System.Drawing.Point(787, 388);
             this.guna2HtmlLabel4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel4.Name = "guna2HtmlLabel4";
             this.guna2HtmlLabel4.Size = new System.Drawing.Size(85, 25);
@@ -120,7 +118,7 @@
             this.guna2HtmlLabel5.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel5.Font = new System.Drawing.Font("Microsoft Tai Le", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(150)))), ((int)(((byte)(250)))));
-            this.guna2HtmlLabel5.Location = new System.Drawing.Point(834, 411);
+            this.guna2HtmlLabel5.Location = new System.Drawing.Point(834, 423);
             this.guna2HtmlLabel5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel5.Name = "guna2HtmlLabel5";
             this.guna2HtmlLabel5.Size = new System.Drawing.Size(121, 25);
@@ -135,21 +133,16 @@
             this.tbPathFilesToGenrate.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
             this.tbPathFilesToGenrate.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
             this.tbPathFilesToGenrate.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.tbPathFilesToGenrate.DisabledState.Parent = this.tbPathFilesToGenrate;
             this.tbPathFilesToGenrate.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
             this.tbPathFilesToGenrate.Enabled = false;
             this.tbPathFilesToGenrate.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.tbPathFilesToGenrate.FocusedState.Parent = this.tbPathFilesToGenrate;
             this.tbPathFilesToGenrate.Font = new System.Drawing.Font("Microsoft YaHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbPathFilesToGenrate.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.tbPathFilesToGenrate.HoverState.Parent = this.tbPathFilesToGenrate;
             this.tbPathFilesToGenrate.Location = new System.Drawing.Point(281, 262);
             this.tbPathFilesToGenrate.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.tbPathFilesToGenrate.Name = "tbPathFilesToGenrate";
-            this.tbPathFilesToGenrate.PasswordChar = '\0';
             this.tbPathFilesToGenrate.PlaceholderText = "";
             this.tbPathFilesToGenrate.SelectedText = "";
-            this.tbPathFilesToGenrate.ShadowDecoration.Parent = this.tbPathFilesToGenrate;
             this.tbPathFilesToGenrate.Size = new System.Drawing.Size(531, 40);
             this.tbPathFilesToGenrate.TabIndex = 10;
             // 
@@ -162,17 +155,13 @@
             this.cbDatabaseName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbDatabaseName.DropDownWidth = 393;
             this.cbDatabaseName.FocusedColor = System.Drawing.Color.Empty;
-            this.cbDatabaseName.FocusedState.Parent = this.cbDatabaseName;
             this.cbDatabaseName.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbDatabaseName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
             this.cbDatabaseName.FormattingEnabled = true;
-            this.cbDatabaseName.HoverState.Parent = this.cbDatabaseName;
             this.cbDatabaseName.IntegralHeight = false;
             this.cbDatabaseName.ItemHeight = 35;
-            this.cbDatabaseName.ItemsAppearance.Parent = this.cbDatabaseName;
             this.cbDatabaseName.Location = new System.Drawing.Point(281, 168);
             this.cbDatabaseName.Name = "cbDatabaseName";
-            this.cbDatabaseName.ShadowDecoration.Parent = this.cbDatabaseName;
             this.cbDatabaseName.Size = new System.Drawing.Size(497, 41);
             this.cbDatabaseName.Sorted = true;
             this.cbDatabaseName.TabIndex = 11;
@@ -181,15 +170,11 @@
             // btnUpload
             // 
             this.btnUpload.BorderRadius = 20;
-            this.btnUpload.CheckedState.Parent = this.btnUpload;
-            this.btnUpload.CustomImages.Parent = this.btnUpload;
             this.btnUpload.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(98)))), ((int)(((byte)(81)))));
             this.btnUpload.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpload.ForeColor = System.Drawing.Color.White;
-            this.btnUpload.HoverState.Parent = this.btnUpload;
             this.btnUpload.Location = new System.Drawing.Point(820, 169);
             this.btnUpload.Name = "btnUpload";
-            this.btnUpload.ShadowDecoration.Parent = this.btnUpload;
             this.btnUpload.Size = new System.Drawing.Size(130, 40);
             this.btnUpload.TabIndex = 13;
             this.btnUpload.Text = "Upload";
@@ -210,17 +195,13 @@
             // btnGenerate
             // 
             this.btnGenerate.BorderRadius = 20;
-            this.btnGenerate.CheckedState.Parent = this.btnGenerate;
-            this.btnGenerate.CustomImages.Parent = this.btnGenerate;
             this.btnGenerate.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
             this.btnGenerate.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGenerate.ForeColor = System.Drawing.Color.White;
-            this.btnGenerate.HoverState.Parent = this.btnGenerate;
             this.btnGenerate.Image = global::BizDataLayerGen.Properties.Resources.magic_wand;
             this.btnGenerate.ImageAlign = System.Windows.Forms.HorizontalAlignment.Left;
-            this.btnGenerate.Location = new System.Drawing.Point(370, 335);
+            this.btnGenerate.Location = new System.Drawing.Point(455, 388);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.ShadowDecoration.Parent = this.btnGenerate;
             this.btnGenerate.Size = new System.Drawing.Size(161, 48);
             this.btnGenerate.TabIndex = 12;
             this.btnGenerate.Text = "    Generate";
@@ -229,10 +210,10 @@
             // guna2PictureBox3
             // 
             this.guna2PictureBox3.Image = global::BizDataLayerGen.Properties.Resources.ai_technology;
+            this.guna2PictureBox3.ImageRotate = 0F;
             this.guna2PictureBox3.Location = new System.Drawing.Point(40, 12);
             this.guna2PictureBox3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2PictureBox3.Name = "guna2PictureBox3";
-            this.guna2PictureBox3.ShadowDecoration.Parent = this.guna2PictureBox3;
             this.guna2PictureBox3.Size = new System.Drawing.Size(154, 151);
             this.guna2PictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.guna2PictureBox3.TabIndex = 7;
@@ -241,10 +222,10 @@
             // guna2PictureBox2
             // 
             this.guna2PictureBox2.Image = global::BizDataLayerGen.Properties.Resources.code_branch;
+            this.guna2PictureBox2.ImageRotate = 0F;
             this.guna2PictureBox2.Location = new System.Drawing.Point(227, 258);
             this.guna2PictureBox2.Margin = new System.Windows.Forms.Padding(5, 5, 6, 5);
             this.guna2PictureBox2.Name = "guna2PictureBox2";
-            this.guna2PictureBox2.ShadowDecoration.Parent = this.guna2PictureBox2;
             this.guna2PictureBox2.Size = new System.Drawing.Size(45, 40);
             this.guna2PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.guna2PictureBox2.TabIndex = 4;
@@ -253,10 +234,10 @@
             // guna2PictureBox1
             // 
             this.guna2PictureBox1.Image = global::BizDataLayerGen.Properties.Resources.database_management;
+            this.guna2PictureBox1.ImageRotate = 0F;
             this.guna2PictureBox1.Location = new System.Drawing.Point(227, 169);
             this.guna2PictureBox1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2PictureBox1.Name = "guna2PictureBox1";
-            this.guna2PictureBox1.ShadowDecoration.Parent = this.guna2PictureBox1;
             this.guna2PictureBox1.Size = new System.Drawing.Size(45, 40);
             this.guna2PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.guna2PictureBox1.TabIndex = 3;
@@ -270,19 +251,53 @@
             // 
             this.guna2CircleButton1.BackgroundImage = global::BizDataLayerGen.Properties.Resources.Cancel;
             this.guna2CircleButton1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.guna2CircleButton1.CheckedState.Parent = this.guna2CircleButton1;
-            this.guna2CircleButton1.CustomImages.Parent = this.guna2CircleButton1;
             this.guna2CircleButton1.FillColor = System.Drawing.Color.Transparent;
             this.guna2CircleButton1.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.guna2CircleButton1.ForeColor = System.Drawing.Color.White;
-            this.guna2CircleButton1.HoverState.Parent = this.guna2CircleButton1;
             this.guna2CircleButton1.Location = new System.Drawing.Point(920, 12);
             this.guna2CircleButton1.Name = "guna2CircleButton1";
             this.guna2CircleButton1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.guna2CircleButton1.ShadowDecoration.Parent = this.guna2CircleButton1;
             this.guna2CircleButton1.Size = new System.Drawing.Size(35, 35);
             this.guna2CircleButton1.TabIndex = 21;
             this.guna2CircleButton1.Click += new System.EventHandler(this.guna2CircleButton1_Click);
+            // 
+            // guna2HtmlLabel7
+            // 
+            this.guna2HtmlLabel7.BackColor = System.Drawing.Color.Transparent;
+            this.guna2HtmlLabel7.Font = new System.Drawing.Font("Microsoft Tai Le", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.guna2HtmlLabel7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(98)))), ((int)(((byte)(81)))));
+            this.guna2HtmlLabel7.Location = new System.Drawing.Point(16, 345);
+            this.guna2HtmlLabel7.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.guna2HtmlLabel7.Name = "guna2HtmlLabel7";
+            this.guna2HtmlLabel7.Size = new System.Drawing.Size(128, 25);
+            this.guna2HtmlLabel7.TabIndex = 22;
+            this.guna2HtmlLabel7.Text = "ProjectName : ";
+            this.guna2HtmlLabel7.Click += new System.EventHandler(this.guna2HtmlLabel7_Click);
+            // 
+            // txtProjectName
+            // 
+            this.txtProjectName.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.txtProjectName.BorderRadius = 20;
+            this.txtProjectName.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtProjectName.DefaultText = "";
+            this.txtProjectName.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtProjectName.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtProjectName.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtProjectName.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtProjectName.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtProjectName.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtProjectName.ForeColor = System.Drawing.Color.DimGray;
+            this.txtProjectName.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtProjectName.Location = new System.Drawing.Point(283, 325);
+            this.txtProjectName.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtProjectName.Name = "txtProjectName";
+            this.txtProjectName.PlaceholderText = "Enter Project Name";
+            this.txtProjectName.SelectedText = "";
+            this.txtProjectName.Size = new System.Drawing.Size(529, 45);
+            this.txtProjectName.TabIndex = 23;
+            this.txtProjectName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtProjectName.TextChanged += new System.EventHandler(this.txtProjectName_TextChanged);
+            this.txtProjectName.Load += new System.EventHandler(this.txtProjectName_Load);
             // 
             // CodeGenratorForm
             // 
@@ -290,6 +305,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
             this.ClientSize = new System.Drawing.Size(970, 450);
+            this.Controls.Add(this.txtProjectName);
+            this.Controls.Add(this.guna2HtmlLabel7);
             this.Controls.Add(this.guna2CircleButton1);
             this.Controls.Add(this.guna2HtmlLabel6);
             this.Controls.Add(this.btnUpload);
@@ -340,6 +357,8 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private Guna.UI2.WinForms.Guna2CircleButton guna2CircleButton1;
+        private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel7;
+        private Guna.UI2.WinForms.Guna2TextBox txtProjectName;
     }
 }
 

@@ -107,8 +107,14 @@ namespace BizDataLayerGen
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
-            //clsAddDataAccessAndBusinessLayers.AddDataAndBusinessLayers();
+            
 
+
+            if (string.IsNullOrEmpty(txtProjectName.Text))
+            {
+                MessageBox.Show("Please Enter The Project Name", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             if (cbDatabaseName.SelectedItem == null || tbPathFilesToGenrate.Text == "")
             {
                 MessageBox.Show("Choose the Path and DataBaseName After You Load", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -121,12 +127,28 @@ namespace BizDataLayerGen
         private void cbDatabaseName_SelectedIndexChanged(object sender, EventArgs e)
         {
             clsGlobal.DataBaseName = cbDatabaseName.Text;
+            txtProjectName.Text = clsGeneraleThings.CleanDatabaseName(cbDatabaseName.Text);
 
         }
 
         private void guna2CircleButton1_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void guna2HtmlLabel7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtProjectName_TextChanged(object sender, EventArgs e)
+        {
+             clsGlobal.ProjectName =clsGeneraleThings.CleanDatabaseName( txtProjectName.Text);
+        }
+
+        private void txtProjectName_Load(object sender, EventArgs e)
+        {
+            txtProjectName.Text = clsGlobal.DataBaseName;
         }
     }
 }
