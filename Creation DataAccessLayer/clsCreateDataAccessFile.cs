@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using BizDataLayerGen.DataAccessLayer;
 using Newtonsoft.Json;
+using BizDataLayerGen.AI;
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -23,7 +24,7 @@ namespace BizDataLayerGen.GeneralClasses
         public clsCreateDataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
             this._filePath = filePath;
-            this._TableName = TableName;
+            this._TableName = clsGeneraleThings.Singularize( TableName);
             this._Columns = Columns;
             this._DataTypes = DataTypes;
             this._NullibietyColumns = NullibietyColumns;
@@ -467,7 +468,7 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
-        public clsGlobal.enTypeRaisons CreateDataAccessClassFile()
+        public async Task<clsGlobal.enTypeRaisons> CreateDataAccessClassFile()
         {
 
 
@@ -498,10 +499,10 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
-using {clsGlobal.DataBaseName}_DataAccess;
+using {clsGlobal.ProjectName}_DataAccess;
 using Newtonsoft.Json;
 
-namespace {clsGlobal.DataBaseName}_DataLayer
+namespace {clsGlobal.ProjectName}_DataLayer
 {{
     public class cls{_TableName}Data
     {{
@@ -522,6 +523,7 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 }}
 ";
 
+         
             // Write the code to the file
             File.WriteAllText(fullPath, code);
             
@@ -529,11 +531,11 @@ namespace {clsGlobal.DataBaseName}_DataLayer
 
         }
 
-        public static clsGlobal.enTypeRaisons CreateDataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
+        public static async Task<clsGlobal.enTypeRaisons> CreateDataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
         {
             clsCreateDataAccessFile Files = new clsCreateDataAccessFile(filePath, TableName, Columns, DataTypes, NullibietyColumns);
 
-            return Files.CreateDataAccessClassFile();
+            return await Files.CreateDataAccessClassFile();
         }
 
     }

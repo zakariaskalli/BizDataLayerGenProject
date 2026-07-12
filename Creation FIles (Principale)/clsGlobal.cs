@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,6 +29,8 @@ namespace BizDataLayerGen
         public static enTypeRaisons MyEnumProperty { get; set; }
 
 
+        public static string ProjectName;
+
         public static string DataBaseName = "";
 
         public static string PathFilesToGenerate = "";
@@ -38,9 +41,12 @@ namespace BizDataLayerGen
         public static string dataAccessLayerPath = "";
         public static string businessLayerPath = "";
         public static string DTOLayerPath = "";
+        public static string MigrationLayerPath = "";
 
         public static string JsonFilePath = "";
 
         public static string TimeInMillisecond = "";
+
+        public static bool AICodeDocsEnabled = false;
     }
 }

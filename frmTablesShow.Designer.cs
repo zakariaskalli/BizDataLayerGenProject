@@ -41,9 +41,13 @@
             this.LBTables = new System.Windows.Forms.CheckedListBox();
             this.switchAutoExcuteSP = new Guna.UI2.WinForms.Guna2ToggleSwitch();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.ckAiCodeDocs = new Guna.UI2.WinForms.Guna2ToggleSwitch();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.switchUsingDTO = new Guna.UI2.WinForms.Guna2ToggleSwitch();
+            this.progressBar = new Guna.UI2.WinForms.Guna2ProgressBar();
+            this.lbCurrentFile = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -52,17 +56,13 @@
             // btnGenerate
             // 
             this.btnGenerate.BorderRadius = 20;
-            this.btnGenerate.CheckedState.Parent = this.btnGenerate;
-            this.btnGenerate.CustomImages.Parent = this.btnGenerate;
             this.btnGenerate.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
             this.btnGenerate.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGenerate.ForeColor = System.Drawing.Color.White;
-            this.btnGenerate.HoverState.Parent = this.btnGenerate;
             this.btnGenerate.Image = global::BizDataLayerGen.Properties.Resources.magic_wand;
             this.btnGenerate.ImageAlign = System.Windows.Forms.HorizontalAlignment.Left;
             this.btnGenerate.Location = new System.Drawing.Point(79, 333);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.ShadowDecoration.Parent = this.btnGenerate;
             this.btnGenerate.Size = new System.Drawing.Size(161, 48);
             this.btnGenerate.TabIndex = 13;
             this.btnGenerate.Text = "    Generate";
@@ -138,7 +138,7 @@
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(387, 95);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(200, 69);
+            this.groupBox1.Size = new System.Drawing.Size(227, 69);
             this.groupBox1.TabIndex = 23;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Searching FK OF:";
@@ -150,7 +150,7 @@
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(387, 185);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(200, 68);
+            this.groupBox2.Size = new System.Drawing.Size(227, 68);
             this.groupBox2.TabIndex = 24;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Adding Static Methods:";
@@ -171,16 +171,12 @@
             // 
             this.guna2CircleButton1.BackgroundImage = global::BizDataLayerGen.Properties.Resources.Cancel;
             this.guna2CircleButton1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.guna2CircleButton1.CheckedState.Parent = this.guna2CircleButton1;
-            this.guna2CircleButton1.CustomImages.Parent = this.guna2CircleButton1;
             this.guna2CircleButton1.FillColor = System.Drawing.Color.Transparent;
             this.guna2CircleButton1.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.guna2CircleButton1.ForeColor = System.Drawing.Color.White;
-            this.guna2CircleButton1.HoverState.Parent = this.guna2CircleButton1;
             this.guna2CircleButton1.Location = new System.Drawing.Point(561, 12);
             this.guna2CircleButton1.Name = "guna2CircleButton1";
             this.guna2CircleButton1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.guna2CircleButton1.ShadowDecoration.Parent = this.guna2CircleButton1;
             this.guna2CircleButton1.Size = new System.Drawing.Size(35, 35);
             this.guna2CircleButton1.TabIndex = 25;
             this.guna2CircleButton1.Click += new System.EventHandler(this.guna2CircleButton1_Click);
@@ -203,20 +199,19 @@
             this.switchAutoExcuteSP.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.switchAutoExcuteSP.CheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.switchAutoExcuteSP.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.switchAutoExcuteSP.CheckedState.Parent = this.switchAutoExcuteSP;
             this.switchAutoExcuteSP.Location = new System.Drawing.Point(14, 37);
             this.switchAutoExcuteSP.Name = "switchAutoExcuteSP";
-            this.switchAutoExcuteSP.ShadowDecoration.Parent = this.switchAutoExcuteSP;
             this.switchAutoExcuteSP.Size = new System.Drawing.Size(35, 20);
             this.switchAutoExcuteSP.TabIndex = 26;
             this.switchAutoExcuteSP.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
             this.switchAutoExcuteSP.UncheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
             this.switchAutoExcuteSP.UncheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.switchAutoExcuteSP.UncheckedState.InnerColor = System.Drawing.Color.White;
-            this.switchAutoExcuteSP.UncheckedState.Parent = this.switchAutoExcuteSP;
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label3);
+            this.groupBox3.Controls.Add(this.ckAiCodeDocs);
             this.groupBox3.Controls.Add(this.label2);
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Controls.Add(this.switchUsingDTO);
@@ -224,10 +219,34 @@
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(387, 260);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(200, 122);
+            this.groupBox3.Size = new System.Drawing.Size(227, 169);
             this.groupBox3.TabIndex = 25;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Pro Things:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(61, 109);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(102, 21);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "AI Code Docs";
+            // 
+            // ckAiCodeDocs
+            // 
+            this.ckAiCodeDocs.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.ckAiCodeDocs.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.ckAiCodeDocs.CheckedState.InnerBorderColor = System.Drawing.Color.White;
+            this.ckAiCodeDocs.CheckedState.InnerColor = System.Drawing.Color.White;
+            this.ckAiCodeDocs.Location = new System.Drawing.Point(14, 110);
+            this.ckAiCodeDocs.Name = "ckAiCodeDocs";
+            this.ckAiCodeDocs.Size = new System.Drawing.Size(35, 20);
+            this.ckAiCodeDocs.TabIndex = 30;
+            this.ckAiCodeDocs.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.ckAiCodeDocs.UncheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.ckAiCodeDocs.UncheckedState.InnerBorderColor = System.Drawing.Color.White;
+            this.ckAiCodeDocs.UncheckedState.InnerColor = System.Drawing.Color.White;
             // 
             // label2
             // 
@@ -253,24 +272,46 @@
             this.switchUsingDTO.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.switchUsingDTO.CheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.switchUsingDTO.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.switchUsingDTO.CheckedState.Parent = this.switchUsingDTO;
             this.switchUsingDTO.Location = new System.Drawing.Point(14, 74);
             this.switchUsingDTO.Name = "switchUsingDTO";
-            this.switchUsingDTO.ShadowDecoration.Parent = this.switchUsingDTO;
             this.switchUsingDTO.Size = new System.Drawing.Size(35, 20);
             this.switchUsingDTO.TabIndex = 27;
             this.switchUsingDTO.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
             this.switchUsingDTO.UncheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
             this.switchUsingDTO.UncheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.switchUsingDTO.UncheckedState.InnerColor = System.Drawing.Color.White;
-            this.switchUsingDTO.UncheckedState.Parent = this.switchUsingDTO;
+            // 
+            // progressBar
+            // 
+            this.progressBar.BorderRadius = 10;
+            this.progressBar.Location = new System.Drawing.Point(27, 477);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
+            this.progressBar.ProgressColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
+            this.progressBar.Size = new System.Drawing.Size(363, 30);
+            this.progressBar.TabIndex = 26;
+            this.progressBar.Text = "guna2ProgressBar1";
+            this.progressBar.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
+            // 
+            // lbCurrentFile
+            // 
+            this.lbCurrentFile.BackColor = System.Drawing.Color.Transparent;
+            this.lbCurrentFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbCurrentFile.Location = new System.Drawing.Point(27, 443);
+            this.lbCurrentFile.Name = "lbCurrentFile";
+            this.lbCurrentFile.Size = new System.Drawing.Size(81, 22);
+            this.lbCurrentFile.TabIndex = 27;
+            this.lbCurrentFile.Text = "CurrentFile";
+            this.lbCurrentFile.Click += new System.EventHandler(this.guna2HtmlLabel1_Click);
             // 
             // frmTablesShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.HighlightText;
-            this.ClientSize = new System.Drawing.Size(608, 391);
+            this.ClientSize = new System.Drawing.Size(633, 541);
+            this.Controls.Add(this.lbCurrentFile);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.guna2CircleButton1);
             this.Controls.Add(this.groupBox2);
@@ -312,5 +353,9 @@
         private System.Windows.Forms.Label label1;
         private Guna.UI2.WinForms.Guna2ToggleSwitch switchUsingDTO;
         private System.Windows.Forms.Label label2;
+        private Guna.UI2.WinForms.Guna2ToggleSwitch ckAiCodeDocs;
+        private System.Windows.Forms.Label label3;
+        private Guna.UI2.WinForms.Guna2ProgressBar progressBar;
+        private Guna.UI2.WinForms.Guna2HtmlLabel lbCurrentFile;
     }
 }

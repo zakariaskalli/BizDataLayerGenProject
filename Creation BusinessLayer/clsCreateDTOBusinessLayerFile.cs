@@ -1,4 +1,5 @@
-﻿using BizDataLayerGen.DataAccessLayer;
+﻿using BizDataLayerGen.AI;
+using BizDataLayerGen.DataAccessLayer;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -8,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using BizDataLayerGen.GeneralClasses;
 namespace BizDataLayerGen.GeneralClasses
 {
     public class clsCreateDTOBusinessLayerFile
@@ -450,15 +451,15 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
-        public void AddCheckedTheDataIsSafeMethod()
+        public  void AddCheckedTheDataIsSafeMethod()
         {
 
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.DataBaseName}_DataLayer;
+using {clsGlobal.ProjectName}_DataLayer;
 
-namespace {clsGlobal.DataBaseName}_BusinessLayer
+namespace {clsGlobal.ProjectName}_BusinessLayer
 {{
     public class SqlHelper
     {{
@@ -521,7 +522,7 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
         }
 
 
-        public clsGlobal.enTypeRaisons CreateDTOBusinessLayerFile()
+        public async Task<clsGlobal.enTypeRaisons> CreateDTOBusinessLayerFile()
         {
             // Define the full path for the file
             string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
@@ -542,10 +543,10 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.DataBaseName}_DataLayer;
-using {clsGlobal.DataBaseName}.DTO;
+using {clsGlobal.ProjectName}_DataLayer;
+using {clsGlobal.ProjectName}.DTO;
 
-namespace {clsGlobal.DataBaseName}_BusinessLayer
+namespace {clsGlobal.ProjectName}_BusinessLayer
 {{
     public class cls{_TableName}
     {{
@@ -590,6 +591,9 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 }}
 ";
 
+
+           
+
             // Write the code to the file
             File.WriteAllText(fullPath, code);
 
@@ -597,7 +601,7 @@ namespace {clsGlobal.DataBaseName}_BusinessLayer
 
         }
 
-        public static clsGlobal.enTypeRaisons CreateDTOBusinessLayerFile(string filePath, string TableName, string[] Columns,
+        public static Task<clsGlobal.enTypeRaisons> CreateDTOBusinessLayerFile(string filePath, string TableName, string[] Columns,
             string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] ReferencedColumn, bool AddingStaticMethods)
         {
             clsCreateDTOBusinessLayerFile Files = new clsCreateDTOBusinessLayerFile(filePath, TableName, Columns, DataTypes,
