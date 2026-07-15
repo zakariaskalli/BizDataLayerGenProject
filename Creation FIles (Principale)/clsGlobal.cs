@@ -41,6 +41,7 @@ namespace BizDataLayerGen
         public static string dataAccessLayerPath = "";
         public static string businessLayerPath = "";
         public static string DTOLayerPath = "";
+        public static string APILayerPath = "";
         public static string MigrationLayerPath = "";
 
         public static string JsonFilePath = "";

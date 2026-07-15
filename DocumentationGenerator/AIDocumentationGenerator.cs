@@ -47,30 +47,31 @@ Return ONLY valid C# code.
         {
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri("http://localhost:1234/")
+                BaseAddress = new Uri("http://127.0.0.1:1234")
             };
         }
 
         public async Task<string> GenerateDocumentationAsync(string sourceCode)
         {
-            
+
 
             var request = new
             {
-                model = "local-model", // ignored by LM Studio
+                // قم بتغيير اسم النموذج إلى الاسم الدقيق التالي:
+                model = "qwen2.5-coder-1.5b-instruct-finetuned-qwq.gguf",
                 temperature = 0.2,
                 messages = new object[]
                 {
-                new
-                {
-                    role = "system",
-                    content = _PromptToGenerateDocumentation
-                },
-                new
-                {
-                    role = "user",
-                    content = sourceCode
-                }
+                    new
+                    {
+                        role = "system",
+                        content = _PromptToGenerateDocumentation
+                    },
+                    new
+                    {
+                        role = "user",
+                        content = sourceCode
+                    }
                 }
             };
 

@@ -180,6 +180,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Creation APIs\clsCreateAPIController.cs" />
     <Compile Include="DocumentationGenerator\AIDocumentationGenerator.cs" />
     <Compile Include="Creating MigrationLayer\clsCreateMigrationLayer.cs" />
     <Compile Include="Creation DataAccessLayer\clsCreateDTODataAccessFile.cs" />
