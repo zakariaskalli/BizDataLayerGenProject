@@ -264,7 +264,6 @@ namespace BizDataLayerGen
 
 
 
-
             // First Mythologic to read Last Error from JsonFile
 
             /*

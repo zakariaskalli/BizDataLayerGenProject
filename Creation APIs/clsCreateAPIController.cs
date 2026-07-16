@@ -42,6 +42,26 @@ namespace BizDataLayerGen.Creation_APIs
             this._ReferencedColumn = ReferencedColumn;
         }
 
+        private static string GetIdValidationCondition(string dataType, string CoulumnIDName)
+        {
+            switch (dataType.ToLower())
+            {
+                case "int":
+                case "short":
+                case "long":
+                case "byte":
+                    return $"{CoulumnIDName} <= 0";
+
+                case "guid":
+                    return $"{CoulumnIDName} == Guid.Empty";
+
+                case "string":
+                    return $"string.IsNullOrWhiteSpace({CoulumnIDName})";
+
+                default:
+                    return "false";
+            }
+        }
 
         public string CreateGetAllEndPoint(string _TableName )
         {
@@ -65,6 +85,34 @@ namespace BizDataLayerGen.Creation_APIs
             return EndPoint;
         }
 
+        public string CreateGetByIDEndPoint(string _TableName)
+        {
+            string entityNameLowerSingulare = _TableName.Singularize().ToLower();
+            string EndPoint = $@"
+        [HttpGet(""{{{_Columns[0]}:{_DataTypes[0]}}}"", Name = ""Get{_TableName}ById"")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName}DTO))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<cls{_TableName}DTO> Get{_TableName.Singularize()}ById([FromRoute] int {_Columns[0]})
+        {{
+            if ({GetIdValidationCondition(_DataTypes[0], _Columns[0])})
+            {{
+                return BadRequest(""Invalid {_TableName.Singularize()} ID."");
+            }}
+        
+            cls{_TableName}? {_TableName.Singularize().ToLower()} = cls{_TableName}.FindBy{_Columns[0]}(ProjectID);
+        
+            if ({_TableName.Singularize().ToLower()} == null)
+            {{
+                return NotFound(""{_TableName} with ID "" + {_Columns[0]} + "" was not found."");
+            }}
+        
+            return Ok({_TableName.Singularize().ToLower()}.Data);
+        }}";
+
+            return EndPoint;
+        }
+
 
         public async Task<clsGlobal.enTypeRaisons> CreateAPILayerFile()
         {
@@ -75,7 +123,7 @@ namespace BizDataLayerGen.Creation_APIs
             //Names Of Methods to generate the EndPoints
             string StringGetAllEndPoint = CreateGetAllEndPoint(_TableName);
 
-
+            string StringGetByID = CreateGetByIDEndPoint(_TableName);
 
             string code = @$"
 using Microsoft.AspNetCore.Mvc; 
@@ -96,7 +144,7 @@ namespace {clsGlobal.ProjectName}Api.Controllers
         
         {StringGetAllEndPoint}
 
-
+        {StringGetByID}
 
     }}    
 
