@@ -391,6 +391,8 @@ namespace BizDataLayerGen.GeneralClasses
                     if (outputIdParam.Value != DBNull.Value)
                     {{
                         {_Columns[0]} = (int)outputIdParam.Value;
+                        {_TableName}DTO.{_Columns[0]} = (int)outputIdParam.Value;
+                    
                     }}
 
                 }}

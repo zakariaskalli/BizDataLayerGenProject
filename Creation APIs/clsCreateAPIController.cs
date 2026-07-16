@@ -63,7 +63,7 @@ namespace BizDataLayerGen.Creation_APIs
             }
         }
 
-        public string CreateGetAllEndPoint(string _TableName )
+        public string CreateGetAllEndPoint(string _TableName)
         {
             string entityNameLowerPlural = _TableName.Pluralize().ToLower();
             string EndPoint = $@"
@@ -85,29 +85,61 @@ namespace BizDataLayerGen.Creation_APIs
             return EndPoint;
         }
 
-        public string CreateGetByIDEndPoint(string _TableName)
+        public string CreateGetByIDEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
         {
             string entityNameLowerSingulare = _TableName.Singularize().ToLower();
             string EndPoint = $@"
-        [HttpGet(""{{{_Columns[0]}:{_DataTypes[0]}}}"", Name = ""Get{_TableName}ById"")]
+        [HttpGet(""{{{IdColumnName}:{IdColumnDataType}}}"", Name = ""Get{_TableName}ById"")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName}DTO))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<cls{_TableName}DTO> Get{_TableName.Singularize()}ById([FromRoute] int {_Columns[0]})
+        public ActionResult<cls{_TableName}DTO> Get{_TableName.Singularize()}ById([FromRoute] int {IdColumnName})
         {{
-            if ({GetIdValidationCondition(_DataTypes[0], _Columns[0])})
+            if ({GetIdValidationCondition(IdColumnDataType, IdColumnName)})
             {{
                 return BadRequest(""Invalid {_TableName.Singularize()} ID."");
             }}
         
-            cls{_TableName}? {_TableName.Singularize().ToLower()} = cls{_TableName}.FindBy{_Columns[0]}(ProjectID);
+            cls{_TableName}? {_TableName.Singularize().ToLower()} = cls{_TableName}.FindBy{IdColumnName}(ProjectID);
         
             if ({_TableName.Singularize().ToLower()} == null)
             {{
-                return NotFound(""{_TableName} with ID "" + {_Columns[0]} + "" was not found."");
+                return NotFound(""{_TableName} with ID "" + {IdColumnName} + "" was not found."");
             }}
         
             return Ok({_TableName.Singularize().ToLower()}.Data);
+        }}";
+
+            return EndPoint;
+        }
+
+
+        public string CreateAddNewEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
+        {
+            string entitySingular = _TableName.Singularize();
+            string entityLowerSingular = entitySingular.ToLower();
+            string IdColumnNameLower = IdColumnName.ToLower(); // المعرف مثل ProjectID
+
+            string EndPoint = $@"
+        [HttpPost(Name = ""AddNew{entitySingular}"")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(cls{_TableName}DTO))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<cls{_TableName}DTO> AddNew{entitySingular}([FromBody] cls{_TableName}DTO {entityLowerSingular}DTO)
+        {{
+            if ({entityLowerSingular}DTO == null)
+            {{
+                return BadRequest(""Invalid data provided."");
+            }}
+
+            bool isCreated = cls{_TableName}.AddNew{_TableName}({entityLowerSingular}DTO);
+
+            if (isCreated == false)
+            {{
+                return BadRequest(""Failed to create new {entitySingular}."");
+            }}
+
+            return CreatedAtRoute(""Get{_TableName}ById"", new {{ {IdColumnName} = {entityLowerSingular}DTO.{IdColumnName} }}, {entityLowerSingular}DTO);
+            
         }}";
 
             return EndPoint;
@@ -123,7 +155,10 @@ namespace BizDataLayerGen.Creation_APIs
             //Names Of Methods to generate the EndPoints
             string StringGetAllEndPoint = CreateGetAllEndPoint(_TableName);
 
-            string StringGetByID = CreateGetByIDEndPoint(_TableName);
+            string StringGetByID = CreateGetByIDEndPoint(_TableName, _Columns[0], _DataTypes[0]);
+
+            string StringAddNew = CreateAddNewEndPoint(_TableName, _Columns[0], _DataTypes[0]);
+
 
             string code = @$"
 using Microsoft.AspNetCore.Mvc; 
@@ -146,6 +181,7 @@ namespace {clsGlobal.ProjectName}Api.Controllers
 
         {StringGetByID}
 
+        {StringAddNew}
     }}    
 
 }}
