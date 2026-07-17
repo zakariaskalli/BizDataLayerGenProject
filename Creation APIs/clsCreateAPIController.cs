@@ -113,7 +113,6 @@ namespace BizDataLayerGen.Creation_APIs
             return EndPoint;
         }
 
-
         public string CreateAddNewEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
         {
             string entitySingular = _TableName.Singularize();
@@ -180,7 +179,32 @@ namespace BizDataLayerGen.Creation_APIs
             return EndPoint;
         }
 
+        public string CreateDeleteEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
+        {
+            string entitySingular = _TableName.Singularize();
 
+            string EndPoint = $@"
+        [HttpDelete(""{{{IdColumnName}:{IdColumnDataType}}}"", Name = ""Delete{entitySingular}"")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult Delete{entitySingular}([FromRoute] {IdColumnDataType} {IdColumnName})
+        {{
+            if ({GetIdValidationCondition(IdColumnDataType, IdColumnName)})
+            {{
+                return BadRequest(""Invalid {entitySingular} ID."");
+            }}
+        
+            if (!cls{_TableName}.Delete{entitySingular}({IdColumnName}))
+            {{
+                return NotFound(""{entitySingular} with ID "" + {IdColumnName} + "" was not found أو لا يمكن حذفه لارتباطه ببيانات أخرى."");
+            }}
+        
+            return Ok(new {{ message = ""{entitySingular} deleted successfully."" }});
+        }}";
+
+            return EndPoint;
+        }
 
         public async Task<clsGlobal.enTypeRaisons> CreateAPILayerFile()
         {
@@ -197,7 +221,8 @@ namespace BizDataLayerGen.Creation_APIs
 
             string StringUpdate = CreateUpdateEndPoint(_TableName, _Columns[0], _DataTypes[0]);
 
-            
+            string StringDelete = CreateDeleteEndPoint(_TableName, _Columns[0], _DataTypes[0]);
+
 
             string code = @$"
 using Microsoft.AspNetCore.Mvc; 
@@ -223,6 +248,9 @@ namespace {clsGlobal.ProjectName}Api.Controllers
         {StringAddNew}
 
         {StringUpdate}
+
+        {StringDelete}
+
     }}    
 
 }}
