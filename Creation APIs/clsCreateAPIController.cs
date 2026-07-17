@@ -93,14 +93,14 @@ namespace BizDataLayerGen.Creation_APIs
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName}DTO))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<cls{_TableName}DTO> Get{_TableName.Singularize()}ById([FromRoute] int {IdColumnName})
+        public ActionResult<cls{_TableName}DTO> Get{_TableName.Singularize()}ById([FromRoute] {IdColumnDataType} {IdColumnName})
         {{
             if ({GetIdValidationCondition(IdColumnDataType, IdColumnName)})
             {{
                 return BadRequest(""Invalid {_TableName.Singularize()} ID."");
             }}
         
-            cls{_TableName}? {_TableName.Singularize().ToLower()} = cls{_TableName}.FindBy{IdColumnName}(ProjectID);
+            cls{_TableName}? {_TableName.Singularize().ToLower()} = cls{_TableName}.FindBy{IdColumnName}({IdColumnName});
         
             if ({_TableName.Singularize().ToLower()} == null)
             {{
@@ -145,6 +145,42 @@ namespace BizDataLayerGen.Creation_APIs
             return EndPoint;
         }
 
+        public string CreateUpdateEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
+        {
+            string entitySingular = _TableName.Singularize();
+            string entityLowerSingular = entitySingular.ToLower();
+
+            string EndPoint = $@"
+        [HttpPut(""{{{IdColumnName}:{IdColumnDataType}}}"", Name = ""Update{entitySingular}"")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName}DTO))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<cls{_TableName}DTO> Update{entitySingular}(
+            [FromRoute] {IdColumnDataType} {IdColumnName},
+            [FromBody] cls{_TableName}DTO {entityLowerSingular}DTO)
+        {{
+            if ({GetIdValidationCondition(IdColumnDataType, IdColumnName)})
+            {{
+                return BadRequest(""Invalid {entitySingular} ID."");
+            }}
+
+            if ({entityLowerSingular}DTO == null || {IdColumnName} != {entityLowerSingular}DTO.{IdColumnName})
+            {{
+                return BadRequest(""Invalid data provided."");
+            }}
+
+            if (!cls{_TableName}.Update{entitySingular}ByID({entityLowerSingular}DTO))
+            {{
+                return NotFound(""{entitySingular} with ID "" + {IdColumnName} + "" was not found."");
+            }}
+
+            return Ok({entityLowerSingular}DTO);
+        }}";
+
+            return EndPoint;
+        }
+
+
 
         public async Task<clsGlobal.enTypeRaisons> CreateAPILayerFile()
         {
@@ -159,6 +195,9 @@ namespace BizDataLayerGen.Creation_APIs
 
             string StringAddNew = CreateAddNewEndPoint(_TableName, _Columns[0], _DataTypes[0]);
 
+            string StringUpdate = CreateUpdateEndPoint(_TableName, _Columns[0], _DataTypes[0]);
+
+            
 
             string code = @$"
 using Microsoft.AspNetCore.Mvc; 
@@ -182,6 +221,8 @@ namespace {clsGlobal.ProjectName}Api.Controllers
         {StringGetByID}
 
         {StringAddNew}
+
+        {StringUpdate}
     }}    
 
 }}
