@@ -206,6 +206,38 @@ namespace BizDataLayerGen.Creation_APIs
             return EndPoint;
         }
 
+        public string CreateSearchEndPoint(string _TableName)
+        {
+            string entitySingular = _TableName.Singularize();
+            string entityNameLowerPlural = _TableName.Pluralize().ToLower();
+
+            string EndPoint = $@"
+        [HttpGet(""search"", Name = ""Search{_TableName.Pluralize()}"")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName}DTO>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<cls{_TableName}DTO>> Search{_TableName.Pluralize()}(
+            [FromQuery] cls{_TableName}.{_TableName}Column column,
+            [FromQuery] string value,
+            [FromQuery] cls{_TableName}.SearchMode mode = cls{_TableName}.SearchMode.Anywhere)
+        {{
+            if (string.IsNullOrWhiteSpace(value))
+            {{
+                return BadRequest(""Search value cannot be empty."");
+            }}
+
+            List<cls{_TableName}DTO>? {entityNameLowerPlural} = cls{_TableName}.SearchData(column, value, mode);
+
+            if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Any())
+            {{
+                return Ok(Enumerable.Empty<cls{_TableName}DTO>());
+            }}
+
+            return Ok({entityNameLowerPlural});
+        }}";
+
+            return EndPoint;
+        }
+
         public async Task<clsGlobal.enTypeRaisons> CreateAPILayerFile()
         {
             // Define the full path for the file
@@ -223,6 +255,7 @@ namespace BizDataLayerGen.Creation_APIs
 
             string StringDelete = CreateDeleteEndPoint(_TableName, _Columns[0], _DataTypes[0]);
 
+            string StringSearch = CreateSearchEndPoint(_TableName);
 
             string code = @$"
 using Microsoft.AspNetCore.Mvc; 
@@ -250,6 +283,8 @@ namespace {clsGlobal.ProjectName}Api.Controllers
         {StringUpdate}
 
         {StringDelete}
+
+        {StringSearch}
 
     }}    
 
