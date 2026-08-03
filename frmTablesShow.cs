@@ -264,7 +264,6 @@ namespace BizDataLayerGen
 
 
 
-
             // First Mythologic to read Last Error from JsonFile
 
             /*
@@ -427,10 +426,6 @@ namespace BizDataLayerGen
             */
 
 
-
-
-
-
             clsGlobal.AICodeDocsEnabled = ckAiCodeDocs.Checked;
 
             
@@ -442,8 +437,9 @@ namespace BizDataLayerGen
 
             bool UseDTO = switchUsingDTO.Checked;
 
+            bool AddAPI = ckGenerateAPI.Checked;
 
-            if (await clsAddLayers.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO) == clsGlobal.enTypeRaisons.enPerfect)
+            if (await clsAddLayers.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Code Generated Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
@@ -483,10 +479,6 @@ namespace BizDataLayerGen
                 MessageBoxIcon.Information);
         }
 
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void rbAddingStaticMethodsNo_CheckedChanged(object sender, EventArgs e)
         {
@@ -563,9 +555,24 @@ namespace BizDataLayerGen
             this.Close();
         }
 
-        private void guna2HtmlLabel1_Click(object sender, EventArgs e)
+        private void ckGenerateAPI_CheckedChanged(object sender, EventArgs e)
         {
+            switchUsingDTO.Checked = ckGenerateAPI.Checked;
+        }
 
+        private void switchUsingDTO_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ckGenerateAPI.Checked)
+            {
+                switchUsingDTO.Checked = true;
+
+                MessageBox.Show(
+                    "API requires DTOs! You cannot select 'Don't Use DTO' while API is enabled.",
+                    "Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+            }
         }
     }
 }

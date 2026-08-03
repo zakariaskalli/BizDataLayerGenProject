@@ -622,5 +622,82 @@ ORDER BY
 
             return true;
         }
+
+
+        public class clsColumnMetadata
+        {
+            public string ColumnName { get; set; }
+            public string DataType { get; set; }
+            public bool IsNullable { get; set; }
+            public int? MaxLengthOrPrecision { get; set; }
+        }
+
+
+        public static List<clsColumnMetadata> GetTableColumnsMetadata(string tableName, string DBName)
+        {
+            List<clsColumnMetadata> columnsMetadata = new List<clsColumnMetadata>();
+
+            if (!clsGeneraleThings.IsValidDatabaseName(DBName))
+            {
+                return null;
+            }
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    connection.Open();
+
+                    string query = $@"
+                USE [{DBName}];
+                SELECT 
+                    COLUMN_NAME, 
+                    DATA_TYPE,
+                    IS_NULLABLE,
+                    COALESCE(CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION) AS [LENGTH_OR_PRECISION]
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = @TableName;";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@TableName", tableName);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    clsColumnMetadata column = new clsColumnMetadata
+                                    {
+                                        ColumnName = reader["COLUMN_NAME"].ToString(),
+                                        DataType = reader["DATA_TYPE"].ToString(),
+                                        IsNullable = reader["IS_NULLABLE"].ToString().Equals("YES", StringComparison.OrdinalIgnoreCase),
+                                        MaxLengthOrPrecision = reader["LENGTH_OR_PRECISION"] != DBNull.Value
+                                            ? (int?)Convert.ToInt32(reader["LENGTH_OR_PRECISION"])
+                                            : null
+                                    };
+
+                                    columnsMetadata.Add(column);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var stackTrace = new StackTrace();
+                var frame = stackTrace.GetFrame(0);
+                var method = frame.GetMethod();
+                var className = method.DeclaringType.Name;
+                var methodName = method.Name;
+
+                ErrorHandler.RaiseError(ex, className, methodName);
+                return null;
+            }
+
+            return columnsMetadata;
+        }
     }
 }

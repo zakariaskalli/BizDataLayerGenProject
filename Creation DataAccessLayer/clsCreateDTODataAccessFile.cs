@@ -306,7 +306,6 @@ namespace BizDataLayerGen.GeneralClasses
             return GetTableByIDCode;
         }
 
-
         public string AddGetAllDataMethod()
         {
             string GetTableByIDCode = @$"public static List<cls{_TableName}DTO> GetAll{_TableName}()
@@ -392,6 +391,8 @@ namespace BizDataLayerGen.GeneralClasses
                     if (outputIdParam.Value != DBNull.Value)
                     {{
                         {_Columns[0]} = (int)outputIdParam.Value;
+                        {_TableName}DTO.{_Columns[0]} = (int)outputIdParam.Value;
+                    
                     }}
 
                 }}
@@ -590,6 +591,10 @@ namespace {clsGlobal.ProjectName}_DataLayer
 
             return await Files.CreateDTODataAccessClassFile();
         }
+
+
+
+
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BizDataLayerGen.Creating_MigrationLayer;
+using BizDataLayerGen.Creation_APIs;
 using BizDataLayerGen.DataAccessLayer;
 using System;
 using System.Collections.Generic;
@@ -25,17 +26,20 @@ namespace BizDataLayerGen.GeneralClasses
                 string dataAccessLayerPath = "";
                 string businessLayerPath = "";
                 string dtoLayerPath = "";
+                string apiLayerPath = "";
 
                 // Define folder names for Data Access Layer and Business Layer
                 clsGlobal.dataAccessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DataAccess");
                 clsGlobal.businessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Business");
                 clsGlobal.DTOLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DTO");
+                clsGlobal.APILayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_API");
                 clsGlobal.MigrationLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Migration");
 
 
                 dataAccessLayerPath = clsGlobal.dataAccessLayerPath;
                 businessLayerPath = clsGlobal.businessLayerPath;
                 dtoLayerPath = clsGlobal.DTOLayerPath;
+                apiLayerPath = clsGlobal.APILayerPath;
 
                 // Check if the folders already exist, if not, create them
                 if (!Directory.Exists(dataAccessLayerPath))
@@ -51,6 +55,11 @@ namespace BizDataLayerGen.GeneralClasses
 
                 if (!Directory.Exists(dtoLayerPath))
                     Directory.CreateDirectory(dtoLayerPath);
+                else
+                    return false;
+
+                if (!Directory.Exists(apiLayerPath))
+                    Directory.CreateDirectory(apiLayerPath);
                 else
                     return false;
 
@@ -178,7 +187,7 @@ END;
         }
 
 
-        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO)
+        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI)
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
 
@@ -291,6 +300,21 @@ END;
                     if (enRaisonForProjectDTO != clsGlobal.enTypeRaisons.enPerfect)
                     {
                         return enRaisonForProjectDTO;
+                    }
+
+                    // API
+
+                    if (AddAPI)
+                    {
+                        clsCreateAPIController  AddAPILayer = new clsCreateAPIController(clsGlobal.APILayerPath, NameTables[i], Columns,
+                            DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn);
+                        
+                        clsGlobal.enTypeRaisons enRaisonForProjectAPI = await AddAPILayer.CreateAPILayerFile();
+                        
+                        if (enRaisonForProjectAPI != clsGlobal.enTypeRaisons.enPerfect)
+                        {
+                            return enRaisonForProjectAPI;
+                        }
                     }
                 }
 
