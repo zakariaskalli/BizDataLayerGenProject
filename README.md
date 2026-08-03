@@ -160,16 +160,8 @@ The app talks to LM Studio's OpenAI-compatible endpoint at `http://127.0.0.1:123
 3. Confirm the default base URL: `http://127.0.0.1:1234` (and port stays `1234`).
 4. The status line shows **`Server is running`** / the model is loaded. Keep the window open while you run the Code Generator.
 
-### Step 5 – Connect the model to the Code Generator
 
-The Code Generator already targets `http://127.0.0.1:1234` and model name `qwen2.5-coder-1.5b-instruct-finetuned-qwq.gguf` out of the box. To verify/adjust the connection:
-
-1. Open `DocumentationGenerator/AIDocumentationGenerator.cs`.
-   - Line 50: `BaseAddress = new Uri("http://127.0.0.1:1234")` — set this to the base URL of your LM Studio server. **Do not** add the `/v1` here; it is appended in the request path (`v1/chat/completions`).
-   - Line 61: `model = "qwen2.5-coder-1.5b-instruct-finetuned-qwq.gguf"` — must match exactly the model name shown on the LM Studio Server page (visible in the loaded model dropdown).
-3. Build and run the app.
-
-### Step 6 – Use AI documentation in the app
+### Step 5 – Use AI documentation in the app
 
 1. Complete a normal code generation (select database + project name + tables).
 2. Tick the **"AI Code Documentation"** option (`ckAiCodeDocs`) before clicking the generate button.
@@ -178,16 +170,6 @@ The Code Generator already targets `http://127.0.0.1:1234` and model name `qwen2
 4. When done, a message box confirms **"Documentation generated successfully"**. Open any generated `.cs` file and verify the XML comments were inserted.
 
 > Every generated file is sent individually to LM Studio, so a large project may take a few minutes — the progress bar shows per-file progress.
-
-## Configuration Reference
-
-| Setting | Where | Default |
-|---|---|---|
-| LM Studio base URL | `AIDocumentationGenerator.cs` → `BaseAddress` | `http://127.0.0.1:1234` |
-| Model ID sent to LM Studio | `AIDocumentationGenerator.cs` → `model` | `qwen2.5-coder-1.5b-instruct-finetuned-qwq.gguf` |
-| Documentation prompt | `AIDocumentationGenerator.cs` → `_PromptToGenerateDocumentation` | "senior .NET architect" prompt |
-| Directories skipped | `DocumentationProcessor.cs` → `_IgnoredDirectries` | `bin`, `obj`, `.git`, `.vs` |
-| Files skipped | `DocumentationProcessor.cs` → `IgnoredFiles` | `AssemblyInfo.cs`, `Program.cs`, `Startup.cs`, `*.Designer.cs`, `*.g.cs` |
 
 ## Troubleshooting / FAQ
 
