@@ -592,10 +592,10 @@ namespace {clsGlobal.ProjectName}_BusinessLayer
 ";
 
 
-           
+
 
             // Write the code to the file
-            File.WriteAllText(fullPath, code);
+            await Task.Run(() => File.WriteAllText(fullPath, code));
 
             return clsGlobal.enTypeRaisons.enPerfect;
 

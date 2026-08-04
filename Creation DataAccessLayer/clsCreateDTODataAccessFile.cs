@@ -22,14 +22,15 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _Columns;
         private string[] _DataTypes;
         private bool[] _NullibietyColumns;
-
-        public clsCreateDTODataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
+        private clsGlobal.enExuctionMethods _ExuctionMethod;
+        public clsCreateDTODataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns, clsGlobal.enExuctionMethods ExuctionMethod)
         {
             this._filePath = filePath;
             this._TableName = TableName;
             this._Columns = Columns;
             this._DataTypes = DataTypes;
             this._NullibietyColumns = NullibietyColumns;
+            this._ExuctionMethod = ExuctionMethod;
         }
 
 
@@ -410,6 +411,7 @@ namespace BizDataLayerGen.GeneralClasses
             return GetTableByIDCode;
         }
 
+
         public string AddUpdatingRecordMethod()
         {
 
@@ -450,6 +452,7 @@ namespace BizDataLayerGen.GeneralClasses
             return GetTableByIDCode;
         }
 
+
         public string AddDeleteByIDMethod()
         {
             string GetTableByIDCode = @$"public static bool Delete{_TableName}({_DataTypes[0]} {_Columns[0]})
@@ -485,6 +488,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             return GetTableByIDCode;
         }
+
 
         public string AddSearchMethod()
         {
@@ -535,6 +539,275 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
 
+        // Asynchronous Methods
+
+        public string AddGetTableInfoByIDAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+        public static async Task<cls{_TableName}DTO?> Get{_TableName}InfoByIDAsync({_DataTypes[0]}? {_Columns[0]}, CancellationToken cancellationToken = default)
+        {{
+            try
+            {{
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = ""SP_Get_{_TableName}_ByID"";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        // Ensure correct parameter assignment
+                        command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]} ?? (object)DBNull.Value);
+
+                        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+                        {{ 
+                            if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                            {{
+                                return new cls{_TableName}DTO
+                                (
+                                    {AddDataReaderToVariablesDTO()}
+                                );
+                            }}
+                            else
+                            {{
+                                return null;
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            catch (Exception ex)
+            {{
+                // Handle all exceptions in a general way
+                ErrorHandler.HandleException(ex, nameof(Get{_TableName}InfoByIDAsync), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+            }}
+            return null;
+        }}";
+
+            return GetTableByIDCode;
+        }
+
+        public string AddGetAllDataAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+        public static async Task<List<cls{_TableName}DTO>> GetAll{_TableName}Async(CancellationToken cancellationToken = default)
+        {{
+            var {_TableName}List = new List<cls{_TableName}DTO>();
+
+            try
+            {{
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = ""SP_Get_All_{_TableName}"";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.CommandType = CommandType.StoredProcedure; 
+
+                        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+                        {{
+                            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                            {{
+                                {_TableName}List.Add(new cls{_TableName}DTO
+                                (
+                                    {AddDataReaderToVariablesDTO()}
+                                ));
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            catch (Exception ex)
+            {{
+                // Handle all exceptions in a general way
+                ErrorHandler.HandleException(ex, nameof(GetAll{_TableName}Async), ""No parameters for this method."");
+            }}
+
+            return {_TableName}List;
+        }}";
+
+            return GetTableByIDCode;
+        }
+
+        public string AddAddingNewRecordAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+    public static async Task<int?> AddNew{_TableName}Async(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
+    {{
+        int? {_Columns[0]} = null;
+
+        try
+        {{
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {{
+                string query = @""SP_Add_{_TableName}"";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {{
+                    command.CommandType = CommandType.StoredProcedure;
+
+{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName)}
+
+                    SqlParameter outputIdParam = new SqlParameter(""@NewID"", SqlDbType.Int)
+                    {{
+                        Direction = ParameterDirection.Output
+                    }};
+                    command.Parameters.Add(outputIdParam);
+
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+
+                    // Retrieve the newly inserted identifier
+                    if (outputIdParam.Value != DBNull.Value)
+                    {{
+                        {_Columns[0]} = (int)outputIdParam.Value;
+                        {_TableName}DTO.{_Columns[0]} = (int)outputIdParam.Value;
+                    
+                    }}
+
+                }}
+            }}
+        }}
+        catch (Exception ex)
+        {{
+            // Handle all exceptions in a general way
+            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName}Async), $""Parameters: {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
+        }}
+
+        return {_Columns[0]};
+    }}";
+
+            return GetTableByIDCode;
+        }
+
+        public string AddUpdatingRecordAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+        public static async Task<bool> Update{_TableName}ByIDAsync(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
+        {{
+            int rowsAffected = 0;
+
+            try
+            {{
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = $@""SP_Update_{_TableName}_ByID""; 
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        // Create the parameters for the stored procedure
+{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName, 0)}
+
+                        // Open the connection and execute the update
+                        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                        rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                    }}
+                }}
+            }}
+            catch (Exception ex)
+            {{
+                // Handle exceptions
+                ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByIDAsync), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
+            }}
+
+            return (rowsAffected > 0);
+        }}";
+
+            return GetTableByIDCode;
+        }
+
+        public string AddDeleteByIDAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+        public static async Task<bool> Delete{_TableName}Async({_DataTypes[0]} {_Columns[0]}, CancellationToken cancellationToken = default)
+        {{
+            int rowsAffected = 0;
+
+            try
+            {{
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = $@""SP_Delete_{_TableName}_ByID"";  
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.AddWithValue(""@{_Columns[0]}"", {_Columns[0]});
+
+                        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+                        rowsAffected = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                    }}
+                }}
+            }}
+            catch (Exception ex)
+            {{
+                // Handle all exceptions in a general way, this includes errors from SP_HandleError if any
+                ErrorHandler.HandleException(ex, nameof(Delete{_TableName}Async), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+            }}
+
+            return (rowsAffected > 0);
+        }}";
+
+            return GetTableByIDCode;
+        }
+
+        public string AddSearchAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+        public static async Task<List<cls{_TableName}DTO>?> SearchDataAsync(string ColumnName, string SearchValue, string Mode = ""Anywhere"", CancellationToken cancellationToken = default)
+        {{
+            var {_TableName}List = new List<cls{_TableName}DTO>();
+
+            try
+            {{
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = $@""SP_Search_{_TableName}_ByColumn"";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.AddWithValue(""@ColumnName"", ColumnName);
+                        command.Parameters.AddWithValue(""@SearchValue"", SearchValue);
+                        command.Parameters.AddWithValue(""@Mode"", Mode);  // Added Mode parameter
+
+                        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+                        {{
+                            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                            {{
+                                {_TableName}List.Add(new cls{_TableName}DTO
+                                (
+                                    {AddDataReaderToVariablesDTO()}
+                                ));
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            catch (Exception ex)
+            {{
+                // Handle all exceptions in a general way
+                ErrorHandler.HandleException(ex, nameof(SearchDataAsync), $""ColumnName: {{ColumnName}}, SearchValue: {{SearchValue}}, Mode: {{Mode}}"");
+                return null;
+            }}
+
+            return {_TableName}List;
+        }}";
+
+            return GetTableByIDCode;
+        }
+
+
         public async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile()
         {
 
@@ -562,32 +835,37 @@ namespace {clsGlobal.ProjectName}_DataLayer
     {{
         //#nullable enable
 
-        {AddGetTableInfoByIDMethod()}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddGetTableInfoByIDMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddGetTableInfoByIDAsyncMethod() : string.Empty)}
 
-        {AddGetAllDataMethod()}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddGetAllDataMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddGetAllDataAsyncMethod() : string.Empty)}
 
-        {AddAddingNewRecordMethod()}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddAddingNewRecordMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddAddingNewRecordAsyncMethod() : string.Empty)}
 
-        {AddUpdatingRecordMethod()}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddUpdatingRecordMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddUpdatingRecordAsyncMethod() : string.Empty)}
 
-        {AddDeleteByIDMethod()}
-        
-        {AddSearchMethod()}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddDeleteByIDMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddDeleteByIDAsyncMethod() : string.Empty)}
+
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddSearchMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddSearchAsyncMethod() : string.Empty)}
     }}
 }}
 ";
 
-            
-            // Write the code to the file
-            File.WriteAllText(fullPath, code);
 
+            // Write the code to the file
+            await Task.Run(() => File.WriteAllText(fullPath, code));
             return clsGlobal.enTypeRaisons.enPerfect;
 
         }
 
-        public static async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns)
+        public static async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns, clsGlobal.enExuctionMethods ExuctionMethod)
         {
-            clsCreateDTODataAccessFile Files = new clsCreateDTODataAccessFile(filePath, TableName, Columns, DataTypes, NullibietyColumns);
+            clsCreateDTODataAccessFile Files = new clsCreateDTODataAccessFile(filePath, TableName, Columns, DataTypes, NullibietyColumns, ExuctionMethod);
 
             return await Files.CreateDTODataAccessClassFile();
         }

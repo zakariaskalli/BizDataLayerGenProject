@@ -439,7 +439,22 @@ namespace BizDataLayerGen
 
             bool AddAPI = ckGenerateAPI.Checked;
 
-            if (await clsAddLayers.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI) == clsGlobal.enTypeRaisons.enPerfect)
+            if (rbAsynchronous.Checked)
+            {
+                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enAsynchronous;
+            }
+            else if (rbSynchronous.Checked)
+            {
+                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enSynchronous;
+            }
+            else
+            {
+                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enBoth;
+            }
+
+
+
+            if (await clsAddLayers.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI, clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Code Generated Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
@@ -574,5 +589,42 @@ namespace BizDataLayerGen
                 );
             }
         }
+
+        private void rbBoth_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbBoth.Checked && !switchUsingDTO.Checked)
+            {
+                switchUsingDTO.Checked = true;
+
+                MessageBox.Show(
+                    "Both operations require DTOs!",
+                    "Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+            }
+
+        }
+
+        private void rbAsynchronous_CheckedChanged(object sender, EventArgs e)
+        {
+
+            if (rbAsynchronous.Checked && !switchUsingDTO.Checked)
+            {
+                switchUsingDTO.Checked = true;
+
+                    MessageBox.Show(
+                        "Asynchronous operations require DTOs!",
+                        "Warning",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+            }
+        }
+
+
+
+
     }
 }

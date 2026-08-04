@@ -50,9 +50,17 @@
             this.switchUsingDTO = new Guna.UI2.WinForms.Guna2ToggleSwitch();
             this.progressBar = new Guna.UI2.WinForms.Guna2ProgressBar();
             this.lbCurrentFile = new Guna.UI2.WinForms.Guna2HtmlLabel();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.rbBoth = new Guna.UI2.WinForms.Guna2RadioButton();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.lable5 = new System.Windows.Forms.Label();
+            this.rbSynchronous = new Guna.UI2.WinForms.Guna2RadioButton();
+            this.rbAsynchronous = new Guna.UI2.WinForms.Guna2RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnGenerate
@@ -76,7 +84,7 @@
             this.guna2HtmlLabel2.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel2.Font = new System.Drawing.Font("Arial Narrow", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
-            this.guna2HtmlLabel2.Location = new System.Drawing.Point(211, 17);
+            this.guna2HtmlLabel2.Location = new System.Drawing.Point(243, 15);
             this.guna2HtmlLabel2.Margin = new System.Windows.Forms.Padding(8, 6, 8, 6);
             this.guna2HtmlLabel2.Name = "guna2HtmlLabel2";
             this.guna2HtmlLabel2.Size = new System.Drawing.Size(352, 71);
@@ -116,7 +124,7 @@
             // 
             this.rbJustThis.AutoSize = true;
             this.rbJustThis.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbJustThis.Location = new System.Drawing.Point(116, 33);
+            this.rbJustThis.Location = new System.Drawing.Point(159, 33);
             this.rbJustThis.Margin = new System.Windows.Forms.Padding(4);
             this.rbJustThis.Name = "rbJustThis";
             this.rbJustThis.Size = new System.Drawing.Size(105, 29);
@@ -147,7 +155,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(303, 85);
+            this.groupBox1.Size = new System.Drawing.Size(396, 85);
             this.groupBox1.TabIndex = 23;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Searching FK OF:";
@@ -161,7 +169,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox2.Size = new System.Drawing.Size(303, 84);
+            this.groupBox2.Size = new System.Drawing.Size(396, 84);
             this.groupBox2.TabIndex = 24;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Adding Static Methods:";
@@ -170,7 +178,7 @@
             // 
             this.rbAddingStaticMethodsNo.AutoSize = true;
             this.rbAddingStaticMethodsNo.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbAddingStaticMethodsNo.Location = new System.Drawing.Point(133, 33);
+            this.rbAddingStaticMethodsNo.Location = new System.Drawing.Point(159, 33);
             this.rbAddingStaticMethodsNo.Margin = new System.Windows.Forms.Padding(4);
             this.rbAddingStaticMethodsNo.Name = "rbAddingStaticMethodsNo";
             this.rbAddingStaticMethodsNo.Size = new System.Drawing.Size(60, 29);
@@ -186,7 +194,7 @@
             this.guna2CircleButton1.FillColor = System.Drawing.Color.Transparent;
             this.guna2CircleButton1.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.guna2CircleButton1.ForeColor = System.Drawing.Color.White;
-            this.guna2CircleButton1.Location = new System.Drawing.Point(1094, 17);
+            this.guna2CircleButton1.Location = new System.Drawing.Point(1153, 15);
             this.guna2CircleButton1.Margin = new System.Windows.Forms.Padding(4);
             this.guna2CircleButton1.Name = "guna2CircleButton1";
             this.guna2CircleButton1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
@@ -238,7 +246,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox3.Size = new System.Drawing.Size(303, 292);
+            this.groupBox3.Size = new System.Drawing.Size(406, 213);
             this.groupBox3.TabIndex = 25;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Pro Things:";
@@ -255,6 +263,7 @@
             // 
             // ckGenerateAPI
             // 
+            this.ckGenerateAPI.Checked = true;
             this.ckGenerateAPI.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.ckGenerateAPI.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.ckGenerateAPI.CheckedState.InnerBorderColor = System.Drawing.Color.White;
@@ -318,6 +327,7 @@
             // 
             // switchUsingDTO
             // 
+            this.switchUsingDTO.Checked = true;
             this.switchUsingDTO.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.switchUsingDTO.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.switchUsingDTO.CheckedState.InnerBorderColor = System.Drawing.Color.White;
@@ -357,12 +367,119 @@
             this.lbCurrentFile.TabIndex = 27;
             this.lbCurrentFile.Text = "CurrentFile";
             // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.rbBoth);
+            this.groupBox4.Controls.Add(this.label5);
+            this.groupBox4.Controls.Add(this.label6);
+            this.groupBox4.Controls.Add(this.lable5);
+            this.groupBox4.Controls.Add(this.rbSynchronous);
+            this.groupBox4.Controls.Add(this.rbAsynchronous);
+            this.groupBox4.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox4.Location = new System.Drawing.Point(816, 546);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox4.Size = new System.Drawing.Size(396, 149);
+            this.groupBox4.TabIndex = 34;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Execution Mode:";
+            // 
+            // rbBoth
+            // 
+            this.rbBoth.AutoSize = true;
+            this.rbBoth.Checked = true;
+            this.rbBoth.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbBoth.CheckedState.BorderThickness = 0;
+            this.rbBoth.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbBoth.CheckedState.InnerColor = System.Drawing.Color.White;
+            this.rbBoth.CheckedState.InnerOffset = -4;
+            this.rbBoth.Location = new System.Drawing.Point(159, 103);
+            this.rbBoth.Name = "rbBoth";
+            this.rbBoth.Size = new System.Drawing.Size(74, 29);
+            this.rbBoth.TabIndex = 40;
+            this.rbBoth.TabStop = true;
+            this.rbBoth.Text = "Both";
+            this.rbBoth.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.rbBoth.UncheckedState.BorderThickness = 2;
+            this.rbBoth.UncheckedState.FillColor = System.Drawing.Color.Transparent;
+            this.rbBoth.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
+            this.rbBoth.CheckedChanged += new System.EventHandler(this.rbBoth_CheckedChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(16, 105);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(100, 28);
+            this.label5.TabIndex = 39;
+            this.label5.Text = "Option 3:";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(16, 68);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(100, 28);
+            this.label6.TabIndex = 38;
+            this.label6.Text = "Option 2:";
+            // 
+            // lable5
+            // 
+            this.lable5.AutoSize = true;
+            this.lable5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lable5.Location = new System.Drawing.Point(16, 30);
+            this.lable5.Name = "lable5";
+            this.lable5.Size = new System.Drawing.Size(100, 28);
+            this.lable5.TabIndex = 37;
+            this.lable5.Text = "Option 1:";
+            // 
+            // rbSynchronous
+            // 
+            this.rbSynchronous.AutoSize = true;
+            this.rbSynchronous.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbSynchronous.CheckedState.BorderThickness = 0;
+            this.rbSynchronous.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbSynchronous.CheckedState.InnerColor = System.Drawing.Color.White;
+            this.rbSynchronous.CheckedState.InnerOffset = -4;
+            this.rbSynchronous.Location = new System.Drawing.Point(159, 29);
+            this.rbSynchronous.Name = "rbSynchronous";
+            this.rbSynchronous.Size = new System.Drawing.Size(146, 29);
+            this.rbSynchronous.TabIndex = 36;
+            this.rbSynchronous.Text = "Synchronous";
+            this.rbSynchronous.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.rbSynchronous.UncheckedState.BorderThickness = 2;
+            this.rbSynchronous.UncheckedState.FillColor = System.Drawing.Color.Transparent;
+            this.rbSynchronous.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
+            // 
+            // rbAsynchronous
+            // 
+            this.rbAsynchronous.AutoSize = true;
+            this.rbAsynchronous.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbAsynchronous.CheckedState.BorderThickness = 0;
+            this.rbAsynchronous.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbAsynchronous.CheckedState.InnerColor = System.Drawing.Color.White;
+            this.rbAsynchronous.CheckedState.InnerOffset = -4;
+            this.rbAsynchronous.Location = new System.Drawing.Point(159, 68);
+            this.rbAsynchronous.Name = "rbAsynchronous";
+            this.rbAsynchronous.Size = new System.Drawing.Size(156, 29);
+            this.rbAsynchronous.TabIndex = 35;
+            this.rbAsynchronous.Text = "Asynchronous";
+            this.rbAsynchronous.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.rbAsynchronous.UncheckedState.BorderThickness = 2;
+            this.rbAsynchronous.UncheckedState.FillColor = System.Drawing.Color.Transparent;
+            this.rbAsynchronous.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
+            this.rbAsynchronous.CheckedChanged += new System.EventHandler(this.rbAsynchronous_CheckedChanged);
+            // 
             // frmTablesShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.HighlightText;
-            this.ClientSize = new System.Drawing.Size(1154, 666);
+            this.ClientSize = new System.Drawing.Size(1271, 708);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.lbCurrentFile);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.groupBox3);
@@ -385,6 +502,8 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -413,5 +532,12 @@
         private Guna.UI2.WinForms.Guna2HtmlLabel lbCurrentFile;
         private System.Windows.Forms.Label label4;
         private Guna.UI2.WinForms.Guna2ToggleSwitch ckGenerateAPI;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private Guna.UI2.WinForms.Guna2RadioButton rbSynchronous;
+        private Guna.UI2.WinForms.Guna2RadioButton rbAsynchronous;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lable5;
+        private Guna.UI2.WinForms.Guna2RadioButton rbBoth;
+        private System.Windows.Forms.Label label5;
     }
 }

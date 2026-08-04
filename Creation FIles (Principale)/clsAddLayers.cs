@@ -187,7 +187,8 @@ END;
         }
 
 
-        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI)
+        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI,
+            clsGlobal.enExuctionMethods ExuctionMethod)
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
 
@@ -274,7 +275,7 @@ END;
                 else if (UseDTO)
                 {
                     // DAL
-                    clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
+                    clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns, ExuctionMethod);
 
                     clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = await AddDataAccessLayer.CreateDTODataAccessClassFile();
 
