@@ -1,7 +1,6 @@
 ﻿using BizDataLayerGen.AI;
 using BizDataLayerGen.DataAccessLayer;
 using Newtonsoft.Json;
-using BizDataLayerGen.AI;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -12,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Humanizer;
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -262,7 +262,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddGetTableInfoByIDMethod()
         {
-            string GetTableByIDCode = @$"public static cls{_TableName}DTO? Get{_TableName}InfoByID({_DataTypes[0]}? {_Columns[0]})
+            string GetTableByIDCode = @$"public static cls{_TableName}DTO? Get{_TableName.Singularize()}InfoByID({_DataTypes[0]}? {_Columns[0]})
 {{
     try
     {{
@@ -298,7 +298,7 @@ namespace BizDataLayerGen.GeneralClasses
     catch (Exception ex)
     {{
         // Handle all exceptions in a general way
-        ErrorHandler.HandleException(ex, nameof(Get{_TableName}InfoByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+        ErrorHandler.HandleException(ex, nameof(Get{_TableName.Singularize()}InfoByID), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
     }}
         return null;
 
@@ -309,7 +309,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddGetAllDataMethod()
         {
-            string GetTableByIDCode = @$"public static List<cls{_TableName}DTO> GetAll{_TableName}()
+            string GetTableByIDCode = @$"public static List<cls{_TableName}DTO> GetAll{_TableName.Pluralize()}()
 {{
     var {_TableName}List = new List<cls{_TableName}DTO>();
 
@@ -341,7 +341,7 @@ namespace BizDataLayerGen.GeneralClasses
     catch (Exception ex)
     {{
         // Handle all exceptions in a general way
-        ErrorHandler.HandleException(ex, nameof(GetAll{_TableName}), ""No parameters for this method."");
+        ErrorHandler.HandleException(ex, nameof(GetAll{_TableName.Pluralize()}), ""No parameters for this method."");
     
     }}
 
@@ -363,7 +363,7 @@ namespace BizDataLayerGen.GeneralClasses
              */
 
 
-            string GetTableByIDCode = @$"public static int? AddNew{_TableName}(cls{_TableName}DTO {_TableName}DTO)
+            string GetTableByIDCode = @$"public static int? AddNew{_TableName.Singularize()}(cls{_TableName}DTO {_TableName}DTO)
     {{
         int? {_Columns[0]} = null;
 
@@ -402,7 +402,7 @@ namespace BizDataLayerGen.GeneralClasses
         catch (Exception ex)
         {{
             // Handle all exceptions in a general way
-            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName}), $""Parameters: {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
+            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName.Singularize()}), $""Parameters: {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
         }}
 
         return {_Columns[0]};
@@ -415,7 +415,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddUpdatingRecordMethod()
         {
 
-            string GetTableByIDCode = @$"public static bool Update{_TableName}ByID(cls{_TableName}DTO {_TableName}DTO)
+            string GetTableByIDCode = @$"public static bool Update{_TableName.Singularize()}ByID(cls{_TableName}DTO {_TableName}DTO)
 {{
     int rowsAffected = 0;
 
@@ -441,7 +441,7 @@ namespace BizDataLayerGen.GeneralClasses
     catch (Exception ex)
     {{
         // Handle exceptions
-        ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByID), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
+        ErrorHandler.HandleException(ex, nameof(Update{_TableName.Singularize()}ByID), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
     }}
 
     return (rowsAffected > 0);
@@ -455,7 +455,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddDeleteByIDMethod()
         {
-            string GetTableByIDCode = @$"public static bool Delete{_TableName}({_DataTypes[0]} {_Columns[0]})
+            string GetTableByIDCode = @$"public static bool Delete{_TableName.Singularize()}({_DataTypes[0]} {_Columns[0]})
 {{
     int rowsAffected = 0;
 
@@ -480,7 +480,7 @@ namespace BizDataLayerGen.GeneralClasses
     catch (Exception ex)
     {{
         // Handle all exceptions in a general way, this includes errors from SP_HandleError if any
-        ErrorHandler.HandleException(ex, nameof(Delete{_TableName}), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+        ErrorHandler.HandleException(ex, nameof(Delete{_TableName.Singularize()}), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
     }}
 
     return (rowsAffected > 0);
@@ -544,7 +544,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddGetTableInfoByIDAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<cls{_TableName}DTO?> Get{_TableName}InfoByIDAsync({_DataTypes[0]}? {_Columns[0]}, CancellationToken cancellationToken = default)
+        public static async Task<cls{_TableName}DTO?> Get{_TableName.Singularize()}InfoByIDAsync({_DataTypes[0]}? {_Columns[0]}, CancellationToken cancellationToken = default)
         {{
             try
             {{
@@ -580,7 +580,7 @@ namespace BizDataLayerGen.GeneralClasses
             catch (Exception ex)
             {{
                 // Handle all exceptions in a general way
-                ErrorHandler.HandleException(ex, nameof(Get{_TableName}InfoByIDAsync), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+                ErrorHandler.HandleException(ex, nameof(Get{_TableName.Singularize()}InfoByIDAsync), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
             }}
             return null;
         }}";
@@ -591,7 +591,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddGetAllDataAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<List<cls{_TableName}DTO>> GetAll{_TableName}Async(CancellationToken cancellationToken = default)
+        public static async Task<List<cls{_TableName}DTO>> GetAll{_TableName.Pluralize()}Async(CancellationToken cancellationToken = default)
         {{
             var {_TableName}List = new List<cls{_TableName}DTO>();
 
@@ -623,7 +623,7 @@ namespace BizDataLayerGen.GeneralClasses
             catch (Exception ex)
             {{
                 // Handle all exceptions in a general way
-                ErrorHandler.HandleException(ex, nameof(GetAll{_TableName}Async), ""No parameters for this method."");
+                ErrorHandler.HandleException(ex, nameof(GetAll{_TableName.Pluralize()}Async), ""No parameters for this method."");
             }}
 
             return {_TableName}List;
@@ -635,7 +635,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddAddingNewRecordAsyncMethod()
         {
             string GetTableByIDCode = @$"
-    public static async Task<int?> AddNew{_TableName}Async(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
+    public static async Task<int?> AddNew{_TableName.Singularize()}Async(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
     {{
         int? {_Columns[0]} = null;
 
@@ -674,7 +674,7 @@ namespace BizDataLayerGen.GeneralClasses
         catch (Exception ex)
         {{
             // Handle all exceptions in a general way
-            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName}Async), $""Parameters: {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
+            ErrorHandler.HandleException(ex, nameof(AddNew{_TableName.Singularize()}Async), $""Parameters: {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns)}"");
         }}
 
         return {_Columns[0]};
@@ -686,7 +686,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddUpdatingRecordAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<bool> Update{_TableName}ByIDAsync(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
+        public static async Task<bool> Update{_TableName.Singularize()}ByIDAsync(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
         {{
             int rowsAffected = 0;
 
@@ -712,7 +712,7 @@ namespace BizDataLayerGen.GeneralClasses
             catch (Exception ex)
             {{
                 // Handle exceptions
-                ErrorHandler.HandleException(ex, nameof(Update{_TableName}ByIDAsync), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
+                ErrorHandler.HandleException(ex, nameof(Update{_TableName.Singularize()}ByIDAsync), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
             }}
 
             return (rowsAffected > 0);
@@ -724,7 +724,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddDeleteByIDAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<bool> Delete{_TableName}Async({_DataTypes[0]} {_Columns[0]}, CancellationToken cancellationToken = default)
+        public static async Task<bool> Delete{_TableName.Singularize()}Async({_DataTypes[0]} {_Columns[0]}, CancellationToken cancellationToken = default)
         {{
             int rowsAffected = 0;
 
@@ -749,7 +749,7 @@ namespace BizDataLayerGen.GeneralClasses
             catch (Exception ex)
             {{
                 // Handle all exceptions in a general way, this includes errors from SP_HandleError if any
-                ErrorHandler.HandleException(ex, nameof(Delete{_TableName}Async), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
+                ErrorHandler.HandleException(ex, nameof(Delete{_TableName.Singularize()}Async), $""Parameter: {_Columns[0]} = "" + {_Columns[0]});
             }}
 
             return (rowsAffected > 0);
