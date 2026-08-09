@@ -523,10 +523,10 @@ namespace {clsGlobal.ProjectName}_DataLayer
 }}
 ";
 
-         
+
             // Write the code to the file
-            File.WriteAllText(fullPath, code);
-            
+            await Task.Run(() => File.WriteAllText(fullPath, code));
+
             return clsGlobal.enTypeRaisons.enPerfect;
 
         }

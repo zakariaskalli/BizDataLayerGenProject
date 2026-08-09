@@ -68,7 +68,7 @@ namespace BizDataLayerGen.Creation_APIs
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName}DTO>))]
         public async Task<ActionResult<IEnumerable<cls{_TableName}DTO>>> GetAll{_TableName.Pluralize()}()
         {{
-            List<cls{_TableName}DTO> {entityNameLowerPlural} = await cls{_TableName}.GetAll{_TableName}();
+            List<cls{_TableName}DTO> {entityNameLowerPlural} = await cls{_TableName}.GetAll{_TableName.Pluralize()}Async();
         
             if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Any())
             {{
@@ -97,7 +97,7 @@ namespace BizDataLayerGen.Creation_APIs
                 return BadRequest(ModelState);
             }}
         
-            cls{_TableName}? {_TableName.Singularize().ToLower()} = await cls{_TableName}.FindBy{IdColumnName}({idParamName});
+            cls{_TableName}? {_TableName.Singularize().ToLower()} = await cls{_TableName}.FindBy{IdColumnName}Async({idParamName});
         
             if ({_TableName.Singularize().ToLower()} == null)
             {{
@@ -127,14 +127,14 @@ namespace BizDataLayerGen.Creation_APIs
                 return BadRequest(ModelState);
             }}
 
-            bool isCreated = await cls{_TableName}.AddNew{_TableName}({entityLowerSingular}DTO);
+            bool isCreated = await cls{_TableName}.AddNew{_TableName.Singularize()}Async({entityLowerSingular}DTO);
 
             if (isCreated == false)
             {{
                 return BadRequest(""Failed to create new {entitySingular}."");
             }}
 
-            return CreatedAtRoute(""Get{_TableName}ById"", new {{ {idParamName} = {entityLowerSingular}DTO.{IdColumnName} }}, {entityLowerSingular}DTO);
+            return CreatedAtRoute(""Get{_TableName.Singularize()}ById"", new {{ {idParamName} = {entityLowerSingular}DTO.{IdColumnName} }}, {entityLowerSingular}DTO);
         }}";
 
             return EndPoint;
@@ -161,7 +161,7 @@ namespace BizDataLayerGen.Creation_APIs
                 return BadRequest(ModelState);
             }}
 
-            if (!await cls{_TableName}.Update{entitySingular}ByID({entityLowerSingular}DTO))
+            if (!await cls{_TableName}.Update{entitySingular}ByIDAsync({entityLowerSingular}DTO))
             {{
                 return NotFound(""{entitySingular} with ID "" + {idParamName} + "" was not found."");
             }}
@@ -190,7 +190,7 @@ namespace BizDataLayerGen.Creation_APIs
                 return BadRequest(ModelState);
             }}
         
-            if (!await cls{_TableName}.Delete{entitySingular}({idParamName}))
+            if (!await cls{_TableName}.Delete{entitySingular}Async({idParamName}))
             {{
                 return NotFound(""{entitySingular} with ID "" + {idParamName} + "" was not found."");
             }}
@@ -210,7 +210,7 @@ namespace BizDataLayerGen.Creation_APIs
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName}DTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<cls{_TableName}DTO>>> Search{_TableName.Pluralize()}(
-            [FromQuery] cls{_TableName}.{_TableName}Column column,
+            [FromQuery] cls{_TableName}.{_TableName.Singularize()}Column column,
             [FromQuery] string value,
             [FromQuery] cls{_TableName}.SearchMode mode = cls{_TableName}.SearchMode.Anywhere)
         {{
@@ -219,7 +219,7 @@ namespace BizDataLayerGen.Creation_APIs
                 return BadRequest(""Search value cannot be empty."");
             }}
 
-            List<cls{_TableName}DTO>? {entityNameLowerPlural} = await cls{_TableName}.SearchData(column, value, mode);
+            List<cls{_TableName}DTO>? {entityNameLowerPlural} = await cls{_TableName}.SearchDataAsync(column, value, mode);
 
             if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Any())
             {{
