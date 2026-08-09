@@ -12,7 +12,7 @@ namespace BizDataLayerGen.Creation_APIs
 {
     public class clsCreateAPIController
     {
-        private string _filePath;
+        private string _apiLayerPath;
         private string _TableName;
         private string[] _Columns;
         private string[] _DataTypes;
@@ -21,11 +21,11 @@ namespace BizDataLayerGen.Creation_APIs
         private string[] _TablesNameHasFK;
         private string[] _ReferencedColumn;
 
-        public clsCreateAPIController(string filePath, string TableName, string[] Columns, string[] DataTypes,
+        public clsCreateAPIController(string apiLayerPath, string TableName, string[] Columns, string[] DataTypes,
                                   bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[]
                                   ReferencedColumn)
         {
-            this._filePath = filePath;
+            this._apiLayerPath = apiLayerPath;
             this._TableName = TableName;
             this._Columns = Columns;
 
@@ -234,8 +234,14 @@ namespace BizDataLayerGen.Creation_APIs
 
         public async Task<clsGlobal.enTypeRaisons> CreateAPILayerFile()
         {
+            var controllerFolderPath = Path.Combine(_apiLayerPath, "Controllers","V1");
+            if (!Directory.Exists(controllerFolderPath))
+            {
+                Directory.CreateDirectory(controllerFolderPath);
+            };
+
             // Define the full path for the file
-            string fullPath = Path.Combine(_filePath, $"cls{_TableName}Controller.cs");
+            string fullPath = Path.Combine(controllerFolderPath, $"cls{_TableName}Controller.cs");
 
             // Names Of Methods to generate the EndPoints
             string StringGetAllEndPoint = CreateGetAllEndPoint(_TableName);
@@ -282,7 +288,7 @@ namespace {clsGlobal.ProjectName}Api.Controllers
             // Write the code to the file
             await Task.Run(() => File.WriteAllText(fullPath, code));
 
-            await CreateProgramAndConfigurationFiles(_filePath);
+            await CreateProgramAndConfigurationFiles(_apiLayerPath);
 
             return clsGlobal.enTypeRaisons.enPerfect;
         }

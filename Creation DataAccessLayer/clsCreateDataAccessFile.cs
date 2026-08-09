@@ -487,10 +487,10 @@ namespace BizDataLayerGen.GeneralClasses
 
 
             // Define the full path for the file
-            string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
+            string fullPath = Path.Combine(_filePath, $"cls{_TableName}Data.cs");
 
 
-            
+
 
             // Define the code to be written in the file
             string code = $@"

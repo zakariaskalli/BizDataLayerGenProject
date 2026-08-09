@@ -197,14 +197,14 @@
     <Compile Include="frmTablesShow.Designer.cs">
       <DependentUpon>frmTablesShow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Creation FIles %28Principale%29\clsAddLayers.cs" />
+    <Compile Include="Code Generation %28Principale%29\clsAddLayersCode.cs" />
     <Compile Include="Creation BusinessLayer\clsCreateBusinessLayerFile.cs" />
     <Compile Include="Creation DataAccessLayer\clsCreateDataAccessFile.cs" />
     <Compile Include="Creation BusinessLayer\clsCreateDTOBusinessLayerFile.cs" />
     <Compile Include="Creation DTO\clsCreateDTOFile.cs" />
-    <Compile Include="Creation FIles %28Principale%29\clsGenDataBizLayerMethods.cs" />
-    <Compile Include="Creation FIles %28Principale%29\clsGeneraleThings.cs" />
-    <Compile Include="Creation FIles %28Principale%29\clsGlobal.cs" />
+    <Compile Include="Code Generation %28Principale%29\clsGenDataBizLayerMethods.cs" />
+    <Compile Include="Code Generation %28Principale%29\clsGeneraleThings.cs" />
+    <Compile Include="Code Generation %28Principale%29\clsGlobal.cs" />
     <Compile Include="Creation DataAccessLayer\clsDataAccessSettings.cs" />
     <Compile Include="Creation DataAccessLayer\clsGeneralWithData.cs" />
     <Compile Include="Form1.cs">
@@ -220,7 +220,15 @@
       <DependentUpon>frmLogin.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\DotNet\clsDotNetCli.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\Files\clsTemplateFileCleaner.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\Projects\clsProjectRefrenceManager.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\Projects\clsNuGetPackageManager.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\Projects\clsProjectCreator.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\Solution\clsSolutionConfiguration.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\Solution\clsSolutionGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\clsProjectPathHelper.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -288,7 +296,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Project Structure Generation %28Principale%29\Configuration\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

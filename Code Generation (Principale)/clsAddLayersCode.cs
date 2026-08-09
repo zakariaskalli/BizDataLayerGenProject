@@ -1,6 +1,8 @@
 ﻿using BizDataLayerGen.Creating_MigrationLayer;
 using BizDataLayerGen.Creation_APIs;
 using BizDataLayerGen.DataAccessLayer;
+using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
+using BizDataLayerGen.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -14,93 +16,91 @@ using System.Windows.Forms;
 
 namespace BizDataLayerGen.GeneralClasses
 {
-    public class clsAddLayers
+    public class clsAddLayersCode
     {
         
-        public static bool CreateProjectFolders(string ProjectName)
-        {
+        //public static bool CreateProjectFolders(string ProjectName)
+        //{
 
-            try
-            {
+        //    try
+        //    {
 
-                string dataAccessLayerPath = "";
-                string businessLayerPath = "";
-                string dtoLayerPath = "";
-                string apiLayerPath = "";
+        //        string dataAccessLayerPath = "";
+        //        string businessLayerPath = "";
+        //        string dtoLayerPath = "";
+        //        string apiLayerPath = "";
 
-                // Define folder names for Data Access Layer and Business Layer
-                clsGlobal.dataAccessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DataAccess");
-                clsGlobal.businessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Business");
-                clsGlobal.DTOLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DTO");
-                clsGlobal.APILayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_API");
-                clsGlobal.MigrationLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Migration");
-
-
-                dataAccessLayerPath = clsGlobal.dataAccessLayerPath;
-                businessLayerPath = clsGlobal.businessLayerPath;
-                dtoLayerPath = clsGlobal.DTOLayerPath;
-                apiLayerPath = clsGlobal.APILayerPath;
-
-                // Check if the folders already exist, if not, create them
-                if (!Directory.Exists(dataAccessLayerPath))
-                    Directory.CreateDirectory(dataAccessLayerPath);
-                else
-                    return false;
-
-                if (!Directory.Exists(businessLayerPath))
-                    Directory.CreateDirectory(businessLayerPath);
-                else
-                    return false;
+        //        // Define folder names for Data Access Layer and Business Layer
+        //        clsGlobal.dataAccessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DataAccess");
+        //        clsGlobal.businessLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Business");
+        //        clsGlobal.DTOLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_DTO");
+        //        clsGlobal.APILayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_API");
+        //        clsGlobal.MigrationLayerPath = Path.Combine(clsGlobal.PathFilesToGenerate, ProjectName + "_Migration");
 
 
-                if (!Directory.Exists(dtoLayerPath))
-                    Directory.CreateDirectory(dtoLayerPath);
-                else
-                    return false;
+        //        dataAccessLayerPath = clsGlobal.dataAccessLayerPath;
+        //        businessLayerPath = clsGlobal.businessLayerPath;
+        //        dtoLayerPath = clsGlobal.DTOLayerPath;
+        //        apiLayerPath = clsGlobal.APILayerPath;
 
-                if (!Directory.Exists(apiLayerPath))
-                    Directory.CreateDirectory(apiLayerPath);
-                else
-                    return false;
+        //        // Check if the folders already exist, if not, create them
+        //        if (!Directory.Exists(dataAccessLayerPath))
+        //            Directory.CreateDirectory(dataAccessLayerPath);
+        //        else
+        //            return false;
 
-                if (!Directory.Exists(clsGlobal.MigrationLayerPath))
-                    Directory.CreateDirectory(clsGlobal.MigrationLayerPath);
-                else
-                    return false;
-            }
-            catch (Exception ex)
-            {
+        //        if (!Directory.Exists(businessLayerPath))
+        //            Directory.CreateDirectory(businessLayerPath);
+        //        else
+        //            return false;
 
-                var stackTrace = new StackTrace();
-                var frame = stackTrace.GetFrame(0);
-                var method = frame.GetMethod();
-                var className = method.DeclaringType.Name;
-                var methodName = method.Name;
+
+        //        if (!Directory.Exists(dtoLayerPath))
+        //            Directory.CreateDirectory(dtoLayerPath);
+        //        else
+        //            return false;
+
+        //        if (!Directory.Exists(apiLayerPath))
+        //            Directory.CreateDirectory(apiLayerPath);
+        //        else
+        //            return false;
+
+        //        if (!Directory.Exists(clsGlobal.MigrationLayerPath))
+        //            Directory.CreateDirectory(clsGlobal.MigrationLayerPath);
+        //        else
+        //            return false;
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        var stackTrace = new StackTrace();
+        //        var frame = stackTrace.GetFrame(0);
+        //        var method = frame.GetMethod();
+        //        var className = method.DeclaringType.Name;
+        //        var methodName = method.Name;
                 
-                var modifiedMessage = ex.Message + ", We have another Folders By The Same Name";
-                var modifiedEx = new Exception(modifiedMessage, ex); // Create a new Exception with the modified message
+        //        var modifiedMessage = ex.Message + ", We have another Folders By The Same Name";
+        //        var modifiedEx = new Exception(modifiedMessage, ex); // Create a new Exception with the modified message
 
-                ErrorHandler.RaiseError(modifiedEx, className, methodName);
+        //        ErrorHandler.RaiseError(modifiedEx, className, methodName);
                 
-                return false;
-            }
+        //        return false;
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
+        
         public static bool CreateDataAccessSettingsClassFile(string ProjectName)
         {
             string errorHandlerFolderPath = Path.Combine(clsGlobal.dataAccessLayerPath, "ConnectionString");
 
-            // Step 2: Create the folder if it doesn't exist
+
             if (!Directory.Exists(errorHandlerFolderPath))
             {
-                Directory.CreateDirectory(errorHandlerFolderPath);
+                    Directory.CreateDirectory(errorHandlerFolderPath);
             }
-            else
-            {
-            }
-
+            
             // Step 3: Define the path for the 'clsErrorHandlingManager.cs' file
             string fullPath = Path.Combine(errorHandlerFolderPath, $"clsDataAccessSettings.cs");
 
@@ -196,15 +196,29 @@ END;
                 return clsGlobal.enTypeRaisons.enError;
             }
 
-            if (!CreateProjectFolders(clsGlobal.ProjectName))
-            {
-                return clsGlobal.enTypeRaisons.enError;
-            }
+            //if (!CreateProjectFolders(clsGlobal.ProjectName))
+            //{
+            //    return clsGlobal.enTypeRaisons.enError;
+            //}
 
-            if (!CreateDataAccessSettingsClassFile(clsGlobal.DataBaseName))
+
+            // Generate the solution using clsSolutionGenerator 
+            await clsSolutionGenerator.GenerateSolutionAsync(new SolutionConfiguration
             {
-                return clsGlobal.enTypeRaisons.enError;
-            }
+                SolutionName = clsGlobal.ProjectName,
+                EnableSwagger = true,
+                EnableApiVersioning = true,
+                IncludeApi = AddAPI,
+                IncludeBusiness = true,
+                IncludeDataAccess = true,
+                IncludeDto = UseDTO,
+                IncludeMigrations = true,
+                DotNetVersion = "net8.0",
+                OutputDirectory = clsGlobal.PathFilesToGenerate,
+
+
+            });
+
 
             if (!CreateDataAccessSettingsClassFile(clsGlobal.ProjectName))
             {
