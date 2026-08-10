@@ -263,8 +263,6 @@ using Newtonsoft.Json;
             // Send the log to the error handler
             ErrorHandler.HandleError(log);
         }}
-    }}
-
     }}";
 
             // Write the content to the file
