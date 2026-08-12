@@ -2,6 +2,7 @@
 using BizDataLayerGen.DataAccessLayer;
 using BizDataLayerGen.DocumentationGenerator;
 using BizDataLayerGen.GeneralClasses;
+using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
 using Guna.UI2.WinForms;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -192,12 +193,30 @@ namespace BizDataLayerGen
 
             bool AddAPI = ckGenerateAPI.Checked;
 
-            if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI) == clsGlobal.enTypeRaisons.enPerfect)
+            if (rbAsynchronous.Checked)
+            {
+                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enAsynchronous;
+            }
+            else if (rbSynchronous.Checked)
+            {
+                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enSynchronous;
+            }
+            else
+            {
+                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enBoth;
+            }
+
+
+
+            await GenerateProjectStructureAsync(AddAPI, UseDTO);
+
+            if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI,clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Code Generated Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
             if (ckAiCodeDocs.Checked)
             {
+
 
                 await GenerateDocumentationAsync();
 
@@ -232,7 +251,48 @@ namespace BizDataLayerGen
                 MessageBoxIcon.Information);
         }
 
+        private async Task GenerateProjectStructureAsync(bool AddAPI,bool UseDTO)
+        {
 
+
+            var progress = new Progress<ProjectStructureGenerationProgress>(p =>
+            {
+                progressBar.Maximum = p.TotalSteps;
+                progressBar.Value = p.ProcessedSteps;
+
+                lbCurrentFile.Text =
+                    $"Processing: {p.CurrentStep} ({p.ProcessedSteps}/{p.TotalSteps}) - {p.Percentage:F2}%";
+            });
+
+            // Generate the solution using clsSolutionGenerator 
+            await clsSolutionGenerator.GenerateSolutionAsync(new SolutionConfiguration
+            {
+                SolutionName = clsGlobal.ProjectName,
+                EnableSwagger = true,
+                EnableApiVersioning = true,
+                IncludeApi = AddAPI,
+                IncludeBusiness = true,
+                IncludeDataAccess = true,
+                IncludeDto = UseDTO,
+                IncludeMigrations = true,
+                DotNetVersion = "net8.0",
+                OutputDirectory = clsGlobal.PathFilesToGenerate,
+
+
+            },progress);
+
+            MessageBox.Show(
+               "Project structure generated succesfully:)",
+               "Done",
+               MessageBoxButtons.OK,
+               MessageBoxIcon.Information);
+
+
+
+
+
+
+        }
         private void rbAddingStaticMethodsNo_CheckedChanged(object sender, EventArgs e)
         {
             // In Button Ok Less rbNo And Cancel Checked RbYes
@@ -327,5 +387,42 @@ namespace BizDataLayerGen
                 );
             }
         }
+
+        private void rbBoth_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbBoth.Checked && !switchUsingDTO.Checked)
+            {
+                switchUsingDTO.Checked = true;
+
+                MessageBox.Show(
+                    "Both operations require DTOs!",
+                    "Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+            }
+
+        }
+
+        private void rbAsynchronous_CheckedChanged(object sender, EventArgs e)
+        {
+
+            if (rbAsynchronous.Checked && !switchUsingDTO.Checked)
+            {
+                switchUsingDTO.Checked = true;
+
+                    MessageBox.Show(
+                        "Asynchronous operations require DTOs!",
+                        "Warning",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+            }
+        }
+
+
+
+
     }
 }

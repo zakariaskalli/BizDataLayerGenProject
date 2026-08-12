@@ -18,6 +18,7 @@ namespace BizDataLayerGen.Creating_MigrationLayer
             _filePath = filePath;
         }
 
+         
 
 
         public async Task<clsGlobal.enTypeRaisons> CreateMigrationLayerFile()
@@ -26,15 +27,18 @@ namespace BizDataLayerGen.Creating_MigrationLayer
             string fullPath = Path.Combine(_filePath, $"clsDbMigrator.cs");
 
             string code = @$"
+using System;
 using DbUp;
-using {clsGlobal.ProjectName}_Shared;
+using Newtonsoft.Json;
+using Microsoft.Data.SqlClient;
+using {clsGlobal.ProjectName}_DataAccess;
 using System.Reflection;
 
 
 namespace {clsGlobal.ProjectName}_Migrations
 {{
 
-
+    
     public class clsDbMigrator
     {{
         public static void Migrate()
@@ -48,8 +52,8 @@ namespace {clsGlobal.ProjectName}_Migrations
             // Go up to src folder
             string projectDir = Path.GetFullPath(Path.Combine(dllDirectory, @""..\..\..\..""));
 
-            // Point to correct Migrations path inside DVLD_DataAccess
-            string migrationsPath = Path.Combine(projectDir, ""DealPart_Migrations"", ""Migrations"");
+            // Point to correct Migrations path inside {clsGlobal.ProjectName}_DataAccess
+            string migrationsPath = Path.Combine(projectDir, ""{clsGlobal.ProjectName}_Migrations"", ""Migrations"");
 
 
 
@@ -84,10 +88,10 @@ namespace {clsGlobal.ProjectName}_Migrations
 
 
 
-           
+
 
             // Write the code to the file
-            File.WriteAllText(fullPath, code);
+            await Task.Run(() => File.WriteAllText(fullPath, code));
 
             return clsGlobal.enTypeRaisons.enPerfect;
 

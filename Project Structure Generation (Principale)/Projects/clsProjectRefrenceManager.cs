@@ -14,7 +14,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
     public class clsProjectRefrenceManager
     {
         public static async Task AddProjectsToSolutionAsync(
-            SolutionConfiguration configuration)
+            SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress)
         {
             var solutionPath = clsSolutionGenerator.GetSolutionPath(configuration);
 
@@ -25,10 +25,15 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                     configuration.OutputDirectory
                     );
             }
+            progress?.Report(new ProjectStructureGenerationProgress
+            {
+                CurrentStep = "Projects added to solution.",
+                ProcessedSteps = 3
+            });
         }
 
         public static async Task AddProjectReferencesAsync(
-        SolutionConfiguration configuration)
+        SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress)
         {
             if (configuration.IncludeApi &&
                 configuration.IncludeBusiness)
@@ -77,14 +82,20 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                     "DTO");
             }
 
-            //if (configuration.IncludeMigrations &&
-            //    configuration.IncludeDataAccess)
-            //{
-            //    await AddProjectReferenceAsync(
-            //        configuration,
-            //        "Migrations",
-            //        "DataAccess");
-            //}
+            if (configuration.IncludeMigrations &&
+                configuration.IncludeDataAccess)
+            {
+                await AddProjectReferenceAsync(
+                    configuration,
+                    "Migrations",
+                    "DataAccess");
+            }
+
+            progress?.Report(new ProjectStructureGenerationProgress
+            {
+                CurrentStep = "Project references added.",
+                ProcessedSteps = 5,TotalSteps = 9,
+            });
         }
 
         private static async Task AddProjectReferenceAsync(

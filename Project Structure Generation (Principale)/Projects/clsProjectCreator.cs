@@ -14,7 +14,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
     public class clsProjectCreator
     {
         public static async Task CreateProjectsAsync(
-        SolutionConfiguration configuration)
+        SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress)
         {
             if (configuration.IncludeApi)
             {
@@ -45,6 +45,12 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                 await CreateMigrationsProjectAsync(
                     configuration);
             }
+
+            progress?.Report(new ProjectStructureGenerationProgress
+            {
+                ProcessedSteps = 4,
+                CurrentStep = "Project creation completed.",TotalSteps = 9,
+            });
         }
 
 

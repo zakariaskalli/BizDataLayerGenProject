@@ -477,7 +477,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             /*
              
-            string GenerateClassFileForErrorLog = Path.Combine(_filePath, "clsErrorHandlingManager.cs");
+            string GenerateClassFileForErrorLog = Path.Combine(_filePath, "\.cs");
 
             GenerateErrorLogClassesFile(GenerateClassFileForErrorLog);
              
@@ -502,7 +502,7 @@ using System.Linq;
 using {clsGlobal.ProjectName}_DataAccess;
 using Newtonsoft.Json;
 
-namespace {clsGlobal.ProjectName}_DataLayer
+namespace {clsGlobal.ProjectName}_DataAccess
 {{
     public class cls{_TableName}Data
     {{
@@ -523,10 +523,10 @@ namespace {clsGlobal.ProjectName}_DataLayer
 }}
 ";
 
-         
+
             // Write the code to the file
-            File.WriteAllText(fullPath, code);
-            
+            await Task.Run(() => File.WriteAllText(fullPath, code));
+
             return clsGlobal.enTypeRaisons.enPerfect;
 
         }

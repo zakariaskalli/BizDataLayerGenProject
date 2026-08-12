@@ -227,6 +227,7 @@
     <Compile Include="Project Structure Generation %28Principale%29\Projects\clsProjectCreator.cs" />
     <Compile Include="Project Structure Generation %28Principale%29\Solution\clsSolutionConfiguration.cs" />
     <Compile Include="Project Structure Generation %28Principale%29\Solution\clsSolutionGenerator.cs" />
+    <Compile Include="Project Structure Generation %28Principale%29\Solution\ProjectStructureGenerationProgress.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\clsProjectPathHelper.cs" />
     <EmbeddedResource Include="Form1.resx">

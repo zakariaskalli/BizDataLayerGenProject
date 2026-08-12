@@ -28,6 +28,13 @@ namespace BizDataLayerGen
         }
         public static enTypeRaisons MyEnumProperty { get; set; }
 
+        public enum enExuctionMethods
+        {
+            enSynchronous = 1,
+            enAsynchronous = 2,
+            enBoth = 3
+        }
+        public static enExuctionMethods ExuctionMethod { get; set; }
 
         public static string ProjectName;
 

@@ -14,7 +14,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
     public class clsNuGetPackageManager
     {
         public static async Task InstallRequiredPackagesAsync(
-        SolutionConfiguration configuration)
+        SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress)
         {
             await InstallApiPackagesAsync(
                 configuration);
@@ -24,6 +24,12 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 
             await InstallMigrationPackagesAsync(
                 configuration);
+            progress?.Report(new ProjectStructureGenerationProgress
+            {
+                ProcessedSteps = 6,
+                CurrentStep = "NuGet package installation completed.",
+                TotalSteps = 9,
+            });
         }
 
         private static async Task InstallApiPackagesAsync(
@@ -62,6 +68,9 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             await AddPackageAsync(
                 $"{projectPath}\\{configuration.SolutionName}_DataAccess.csproj",
                 "Microsoft.Data.SqlClient", "7.0.2");
+            await AddPackageAsync(
+               $"{projectPath}\\{configuration.SolutionName}_DataAccess.csproj",
+               "Newtonsoft.Json", null);
         }
 
         private static async Task InstallMigrationPackagesAsync(SolutionConfiguration configuration)
@@ -74,7 +83,13 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             await AddPackageAsync(
                 $"{projectPath}\\{configuration.SolutionName}_Migrations.csproj",
                 "DbUp", "5.0.40");
-            
+
+
+            await AddPackageAsync(
+                $"{projectPath}\\{configuration.SolutionName}_Migrations.csproj",
+                "Microsoft.Data.SqlClient", "7.0.2");
+
+
         }
 
 

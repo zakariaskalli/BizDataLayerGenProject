@@ -110,7 +110,7 @@ namespace BizDataLayerGen.GeneralClasses
 using System;
 namespace {ProjectName}_DataAccess
 {{
-    static class clsDataAccessSettings
+    static public class clsDataAccessSettings
     {{
         public static string ConnectionString = ""Server=.;Database={clsGlobal.DataBaseName};User Id={clsGlobal.UserId};Password={clsGlobal.Password};TrustServerCertificate=True;Encrypt=False;"";
 
@@ -187,7 +187,8 @@ END;
         }
 
 
-        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI)
+        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI,
+            clsGlobal.enExuctionMethods ExuctionMethod)
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
 
@@ -202,23 +203,7 @@ END;
             //}
 
 
-            // Generate the solution using clsSolutionGenerator 
-            await clsSolutionGenerator.GenerateSolutionAsync(new SolutionConfiguration
-            {
-                SolutionName = clsGlobal.ProjectName,
-                EnableSwagger = true,
-                EnableApiVersioning = true,
-                IncludeApi = AddAPI,
-                IncludeBusiness = true,
-                IncludeDataAccess = true,
-                IncludeDto = UseDTO,
-                IncludeMigrations = true,
-                DotNetVersion = "net8.0",
-                OutputDirectory = clsGlobal.PathFilesToGenerate,
-
-
-            });
-
+           
 
             if (!CreateDataAccessSettingsClassFile(clsGlobal.ProjectName))
             {
@@ -288,7 +273,7 @@ END;
                 else if (UseDTO)
                 {
                     // DAL
-                    clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns);
+                    clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns, ExuctionMethod);
 
                     clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = await AddDataAccessLayer.CreateDTODataAccessClassFile();
 
@@ -301,7 +286,7 @@ END;
                     // BL
 
                     clsCreateDTOBusinessLayerFile AddBusinessAccessLayer = new clsCreateDTOBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
-                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods);
+                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods, ExuctionMethod);
 
                     clsGlobal.enTypeRaisons enRaisonForProjectBusiness = await AddBusinessAccessLayer.CreateDTOBusinessLayerFile();
 

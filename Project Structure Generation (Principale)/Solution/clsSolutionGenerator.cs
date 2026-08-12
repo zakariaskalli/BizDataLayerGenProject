@@ -13,31 +13,66 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
     public class clsSolutionGenerator
     {
 
-  
-        public static async Task GenerateSolutionAsync(SolutionConfiguration configuration)
+
+
+
+        public static async Task GenerateSolutionAsync(SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress = null)
         {
+            int CurrentStep = 0;
+            int TotalSteps = 9;
+
+            async Task ReportAsync(string description)
+            {
+                progress?.Report(new ProjectStructureGenerationProgress
+                {
+                    CurrentStep = description,
+                    ProcessedSteps = CurrentStep,
+                    TotalSteps = TotalSteps,
+                });
+                await Task.Yield();
+            }
+
+            await ReportAsync("Starting solution generation...");
+
             ValidateConfiguration(configuration);
+            CurrentStep++;
+            await ReportAsync("Configuration validated successfully.");
 
             await CreateSolutionAsync(configuration);
+            CurrentStep++;
+            await ReportAsync("Solution created successfully.");
 
-            await clsProjectCreator.CreateProjectsAsync(configuration);
+            await clsProjectCreator.CreateProjectsAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("Projects created successfully.");
 
-            await clsProjectRefrenceManager.AddProjectsToSolutionAsync(configuration);
+            await clsProjectRefrenceManager.AddProjectsToSolutionAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("Projects added to solution.");
 
-            await clsProjectRefrenceManager. AddProjectReferencesAsync(configuration);
+            await clsProjectRefrenceManager.AddProjectReferencesAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("Project references added.");
 
-            await clsNuGetPackageManager.InstallRequiredPackagesAsync(configuration);
+            await clsNuGetPackageManager.InstallRequiredPackagesAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("Required NuGet packages installed.");
 
-            await Files.clsTemplateFileCleaner.RemoveTemplateFilesAsync(configuration);
+            await Files.clsTemplateFileCleaner.RemoveTemplateFilesAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("Template files removed.");
 
-            await RestorePackagesAsync(configuration);
+            await RestorePackagesAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("Packages restored.");
 
-            await BuildSolutionAsync(configuration);
+            await BuildSolutionAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("Solution built successfully.");
         }
-
-
-        private static void ValidateConfiguration(SolutionConfiguration configuration)
+        private static void ValidateConfiguration(SolutionConfiguration configuration,IProgress<ProjectStructureGenerationProgress> progress = null)
         {
+
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
@@ -55,6 +90,13 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
                 throw new ArgumentException(
                     ".NET version cannot be empty.",
                     nameof(configuration));
+
+            progress?.Report( new ProjectStructureGenerationProgress
+            {
+                CurrentStep = "Configuration validated successfully.",
+                ProcessedSteps = 1,
+                TotalSteps = 9,
+            });
         }
 
         private static async Task CreateSolutionAsync(
@@ -63,6 +105,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             await clsDotNetCli.ExecuteAsync(
                 $"new sln --name \"{configuration.SolutionName}\" --format sln",
                 configuration.OutputDirectory);
+            
         }
 
         public static string GetSolutionPath(
@@ -75,7 +118,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
 
 
         private static async Task BuildSolutionAsync(
-        SolutionConfiguration configuration)
+        SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress=null)
         {
             var solutionPath = GetSolutionPath(configuration);
 
@@ -83,17 +126,31 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
                 $"build \"{solutionPath}\" --no-restore",
                 configuration.OutputDirectory);
 
+            progress?.Report(new ProjectStructureGenerationProgress
+            {
+                ProcessedSteps = 9,
+                CurrentStep = "Solution built successfully.",
+                TotalSteps = 9,
+            });
+
         }
 
 
         private static async Task RestorePackagesAsync(
-        SolutionConfiguration configuration)
+        SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress=null)
         {
             var solutionPath = GetSolutionPath(configuration);
 
             await clsDotNetCli.ExecuteAsync(
                 $"restore \"{solutionPath}\"",
                 configuration.OutputDirectory);
+
+            progress?.Report(new ProjectStructureGenerationProgress
+            {
+                ProcessedSteps = 8,
+                CurrentStep = "NuGet packages restored successfully.",
+                TotalSteps = 9,
+            });
         }
     }
 }

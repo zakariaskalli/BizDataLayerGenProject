@@ -14,7 +14,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Files
     {
 
         public static Task RemoveTemplateFilesAsync(
-    SolutionConfiguration configuration)
+    SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress)
         {
             var filesToRemove = new[]
             {
@@ -31,6 +31,12 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Files
                 DeleteFileIfExists(file);
             }
 
+            progress?.Report(new ProjectStructureGenerationProgress
+            {
+                ProcessedSteps = 7,
+                CurrentStep = "Template files removed.",
+                TotalSteps = 9,
+            });
             return Task.CompletedTask;
         }
 
