@@ -262,13 +262,13 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddGetTableInfoByIDMethod()
         {
-            string GetTableByIDCode = @$"public static cls{_TableName}DTO? Get{_TableName.Singularize()}InfoByID({_DataTypes[0]}? {_Columns[0]})
+            string GetTableByIDCode = @$"public static cls{_TableName.Singularize()}DTO? Get{_TableName.Singularize()}InfoByID({_DataTypes[0]}? {_Columns[0]})
 {{
     try
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = ""SP_Get_{_TableName}_ByID"";
+            string query = ""SP_Get_{_TableName.Singularize()}_ByID"";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
@@ -282,7 +282,7 @@ namespace BizDataLayerGen.GeneralClasses
                 {{ 
                     if (reader.Read())
                     {{
-                        return new cls{_TableName}DTO
+                        return new cls{_TableName.Singularize()}DTO
                         (
                             {AddDataReaderToVariablesDTO()}
                         );
@@ -309,15 +309,15 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddGetAllDataMethod()
         {
-            string GetTableByIDCode = @$"public static List<cls{_TableName}DTO> GetAll{_TableName.Pluralize()}()
+            string GetTableByIDCode = @$"public static List<cls{_TableName.Singularize()}DTO> GetAll{_TableName.Pluralize()}()
 {{
-    var {_TableName}List = new List<cls{_TableName}DTO>();
+    var {_TableName.Pluralize()}List = new List<cls{_TableName.Singularize()}DTO>();
 
     try
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = ""SP_Get_All_{_TableName}"";
+            string query = ""SP_Get_All_{_TableName.Pluralize()}"";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
@@ -329,7 +329,7 @@ namespace BizDataLayerGen.GeneralClasses
                 {{
                     while (reader.Read())
                     {{
-                        {_TableName}List.Add(new cls{_TableName}DTO
+                        {_TableName.Pluralize()}List.Add(new cls{_TableName.Singularize()}DTO
                         (
                             {AddDataReaderToVariablesDTO()}
                         ));
@@ -345,7 +345,7 @@ namespace BizDataLayerGen.GeneralClasses
     
     }}
 
-    return {_TableName}List;
+    return {_TableName.Pluralize()}List;
 }}";
 
             return GetTableByIDCode;
@@ -363,7 +363,7 @@ namespace BizDataLayerGen.GeneralClasses
              */
 
 
-            string GetTableByIDCode = @$"public static int? AddNew{_TableName.Singularize()}(cls{_TableName}DTO {_TableName}DTO)
+            string GetTableByIDCode = @$"public static int? AddNew{_TableName.Singularize()}(cls{_TableName.Singularize()}DTO {_TableName.Singularize()}DTO)
     {{
         int? {_Columns[0]} = null;
 
@@ -371,13 +371,13 @@ namespace BizDataLayerGen.GeneralClasses
         {{
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
-                string query = @""SP_Add_{_TableName}"";
+                string query = @""SP_Add_{_TableName.Singularize()}"";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {{
                     command.CommandType = CommandType.StoredProcedure;
 
-{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName)}
+{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName.Singularize())}
 
                     SqlParameter outputIdParam = new SqlParameter(""@NewID"", SqlDbType.Int)
                     {{
@@ -392,7 +392,7 @@ namespace BizDataLayerGen.GeneralClasses
                     if (outputIdParam.Value != DBNull.Value)
                     {{
                         {_Columns[0]} = (int)outputIdParam.Value;
-                        {_TableName}DTO.{_Columns[0]} = (int)outputIdParam.Value;
+                        {_TableName.Singularize()}DTO.{_Columns[0]} = (int)outputIdParam.Value;
                     
                     }}
 
@@ -415,7 +415,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddUpdatingRecordMethod()
         {
 
-            string GetTableByIDCode = @$"public static bool Update{_TableName.Singularize()}ByID(cls{_TableName}DTO {_TableName}DTO)
+            string GetTableByIDCode = @$"public static bool Update{_TableName.Singularize()}ByID(cls{_TableName.Singularize()}DTO {_TableName.Singularize()}DTO)
 {{
     int rowsAffected = 0;
 
@@ -423,14 +423,14 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = $@""SP_Update_{_TableName}_ByID""; 
+            string query = $@""SP_Update_{_TableName.Singularize()}_ByID""; 
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
                 command.CommandType = CommandType.StoredProcedure;
 
                 // Create the parameters for the stored procedure
-{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName, 0)}
+{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName.Singularize(), 0)}
 
                 // Open the connection and execute the update
                 connection.Open();
@@ -441,7 +441,7 @@ namespace BizDataLayerGen.GeneralClasses
     catch (Exception ex)
     {{
         // Handle exceptions
-        ErrorHandler.HandleException(ex, nameof(Update{_TableName.Singularize()}ByID), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
+        ErrorHandler.HandleException(ex, nameof(Update{_TableName.Singularize()}ByID), $""Parameter: {_Columns[0]} = "" + {_TableName.Singularize()}DTO.{_Columns[0]});
     }}
 
     return (rowsAffected > 0);
@@ -463,7 +463,7 @@ namespace BizDataLayerGen.GeneralClasses
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = $@""SP_Delete_{_TableName}_ByID"";  
+            string query = $@""SP_Delete_{_TableName.Singularize()}_ByID"";  
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
@@ -492,15 +492,15 @@ namespace BizDataLayerGen.GeneralClasses
 
         public string AddSearchMethod()
         {
-            string GetTableByIDCode = @$"public static List<cls{_TableName}DTO>? SearchData(string ColumnName, string SearchValue, string Mode = ""Anywhere"")
+            string GetTableByIDCode = @$"public static List<cls{_TableName.Singularize()}DTO>? SearchData(string ColumnName, string SearchValue, string Mode = ""Anywhere"")
 {{
-    var {_TableName}List = new List<cls{_TableName}DTO>();
+    var {_TableName.Pluralize()}List = new List<cls{_TableName.Singularize()}DTO>();
 
     try
     {{
         using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
         {{
-            string query = $@""SP_Search_{_TableName}_ByColumn"";
+            string query = $@""SP_Search_{_TableName.Singularize()}_ByColumn"";
 
             using (SqlCommand command = new SqlCommand(query, connection))
             {{
@@ -516,7 +516,7 @@ namespace BizDataLayerGen.GeneralClasses
                 {{
                     while (reader.Read())
                     {{
-                        {_TableName}List.Add(new cls{_TableName}DTO
+                        {_TableName.Pluralize()}List.Add(new cls{_TableName.Singularize()}DTO
                         (
                             {AddDataReaderToVariablesDTO()}
                         ));
@@ -532,7 +532,7 @@ namespace BizDataLayerGen.GeneralClasses
         return null;
     }}
 
-    return {_TableName}List;
+    return {_TableName.Pluralize()}List;
 }}";
 
             return GetTableByIDCode;
@@ -544,13 +544,13 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddGetTableInfoByIDAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<cls{_TableName}DTO?> Get{_TableName.Singularize()}InfoByIDAsync({_DataTypes[0]}? {_Columns[0]}, CancellationToken cancellationToken = default)
+        public static async Task<cls{_TableName.Singularize()}DTO?> Get{_TableName.Singularize()}InfoByIDAsync({_DataTypes[0]}? {_Columns[0]}, CancellationToken cancellationToken = default)
         {{
             try
             {{
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    string query = ""SP_Get_{_TableName}_ByID"";
+                    string query = ""SP_Get_{_TableName.Singularize()}_ByID"";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {{
@@ -564,7 +564,7 @@ namespace BizDataLayerGen.GeneralClasses
                         {{ 
                             if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                             {{
-                                return new cls{_TableName}DTO
+                                return new cls{_TableName.Singularize()}DTO
                                 (
                                     {AddDataReaderToVariablesDTO()}
                                 );
@@ -591,15 +591,15 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddGetAllDataAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<List<cls{_TableName}DTO>> GetAll{_TableName.Pluralize()}Async(CancellationToken cancellationToken = default)
+        public static async Task<List<cls{_TableName.Singularize()}DTO>> GetAll{_TableName.Pluralize()}Async(CancellationToken cancellationToken = default)
         {{
-            var {_TableName}List = new List<cls{_TableName}DTO>();
+            var {_TableName.Pluralize()}List = new List<cls{_TableName.Singularize()}DTO>();
 
             try
             {{
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    string query = ""SP_Get_All_{_TableName}"";
+                    string query = ""SP_Get_All_{_TableName.Pluralize()}"";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {{
@@ -611,7 +611,7 @@ namespace BizDataLayerGen.GeneralClasses
                         {{
                             while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                             {{
-                                {_TableName}List.Add(new cls{_TableName}DTO
+                                {_TableName.Pluralize()}List.Add(new cls{_TableName.Singularize()}DTO
                                 (
                                     {AddDataReaderToVariablesDTO()}
                                 ));
@@ -626,7 +626,7 @@ namespace BizDataLayerGen.GeneralClasses
                 ErrorHandler.HandleException(ex, nameof(GetAll{_TableName.Pluralize()}Async), ""No parameters for this method."");
             }}
 
-            return {_TableName}List;
+            return {_TableName.Pluralize()}List;
         }}";
 
             return GetTableByIDCode;
@@ -635,7 +635,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddAddingNewRecordAsyncMethod()
         {
             string GetTableByIDCode = @$"
-    public static async Task<int?> AddNew{_TableName.Singularize()}Async(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
+    public static async Task<int?> AddNew{_TableName.Singularize()}Async(cls{_TableName.Singularize()}DTO {_TableName.Singularize()}DTO, CancellationToken cancellationToken = default)
     {{
         int? {_Columns[0]} = null;
 
@@ -643,13 +643,13 @@ namespace BizDataLayerGen.GeneralClasses
         {{
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
-                string query = @""SP_Add_{_TableName}"";
+                string query = @""SP_Add_{_TableName.Singularize()}"";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {{
                     command.CommandType = CommandType.StoredProcedure;
 
-{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName)}
+{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName.Singularize())}
 
                     SqlParameter outputIdParam = new SqlParameter(""@NewID"", SqlDbType.Int)
                     {{
@@ -664,7 +664,7 @@ namespace BizDataLayerGen.GeneralClasses
                     if (outputIdParam.Value != DBNull.Value)
                     {{
                         {_Columns[0]} = (int)outputIdParam.Value;
-                        {_TableName}DTO.{_Columns[0]} = (int)outputIdParam.Value;
+                        {_TableName.Singularize()}DTO.{_Columns[0]} = (int)outputIdParam.Value;
                     
                     }}
 
@@ -686,7 +686,7 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddUpdatingRecordAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<bool> Update{_TableName.Singularize()}ByIDAsync(cls{_TableName}DTO {_TableName}DTO, CancellationToken cancellationToken = default)
+        public static async Task<bool> Update{_TableName.Singularize()}ByIDAsync(cls{_TableName.Singularize()}DTO {_TableName.Singularize()}DTO, CancellationToken cancellationToken = default)
         {{
             int rowsAffected = 0;
 
@@ -694,14 +694,14 @@ namespace BizDataLayerGen.GeneralClasses
             {{
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    string query = $@""SP_Update_{_TableName}_ByID""; 
+                    string query = $@""SP_Update_{_TableName.Singularize()}_ByID""; 
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {{
                         command.CommandType = CommandType.StoredProcedure;
 
                         // Create the parameters for the stored procedure
-{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName, 0)}
+{clsGenDataBizLayerMethods.CreatingCommandParameterDTO(_Columns, _NullibietyColumns, _TableName.Singularize(), 0)}
 
                         // Open the connection and execute the update
                         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
@@ -712,7 +712,7 @@ namespace BizDataLayerGen.GeneralClasses
             catch (Exception ex)
             {{
                 // Handle exceptions
-                ErrorHandler.HandleException(ex, nameof(Update{_TableName.Singularize()}ByIDAsync), $""Parameter: {_Columns[0]} = "" + {_TableName}DTO.{_Columns[0]});
+                ErrorHandler.HandleException(ex, nameof(Update{_TableName.Singularize()}ByIDAsync), $""Parameter: {_Columns[0]} = "" + {_TableName.Singularize()}DTO.{_Columns[0]});
             }}
 
             return (rowsAffected > 0);
@@ -732,7 +732,7 @@ namespace BizDataLayerGen.GeneralClasses
             {{
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    string query = $@""SP_Delete_{_TableName}_ByID"";  
+                    string query = $@""SP_Delete_{_TableName.Singularize()}_ByID"";  
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {{
@@ -761,15 +761,15 @@ namespace BizDataLayerGen.GeneralClasses
         public string AddSearchAsyncMethod()
         {
             string GetTableByIDCode = @$"
-        public static async Task<List<cls{_TableName}DTO>?> SearchDataAsync(string ColumnName, string SearchValue, string Mode = ""Anywhere"", CancellationToken cancellationToken = default)
+        public static async Task<List<cls{_TableName.Singularize()}DTO>?> SearchDataAsync(string ColumnName, string SearchValue, string Mode = ""Anywhere"", CancellationToken cancellationToken = default)
         {{
-            var {_TableName}List = new List<cls{_TableName}DTO>();
+            var {_TableName.Pluralize()}List = new List<cls{_TableName.Singularize()}DTO>();
 
             try
             {{
                 using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    string query = $@""SP_Search_{_TableName}_ByColumn"";
+                    string query = $@""SP_Search_{_TableName.Singularize()}_ByColumn"";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {{
@@ -785,7 +785,7 @@ namespace BizDataLayerGen.GeneralClasses
                         {{
                             while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                             {{
-                                {_TableName}List.Add(new cls{_TableName}DTO
+                                {_TableName.Pluralize()}List.Add(new cls{_TableName.Singularize()}DTO
                                 (
                                     {AddDataReaderToVariablesDTO()}
                                 ));
@@ -801,7 +801,7 @@ namespace BizDataLayerGen.GeneralClasses
                 return null;
             }}
 
-            return {_TableName}List;
+            return {_TableName.Pluralize()}List;
         }}";
 
             return GetTableByIDCode;
