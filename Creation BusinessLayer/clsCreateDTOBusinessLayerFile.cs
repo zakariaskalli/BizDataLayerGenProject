@@ -68,7 +68,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             sb.AppendLine($"        // DTO object that holds all booking data\r\n");
 
-            sb.AppendLine($"        public cls{_TableName}DTO Data {{ get; set; }}");
+            sb.AppendLine($"        public cls{_TableName.Singularize()}DTO Data {{ get; set; }}");
 
             var foreignKeyMap = _ColumnNamesHasFK
                 .Select((fkColumn, index) => new { fkColumn, tableName = _TablesNameHasFK[index], referencedColumn = _ReferencedColumn[index] })
@@ -116,7 +116,7 @@ namespace BizDataLayerGen.GeneralClasses
             // Constructor signature
             sb.AppendLine($"        public cls{_TableName}()");
             sb.AppendLine("        {");
-            sb.AppendLine($"            Data = new cls{_TableName}DTO {{}};");
+            sb.AppendLine($"            Data = new cls{_TableName.Singularize()}DTO {{}};");
             
             //sb.AppendLine("        {");
             //
@@ -178,12 +178,12 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"        private cls{_TableName}(cls{_TableName}DTO dto)");
+            sb.AppendLine($"        private cls{_TableName}(cls{_TableName.Singularize()}DTO dto)");
 
             //sb.Append($"{_DataTypes[0]}? {_Columns[0]}, {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})");
 
             sb.AppendLine("        {");
-            sb.AppendLine($"            Data = dto ?? new cls{_TableName}DTO();");
+            sb.AppendLine($"            Data = dto ?? new cls{_TableName.Singularize()}DTO();");
 
             sb.AppendLine("            InitLazyLoaders();");
 
@@ -266,7 +266,7 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine("       {");
 
             // Start adding the AddNew call
-            sb.AppendLine($"           Data.{_Columns[0]} = cls{_TableName.Pluralize()}Data.AddNew{_TableName.Singularize()}(Data);");
+            sb.AppendLine($"           Data.{_Columns[0]} = cls{_TableName}Data.AddNew{_TableName.Singularize()}(Data);");
             // Return a condition checking if the object is not null
             sb.AppendLine($"           return (Data.{_Columns[0]} != null);");
             sb.AppendLine("       }");
@@ -279,12 +279,12 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static bool AddNew{_TableName.Singularize()}(cls{_TableName.Pluralize()}DTO dto)");
+            sb.AppendLine($"       public static bool AddNew{_TableName.Singularize()}(cls{_TableName.Singularize()}DTO dto)");
 
             sb.AppendLine("        {");
 
             // Start adding the AddNew call
-            sb.AppendLine($"            return cls{_TableName.Pluralize()}Data.AddNew{_TableName.Singularize()}(dto) != null;");
+            sb.AppendLine($"            return cls{_TableName}Data.AddNew{_TableName.Singularize()}(dto) != null;");
 
             sb.AppendLine("        }");
 
@@ -300,7 +300,7 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine("       {");
 
             // Start adding the Update call
-            sb.AppendLine($"        return cls{_TableName.Pluralize()}Data.Update{_TableName.Singularize()}ByID(Data);");
+            sb.AppendLine($"        return cls{_TableName}Data.Update{_TableName.Singularize()}ByID(Data);");
             sb.AppendLine("       }");
 
             return sb.ToString();
@@ -311,12 +311,12 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static bool Update{_TableName.Singularize()}ByID(cls{_TableName.Pluralize()}DTO dto)");
+            sb.AppendLine($"       public static bool Update{_TableName.Singularize()}ByID(cls{_TableName.Singularize()}DTO dto)");
 
             sb.AppendLine("        {");
 
             // Start adding the Update call
-            sb.AppendLine($"        return cls{_TableName.Pluralize()}Data.Update{_TableName.Singularize()}ByID(dto);");
+            sb.AppendLine($"        return cls{_TableName}Data.Update{_TableName.Singularize()}ByID(dto);");
 
             sb.AppendLine("        }");
 
@@ -334,16 +334,16 @@ namespace BizDataLayerGen.GeneralClasses
             }
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static cls{_TableName.Pluralize()}? FindBy{_Columns[0]}({pkDataType} {_Columns[0]})");
+            sb.AppendLine($"       public static cls{_TableName}? FindBy{_Columns[0]}({pkDataType} {_Columns[0]})");
             sb.AppendLine(@$"
         {{
             if ({_Columns[0]} == null) return null;");
 
-            sb.AppendLine($"            cls{_TableName.Pluralize()}DTO? dto = cls{_TableName.Pluralize()}Data.Get{_TableName.Singularize()}InfoByID({_Columns[0]});");
+            sb.AppendLine($"            cls{_TableName.Singularize()}DTO? dto = cls{_TableName}Data.Get{_TableName.Singularize()}InfoByID({_Columns[0]});");
 
             sb.AppendLine($"                        if (dto == null) return null;\n");
 
-            sb.AppendLine($@"               return new cls{_TableName.Pluralize()}(dto);
+            sb.AppendLine($@"               return new cls{_TableName}(dto);
 
         }}");
 
@@ -355,11 +355,11 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static List<cls{_TableName.Pluralize()}DTO> GetAll{_TableName.Singularize()}()");
+            sb.AppendLine($"       public static List<cls{_TableName.Singularize()}DTO> GetAll{_TableName.Pluralize()}()");
             sb.AppendLine("       {");
             sb.AppendLine("");
 
-            sb.AppendLine($"        return cls{_TableName.Pluralize()}Data.GetAll{_TableName.Pluralize()}() ?? new List<cls{_TableName.Pluralize()}DTO>();");
+            sb.AppendLine($"        return cls{_TableName}Data.GetAll{_TableName.Pluralize()}() ?? new List<cls{_TableName.Singularize()}DTO>();");
 
             sb.AppendLine("");
             sb.AppendLine("       }");
@@ -408,7 +408,7 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine("       {");
             sb.AppendLine("");
 
-            sb.AppendLine($"        return cls{_TableName.Pluralize()}Data.Delete{_TableName.Singularize()}({PKColumnName});");
+            sb.AppendLine($"        return cls{_TableName}Data.Delete{_TableName.Singularize()}({PKColumnName});");
 
             sb.AppendLine("");
             sb.AppendLine("       }");
@@ -420,7 +420,7 @@ namespace BizDataLayerGen.GeneralClasses
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"        public enum {_TableName.Singularize()}Column");
+            sb.AppendLine($"        public enum {_TableName}Column");
             sb.AppendLine("         {");
 
             for (int i = 0; i < _Columns.Length; i++)
@@ -462,14 +462,14 @@ namespace BizDataLayerGen.GeneralClasses
 
             // Constructor signature with parameters
             sb.AppendLine($@"
-        public static List<cls{_TableName.Pluralize()}DTO> SearchData({_TableName.Singularize()}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere)
+        public static List<cls{_TableName.Singularize()}DTO> SearchData({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere)
         {{
             if (string.IsNullOrWhiteSpace(SearchValue))
-                return new List<cls{_TableName.Pluralize()}DTO>();
+                return new List<cls{_TableName.Singularize()}DTO>();
 
             string modeValue = Mode.ToString(); // Get the mode as string for passing to the stored procedure
 
-            return cls{_TableName.Pluralize()}Data.SearchData(ChosenColumn.ToString(), SearchValue, modeValue) ?? new List<cls{_TableName.Pluralize()}DTO>();
+            return cls{_TableName}Data.SearchData(ChosenColumn.ToString(), SearchValue, modeValue) ?? new List<cls{_TableName.Singularize()}DTO>();
         }}        
 ");
 
@@ -502,7 +502,7 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static async Task<bool> AddNew{_TableName.Singularize()}Async(cls{_TableName}DTO dto, CancellationToken cancellationToken = default)");
+            sb.AppendLine($"       public static async Task<bool> AddNew{_TableName.Singularize()}Async(cls{_TableName.Singularize()}DTO dto, CancellationToken cancellationToken = default)");
 
             sb.AppendLine("        {");
 
@@ -534,7 +534,7 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static async Task<bool> Update{_TableName.Singularize()}ByIDAsync(cls{_TableName}DTO dto, CancellationToken cancellationToken = default)");
+            sb.AppendLine($"       public static async Task<bool> Update{_TableName.Singularize()}ByIDAsync(cls{_TableName.Singularize()}DTO dto, CancellationToken cancellationToken = default)");
 
             sb.AppendLine("        {");
 
@@ -562,7 +562,7 @@ namespace BizDataLayerGen.GeneralClasses
         {{
             if ({_Columns[0]} == null) return null;");
 
-            sb.AppendLine($"            cls{_TableName}DTO? dto = await cls{_TableName}Data.Get{_TableName.Singularize()}InfoByIDAsync({_Columns[0]}, cancellationToken).ConfigureAwait(false);");
+            sb.AppendLine($"            cls{_TableName.Singularize()}DTO? dto = await cls{_TableName}Data.Get{_TableName.Singularize()}InfoByIDAsync({_Columns[0]}, cancellationToken).ConfigureAwait(false);");
 
             sb.AppendLine($"                        if (dto == null) return null;\n");
 
@@ -578,11 +578,11 @@ namespace BizDataLayerGen.GeneralClasses
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static async Task<List<cls{_TableName}DTO>> GetAll{_TableName.Pluralize()}Async(CancellationToken cancellationToken = default)");
+            sb.AppendLine($"       public static async Task<List<cls{_TableName.Singularize()}DTO>> GetAll{_TableName.Pluralize()}Async(CancellationToken cancellationToken = default)");
             sb.AppendLine("       {");
             sb.AppendLine("");
 
-            sb.AppendLine($"        return await cls{_TableName}Data.GetAll{_TableName.Pluralize()}Async(cancellationToken).ConfigureAwait(false) ?? new List<cls{_TableName}DTO>();");
+            sb.AppendLine($"        return await cls{_TableName}Data.GetAll{_TableName.Pluralize()}Async(cancellationToken).ConfigureAwait(false) ?? new List<cls{_TableName.Singularize()}DTO>();");
 
             sb.AppendLine("");
             sb.AppendLine("       }");
@@ -654,14 +654,14 @@ namespace BizDataLayerGen.GeneralClasses
 
             // Constructor signature with parameters
             sb.AppendLine($@"
-        public static async Task<List<cls{_TableName}DTO>> SearchDataAsync({_TableName.Singularize()}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere, CancellationToken cancellationToken = default)
+        public static async Task<List<cls{_TableName.Singularize()}DTO>> SearchDataAsync({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere, CancellationToken cancellationToken = default)
         {{
             if (string.IsNullOrWhiteSpace(SearchValue))
-                return new List<cls{_TableName}DTO>();
+                return new List<cls{_TableName.Singularize()}DTO>();
 
             string modeValue = Mode.ToString(); // Get the mode as string for passing to the stored procedure
 
-            return await cls{_TableName}Data.SearchDataAsync(ChosenColumn.ToString(), SearchValue, modeValue, cancellationToken).ConfigureAwait(false) ?? new List<cls{_TableName}DTO>();
+            return await cls{_TableName}Data.SearchDataAsync(ChosenColumn.ToString(), SearchValue, modeValue, cancellationToken).ConfigureAwait(false) ?? new List<cls{_TableName.Singularize()}DTO>();
         }}        
 ");
 
