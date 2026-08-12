@@ -210,9 +210,10 @@ MyProject_Migration/      clsDbMigrator.cs + Migrations folder
 ## Contact & Support
 
 For questions, support, or contributions, feel free to reach out via LinkedIn:  
-[Zakaria Sakalli Housaini](https://www.linkedin.com/in/zakaria-sakalli-housaini-1a782b289)
+[Zakaria Sakalli Housaini](https://www.linkedin.com/in/zakaria-skalli-housaini-1a782b289)
+[Mohamed Ouaalane](https://www.linkedin.com/in/mohamed-ouaalane-82758129b)
 
-📹 **Project Demo Video (Version: 12/2024 – with major updates):**  
+📹 **Project Demo Video (Version: 8/2026 – with major updates):**  
 [Watch Here](https://drive.google.com/file/d/1UoHtK0V07jpzq3qof5heyD3q9Zz2l4VT/view?usp=drive_link)
 
 ---

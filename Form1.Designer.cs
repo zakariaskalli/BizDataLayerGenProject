@@ -47,6 +47,7 @@
             this.guna2CircleButton1 = new Guna.UI2.WinForms.Guna2CircleButton();
             this.guna2HtmlLabel7 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.txtProjectName = new Guna.UI2.WinForms.Guna2TextBox();
+            this.guna2HtmlLabel8 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBox1)).BeginInit();
@@ -106,7 +107,7 @@
             this.guna2HtmlLabel4.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel4.Font = new System.Drawing.Font("Microsoft Tai Le", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(98)))), ((int)(((byte)(81)))));
-            this.guna2HtmlLabel4.Location = new System.Drawing.Point(863, 421);
+            this.guna2HtmlLabel4.Location = new System.Drawing.Point(825, 412);
             this.guna2HtmlLabel4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel4.Name = "guna2HtmlLabel4";
             this.guna2HtmlLabel4.Size = new System.Drawing.Size(109, 33);
@@ -118,7 +119,7 @@
             this.guna2HtmlLabel5.BackColor = System.Drawing.Color.Transparent;
             this.guna2HtmlLabel5.Font = new System.Drawing.Font("Microsoft Tai Le", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.guna2HtmlLabel5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(150)))), ((int)(((byte)(250)))));
-            this.guna2HtmlLabel5.Location = new System.Drawing.Point(922, 464);
+            this.guna2HtmlLabel5.Location = new System.Drawing.Point(898, 444);
             this.guna2HtmlLabel5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel5.Name = "guna2HtmlLabel5";
             this.guna2HtmlLabel5.Size = new System.Drawing.Size(154, 33);
@@ -299,12 +300,25 @@
             this.txtProjectName.TextChanged += new System.EventHandler(this.txtProjectName_TextChanged);
             this.txtProjectName.Load += new System.EventHandler(this.txtProjectName_Load);
             // 
+            // guna2HtmlLabel8
+            // 
+            this.guna2HtmlLabel8.BackColor = System.Drawing.Color.Transparent;
+            this.guna2HtmlLabel8.Font = new System.Drawing.Font("Microsoft Tai Le", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.guna2HtmlLabel8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(150)))), ((int)(((byte)(250)))));
+            this.guna2HtmlLabel8.Location = new System.Drawing.Point(898, 480);
+            this.guna2HtmlLabel8.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.guna2HtmlLabel8.Name = "guna2HtmlLabel8";
+            this.guna2HtmlLabel8.Size = new System.Drawing.Size(232, 33);
+            this.guna2HtmlLabel8.TabIndex = 24;
+            this.guna2HtmlLabel8.Text = "Mohamed Ouaalane";
+            // 
             // CodeGenratorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
-            this.ClientSize = new System.Drawing.Size(1080, 504);
+            this.ClientSize = new System.Drawing.Size(1155, 527);
+            this.Controls.Add(this.guna2HtmlLabel8);
             this.Controls.Add(this.txtProjectName);
             this.Controls.Add(this.guna2HtmlLabel7);
             this.Controls.Add(this.guna2CircleButton1);
@@ -359,6 +373,7 @@
         private Guna.UI2.WinForms.Guna2CircleButton guna2CircleButton1;
         private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel7;
         private Guna.UI2.WinForms.Guna2TextBox txtProjectName;
+        private Guna.UI2.WinForms.Guna2HtmlLabel guna2HtmlLabel8;
     }
 }
 
