@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace BizDataLayerGen.DataAccessLayer
 {
-    static class clsDataAccessSettings
+    static public class clsDataAccessSettings
     {
         //public static string UserId = "";
         //public static string Password = "";

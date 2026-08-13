@@ -175,6 +175,24 @@ namespace BizDataLayerGen.GeneralClasses
                 // Non-nullable
                 switch (lowerType)
                 {
+                    case "smallint":
+                    case "int16": return $"reader.GetInt16({ordinal})";
+                    case "int":
+                    case "int32": return $"reader.GetInt32({ordinal})";
+                    case "bigint":
+                    case "int64": return $"reader.GetInt64({ordinal})";
+                    case "tinyint":
+                    case "byte": return $"reader.GetByte({ordinal})";
+                    case "bit":
+                    case "bool":
+                    case "boolean": return $"reader.GetBoolean({ordinal})";
+                    case "decimal":
+                    case "numeric":
+                    case "money":
+                    case "smallmoney": return $"reader.GetDecimal({ordinal})";
+                    case "float":
+                    case "double": return $"reader.GetDouble({ordinal})";
+                    case "real": return $"reader.GetFloat({ordinal})";
                     case "char":
                     case "varchar":
                     case "text":
@@ -182,6 +200,10 @@ namespace BizDataLayerGen.GeneralClasses
                     case "nvarchar":
                     case "ntext":
                     case "string": return $"reader.GetString({ordinal})";
+                    case "datetime":
+                    case "date":
+                    case "datetime2":
+                    case "smalldatetime": return $"reader.GetDateTime({ordinal})";
 
                     // إصلاح خطأ الـ Cast المكسور للـ time ليصبح تعبيراً سليماً ومباشراً
                     case "time": return $"reader.{readerMethod}({ordinal})";
@@ -199,7 +221,7 @@ namespace BizDataLayerGen.GeneralClasses
         {
             var dataReaderCodeBuilder = new StringBuilder();
 
-            dataReaderCodeBuilder.AppendLine(GetReaderExpression(_Columns[0].Replace(" ", ""), _DataTypes[0], false) + ",");
+            dataReaderCodeBuilder.AppendLine(GetReaderExpression(_Columns[0].Replace(" ", ""), _DataTypes[0], _NullibietyColumns[0]) + ",");
 
             for (int i = 1; i < _Columns.Length; i++) // Start from 1 to skip the first column
             {
@@ -209,11 +231,11 @@ namespace BizDataLayerGen.GeneralClasses
 
                 if (i == _Columns.Length - 1)
                 {
-                    dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) );
+                    dataReaderCodeBuilder.AppendLine(GetReaderExpression(column, dataType, isNullable));
                 }
                 else
                 {
-                    dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) + "," );
+                    dataReaderCodeBuilder.AppendLine(GetReaderExpression(column, dataType, isNullable) + ",");
                 }
 
 
@@ -221,6 +243,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             return dataReaderCodeBuilder.ToString();
         }
+
 
         public static string parameterForUpdateQuery(string[] Columns)
         {
@@ -829,7 +852,7 @@ using {clsGlobal.ProjectName}_DataAccess;
 using Newtonsoft.Json;
 using {clsGlobal.ProjectName}.DTO;
 
-namespace {clsGlobal.ProjectName}_DataLayer
+namespace {clsGlobal.ProjectName}_DataAccess
 {{
     public class cls{_TableName}Data
     {{

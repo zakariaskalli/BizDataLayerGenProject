@@ -638,7 +638,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             return sb.ToString();
         }
-
+        
         public string AddSearchDataAsync(string[] _Columns, string _TableName)
         {
             StringBuilder sb = new StringBuilder();
@@ -678,6 +678,8 @@ namespace BizDataLayerGen.GeneralClasses
             bool isSync = (_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth);
             bool isAsync = (_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth);
 
+         
+
             // Sync Methods String Generation
             string stringAddAddingNewRow = isSync ? AddAddingNewRow(_Columns, _TableName) : "";
             string stringAddStaticAddingNewRow = (isSync && _AddingStaticMethods) ? AddStaticAddingNewRow(_TableName) : "";
@@ -702,7 +704,7 @@ namespace BizDataLayerGen.GeneralClasses
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.ProjectName}_DataLayer;
+using {clsGlobal.ProjectName}_DataAccess;
 using {clsGlobal.ProjectName}.DTO;
 
 namespace {clsGlobal.ProjectName}_BusinessLayer{{

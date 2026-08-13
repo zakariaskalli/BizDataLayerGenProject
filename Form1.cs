@@ -96,6 +96,11 @@ namespace BizDataLayerGen
                     tbPathFilesToGenrate.Text = selectedPath;
 
                     clsGlobal.PathFilesToGenerate = selectedPath;
+                    clsGlobal.APILayerPath = $"{selectedPath}\\{clsGlobal.ProjectName}_API";
+                    clsGlobal.dataAccessLayerPath = $"{selectedPath}\\{clsGlobal.ProjectName}_DataAccess";
+                    clsGlobal.businessLayerPath = $"{selectedPath}\\{clsGlobal.ProjectName}_Business";
+                    clsGlobal.DTOLayerPath = $"{selectedPath}\\{clsGlobal.ProjectName}_DTO";
+                    clsGlobal.MigrationLayerPath = $"{selectedPath}\\{clsGlobal.ProjectName}_Migrations";
                 }
                 else
                 {

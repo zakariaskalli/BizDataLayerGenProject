@@ -689,7 +689,7 @@ namespace BizDataLayerGen.GeneralClasses
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.ProjectName}_DataLayer;
+using {clsGlobal.ProjectName}_DataAccess;
 
 namespace {clsGlobal.ProjectName}_BusinessLayer
 {{

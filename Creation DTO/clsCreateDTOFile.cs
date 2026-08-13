@@ -198,7 +198,7 @@ namespace BizDataLayerGen.GeneralClasses
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace {clsGlobal.DataBaseName}.DTO{{{StringAddFlatDTO}{StringAddRichDTO}}}
+namespace {clsGlobal.ProjectName}.DTO{{{StringAddFlatDTO}{StringAddRichDTO}}}
 ";
 
             File.WriteAllText(fullPath, code);
