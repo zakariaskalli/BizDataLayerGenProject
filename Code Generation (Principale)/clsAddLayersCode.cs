@@ -190,7 +190,6 @@ END;
         public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI,
             clsGlobal.enExuctionMethods ExuctionMethod)
         {
-            Stopwatch stopwatch1 = Stopwatch.StartNew();
 
             if (NameTables == null)
             {
@@ -342,9 +341,6 @@ END;
             }
 
 
-
-            stopwatch1.Stop();
-            clsGlobal.TimeInMillisecond = stopwatch1.ElapsedMilliseconds.ToString();
 
             
             return clsGlobal.enTypeRaisons.enPerfect;

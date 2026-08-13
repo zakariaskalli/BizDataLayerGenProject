@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static BizDataLayerGen.DataAccessLayer.clsGeneralWithData;
+using Humanizer;
+
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -67,7 +69,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             sb.AppendLine($"\n       // Flat DTO: contains only the basic fields of the table, used for Add / Update / List operations\r\n");
 
-            sb.AppendLine($"       public class cls{_TableName}DTO");
+            sb.AppendLine($"       public class cls{_TableName.Singularize()}DTO");
             sb.AppendLine("       {");
 
             // Primary Key Validation Attribute & Property Definition
@@ -115,11 +117,11 @@ namespace BizDataLayerGen.GeneralClasses
             }
 
             sb.AppendLine("");
-            sb.AppendLine($"       public cls{_TableName}DTO() {{}}");
+            sb.AppendLine($"       public cls{_TableName.Singularize()}DTO() {{}}");
             sb.AppendLine("");
 
             // Parameterized Constructor
-            sb.Append($"        public cls{_TableName}DTO(");
+            sb.Append($"        public cls{_TableName.Singularize()}DTO(");
 
             List<string> parametersList = new List<string>();
 
@@ -157,7 +159,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             sb.AppendLine($"\n       // Rich DTO: contains basic fields + relationships (Navigation DTOs), used for display or API responses\r\n");
 
-            sb.AppendLine($"       public class cls{_TableName}DetailsDTO : cls{_TableName}DTO");
+            sb.AppendLine($"       public class cls{_TableName.Singularize()}DetailsDTO : cls{_TableName.Singularize()}DTO");
             sb.AppendLine("       {");
 
             var foreignKeyMap = _ColumnNamesHasFK
@@ -173,12 +175,12 @@ namespace BizDataLayerGen.GeneralClasses
 
                 if (foreignKeyMap.TryGetValue(columnName, out var foreignKey))
                 {
-                    sb.AppendLine($"        public cls{foreignKey.tableName}DTO? {foreignKey.tableName} {{ get; set; }} = null;");
+                    sb.AppendLine($"        public cls{foreignKey.tableName.Singularize()}DTO? {foreignKey.tableName.Singularize()} {{ get; set; }} = null;");
                     continue;
                 }
             }
 
-            sb.AppendLine($"         public cls{_TableName}DetailsDTO() : base() {{}}");
+            sb.AppendLine($"         public cls{_TableName.Singularize()}DetailsDTO() : base() {{}}");
 
             sb.AppendLine("       }");
 

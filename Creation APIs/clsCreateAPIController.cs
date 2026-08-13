@@ -65,14 +65,14 @@ namespace BizDataLayerGen.Creation_APIs
             string entityNameLowerPlural = _TableName.Pluralize().ToLower();
             string EndPoint = $@"
         [HttpGet("""", Name = ""GetAll{_TableName.Pluralize()}"")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName}DTO>))]
-        public async Task<ActionResult<IEnumerable<cls{_TableName}DTO>>> GetAll{_TableName.Pluralize()}()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName.Singularize()}DTO>))]
+        public async Task<ActionResult<IEnumerable<cls{_TableName.Singularize()}DTO>>> GetAll{_TableName.Pluralize()}()
         {{
-            List<cls{_TableName}DTO> {entityNameLowerPlural} = await cls{_TableName}.GetAll{_TableName.Pluralize()}Async();
+            List<cls{_TableName.Singularize()}DTO> {entityNameLowerPlural} = await cls{_TableName}.GetAll{_TableName.Pluralize()}Async();
         
             if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Any())
             {{
-                return Ok(Enumerable.Empty<cls{_TableName}DTO>());
+                return Ok(Enumerable.Empty<cls{_TableName.Singularize()}DTO>());
             }}
         
             return Ok({entityNameLowerPlural});
@@ -86,11 +86,11 @@ namespace BizDataLayerGen.Creation_APIs
             string idParamName = char.ToLower(IdColumnName[0]) + IdColumnName.Substring(1);
             string routeConstraint = GetRouteConstraint(IdColumnDataType);
             string EndPoint = $@"
-        [HttpGet(""{{{idParamName}{routeConstraint}}}"", Name = ""Get{_TableName}ById"")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName}DTO))]
+        [HttpGet(""{{{idParamName}{routeConstraint}}}"", Name = ""Get{_TableName.Singularize()}ById"")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName.Singularize()}DTO))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<cls{_TableName}DTO>> Get{_TableName.Singularize()}ById([FromRoute] {IdColumnDataType} {idParamName})
+        public async Task<ActionResult<cls{_TableName.Singularize()}DTO>> Get{_TableName.Singularize()}ById([FromRoute] {IdColumnDataType} {idParamName})
         {{
             if (!ModelState.IsValid)
             {{
@@ -113,28 +113,26 @@ namespace BizDataLayerGen.Creation_APIs
         public string CreateAddNewEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
         {
             string idParamName = char.ToLower(IdColumnName[0]) + IdColumnName.Substring(1);
-            string entitySingular = _TableName.Singularize();
-            string entityLowerSingular = entitySingular.ToLower();
 
             string EndPoint = $@"
-        [HttpPost(Name = ""AddNew{entitySingular}"")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(cls{_TableName}DTO))]
+        [HttpPost(Name = ""AddNew{_TableName.Singularize()}"")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(cls{_TableName.Singularize()}DTO))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<cls{_TableName}DTO>> AddNew{entitySingular}([FromBody] cls{_TableName}DTO {entityLowerSingular}DTO)
+        public async Task<ActionResult<cls{_TableName.Singularize()}DTO>> AddNew{_TableName.Singularize()}([FromBody] cls{_TableName.Singularize()}DTO {_TableName.Singularize()}DTO)
         {{
-            if (!ModelState.IsValid || {entityLowerSingular}DTO == null)
+            if (!ModelState.IsValid || {_TableName.Singularize()}DTO == null)
             {{
                 return BadRequest(ModelState);
             }}
 
-            bool isCreated = await cls{_TableName}.AddNew{_TableName.Singularize()}Async({entityLowerSingular}DTO);
+            bool isCreated = await cls{_TableName}.AddNew{_TableName.Singularize()}Async({_TableName.Singularize()}DTO);
 
             if (isCreated == false)
             {{
-                return BadRequest(""Failed to create new {entitySingular}."");
+                return BadRequest(""Failed to create new {_TableName.Singularize()}."");
             }}
 
-            return CreatedAtRoute(""Get{_TableName.Singularize()}ById"", new {{ {idParamName} = {entityLowerSingular}DTO.{IdColumnName} }}, {entityLowerSingular}DTO);
+            return CreatedAtRoute(""Get{_TableName.Singularize()}ById"", new {{ {idParamName} = {_TableName.Singularize()}DTO.{IdColumnName} }}, {_TableName.Singularize()}DTO);
         }}";
 
             return EndPoint;
@@ -143,30 +141,28 @@ namespace BizDataLayerGen.Creation_APIs
         public string CreateUpdateEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
         {
             string idParamName = char.ToLower(IdColumnName[0]) + IdColumnName.Substring(1);
-            string entitySingular = _TableName.Singularize();
-            string entityLowerSingular = entitySingular.ToLower();
             string routeConstraint = GetRouteConstraint(IdColumnDataType);
 
             string EndPoint = $@"
-        [HttpPut(""{{{idParamName}{routeConstraint}}}"", Name = ""Update{entitySingular}"")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName}DTO))]
+        [HttpPut(""{{{idParamName}{routeConstraint}}}"", Name = ""Update{_TableName.Singularize()}"")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(cls{_TableName.Singularize()}DTO))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<cls{_TableName}DTO>> Update{entitySingular}(
+        public async Task<ActionResult<cls{_TableName.Singularize()}DTO>> Update{_TableName.Singularize()}(
             [FromRoute] {IdColumnDataType} {idParamName},
-            [FromBody] cls{_TableName}DTO {entityLowerSingular}DTO)
+            [FromBody] cls{_TableName.Singularize()}DTO {_TableName.Singularize()}DTO)
         {{
-            if (!ModelState.IsValid || {entityLowerSingular}DTO == null || !{idParamName}.Equals({entityLowerSingular}DTO.{IdColumnName}))
+            if (!ModelState.IsValid || {_TableName.Singularize()}DTO == null || !{idParamName}.Equals({_TableName.Singularize()}DTO.{IdColumnName}))
             {{
                 return BadRequest(ModelState);
             }}
 
-            if (!await cls{_TableName}.Update{entitySingular}ByIDAsync({entityLowerSingular}DTO))
+            if (!await cls{_TableName}.Update{_TableName.Singularize()}ByIDAsync({_TableName.Singularize()}DTO))
             {{
-                return NotFound(""{entitySingular} with ID "" + {idParamName} + "" was not found."");
+                return NotFound(""{_TableName.Singularize()} with ID "" + {idParamName} + "" was not found."");
             }}
 
-            return Ok({entityLowerSingular}DTO);
+            return Ok({_TableName.Singularize()}DTO);
         }}";
 
             return EndPoint;
@@ -175,24 +171,23 @@ namespace BizDataLayerGen.Creation_APIs
         public string CreateDeleteEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
         {
             string idParamName = char.ToLower(IdColumnName[0]) + IdColumnName.Substring(1);
-            string entitySingular = _TableName.Singularize();
             string routeConstraint = GetRouteConstraint(IdColumnDataType);
 
             string EndPoint = $@"
-        [HttpDelete(""{{{idParamName}{routeConstraint}}}"", Name = ""Delete{entitySingular}"")]
+        [HttpDelete(""{{{idParamName}{routeConstraint}}}"", Name = ""Delete{_TableName.Singularize()}"")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete{entitySingular}([FromRoute] {IdColumnDataType} {idParamName})
+        public async Task<IActionResult> Delete{_TableName.Singularize()}([FromRoute] {IdColumnDataType} {idParamName})
         {{
             if (!ModelState.IsValid)
             {{
                 return BadRequest(ModelState);
             }}
         
-            if (!await cls{_TableName}.Delete{entitySingular}Async({idParamName}))
+            if (!await cls{_TableName}.Delete{_TableName.Singularize()}Async({idParamName}))
             {{
-                return NotFound(""{entitySingular} with ID "" + {idParamName} + "" was not found."");
+                return NotFound(""{_TableName.Singularize()} with ID "" + {idParamName} + "" was not found."");
             }}
         
             return NoContent();
@@ -203,14 +198,13 @@ namespace BizDataLayerGen.Creation_APIs
 
         public string CreateSearchEndPoint(string _TableName)
         {
-            string entityNameLowerPlural = _TableName.Pluralize().ToLower();
 
             string EndPoint = $@"
         [HttpGet(""search"", Name = ""Search{_TableName.Pluralize()}"")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName}DTO>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName.Singularize()}DTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<cls{_TableName}DTO>>> Search{_TableName.Pluralize()}(
-            [FromQuery] cls{_TableName}.{_TableName.Singularize()}Column column,
+        public async Task<ActionResult<IEnumerable<cls{_TableName.Singularize()}DTO>>> Search{_TableName.Pluralize()}(
+            [FromQuery] cls{_TableName}.{_TableName}Column column,
             [FromQuery] string value,
             [FromQuery] cls{_TableName}.SearchMode mode = cls{_TableName}.SearchMode.Anywhere)
         {{
@@ -219,14 +213,14 @@ namespace BizDataLayerGen.Creation_APIs
                 return BadRequest(""Search value cannot be empty."");
             }}
 
-            List<cls{_TableName}DTO>? {entityNameLowerPlural} = await cls{_TableName}.SearchDataAsync(column, value, mode);
+            List<cls{_TableName.Singularize()}DTO>? {_TableName.Pluralize()} = await cls{_TableName}.SearchDataAsync(column, value, mode);
 
-            if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Any())
+            if ({_TableName.Pluralize()} == null || !{_TableName.Pluralize()}.Any())
             {{
-                return Ok(Enumerable.Empty<cls{_TableName}DTO>());
+                return Ok(Enumerable.Empty<cls{_TableName.Singularize()}DTO>());
             }}
 
-            return Ok({entityNameLowerPlural});
+            return Ok({_TableName.Pluralize()});
         }}";
 
             return EndPoint;

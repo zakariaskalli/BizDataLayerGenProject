@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Humanizer;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
@@ -120,7 +121,7 @@ namespace BizDataLayerGen.DataAccessLayer
             string primaryKeyType = _dataTypes[0];
 
             return $@"
-CREATE OR ALTER PROCEDURE SP_Get_{_tableName}_ByID
+CREATE OR ALTER PROCEDURE SP_Get_{_tableName.Singularize()}_ByID
 (
     @{primaryKey} {primaryKeyType}
 )
@@ -143,7 +144,7 @@ GO";
         private string CreateSP_GetAll()
         {
             return $@"
-CREATE OR ALTER PROCEDURE SP_Get_All_{_tableName}
+CREATE OR ALTER PROCEDURE SP_Get_All_{_tableName.Pluralize()}
 AS
 BEGIN
     BEGIN TRY
@@ -196,7 +197,7 @@ GO
             string columnsString = columnsList.ToString().TrimEnd(',', '\n');
 
             return $@"
-CREATE OR ALTER PROCEDURE SP_Add_{_tableName}
+CREATE OR ALTER PROCEDURE SP_Add_{_tableName.Singularize()}
 (
 {parameterString}
 )
@@ -266,7 +267,7 @@ GO
 
             // Generate the full stored procedure with proper error handling and parameter validation
             return $@"
-CREATE OR ALTER PROCEDURE SP_Update_{_tableName}_ByID
+CREATE OR ALTER PROCEDURE SP_Update_{_tableName.Singularize()}_ByID
 (
     {primaryKeyParam},
 {parametersString}
@@ -315,7 +316,7 @@ GO
             string primaryKeyType = _dataTypes[0];
 
             return $@"
-CREATE OR ALTER PROCEDURE SP_Delete_{_tableName}_ByID
+CREATE OR ALTER PROCEDURE SP_Delete_{_tableName.Singularize()}_ByID
 (
     @{primaryKey} {primaryKeyType}
 )
@@ -424,7 +425,7 @@ GO";
             );
 
             return $@"
-CREATE OR ALTER PROCEDURE SP_Search_{_tableName}_ByColumn
+CREATE OR ALTER PROCEDURE SP_Search_{_tableName.Singularize()}_ByColumn
 (
     @ColumnName NVARCHAR(128),  -- Column name without spaces
     @SearchValue NVARCHAR(255), -- Value to search for

@@ -197,21 +197,30 @@ namespace BizDataLayerGen
             {
                 clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enAsynchronous;
             }
-            else if (rbSynchronous.Checked)
-            {
-                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enSynchronous;
-            }
+            //else if (rbSynchronous.Checked)
+            //{
+            //    clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enSynchronous;
+            //}
             else
             {
                 clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enBoth;
             }
 
 
+            Stopwatch stopwatch1 = Stopwatch.StartNew();
 
             await GenerateProjectStructureAsync(AddAPI, UseDTO);
 
             if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI,clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
-                MessageBox.Show($"Code Generated Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            {
+                stopwatch1.Stop();
+
+                double timeInSeconds = stopwatch1.Elapsed.TotalSeconds;
+
+                clsGlobal.TimeInMillisecond = timeInSeconds.ToString("0.00");
+
+                MessageBox.Show($"Project structure generated succesfully:), In: {clsGlobal.TimeInMillisecond}s", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
 
             if (ckAiCodeDocs.Checked)
@@ -281,11 +290,6 @@ namespace BizDataLayerGen
 
             },progress);
 
-            MessageBox.Show(
-               "Project structure generated succesfully:)",
-               "Done",
-               MessageBoxButtons.OK,
-               MessageBoxIcon.Information);
 
 
 

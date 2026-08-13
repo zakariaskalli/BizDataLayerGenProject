@@ -1,5 +1,7 @@
 # Code Generator
-![Code Generator Screenshot](CodeGeneratorScreen.png)
+<img width="1150" height="525" alt="image" src="https://github.com/user-attachments/assets/d9f02c8c-14ca-4e86-ac16-5c87acf17324" />
+<img width="1274" height="715" alt="image" src="https://github.com/user-attachments/assets/91ec6c99-2a3d-41cd-b75c-4e8138a9e218" />
+
 
 ## Project Overview
 Code Generator is a powerful tool designed to automate the generation of Data Access Layer (DAL) and Business Layer (BL) code for CRUD operations. Instead of manually writing repetitive methods for each database table, this project generates the complete DAL, BL, DTO, API, and Migration layers in seconds, saving hours of development time and minimizing human errors.
@@ -210,9 +212,10 @@ MyProject_Migration/      clsDbMigrator.cs + Migrations folder
 ## Contact & Support
 
 For questions, support, or contributions, feel free to reach out via LinkedIn:  
-[Zakaria Sakalli Housaini](https://www.linkedin.com/in/zakaria-sakalli-housaini-1a782b289)
+[Zakaria Sakalli Housaini](https://www.linkedin.com/in/zakaria-skalli-housaini-1a782b289)
+[Mohamed Ouaalane](https://www.linkedin.com/in/mohamed-ouaalane-82758129b)
 
-📹 **Project Demo Video (Version: 12/2024 – with major updates):**  
+📹 **Project Demo Video (Version: 8/2026 – with major updates):**  
 [Watch Here](https://drive.google.com/file/d/1UoHtK0V07jpzq3qof5heyD3q9Zz2l4VT/view?usp=drive_link)
 
 ---
