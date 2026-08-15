@@ -4,12 +4,14 @@ using BizDataLayerGen.DocumentationGenerator;
 using BizDataLayerGen.GeneralClasses;
 using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
 using Guna.UI2.WinForms;
+using Guna.UI2.WinForms.Suite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -64,6 +66,14 @@ namespace BizDataLayerGen
 
         private void frmTablesShow_Load(object sender, EventArgs e)
         {
+
+           
+            foreach (var TableName in AllTables)
+            {
+                dvTables.Rows.Add(true,TableName,true);
+            }
+            
+
             this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 35, 35));
 
             //LBTables.Items.Clear();
@@ -210,7 +220,7 @@ namespace BizDataLayerGen
 
             await GenerateProjectStructureAsync(AddAPI, UseDTO);
 
-            if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI,clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
+            if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI,false,clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
                 MessageBox.Show($"Code Generated Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
@@ -421,8 +431,14 @@ namespace BizDataLayerGen
             }
         }
 
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
 
+        }
 
+        private void guna2DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
 
+        }
     }
 }

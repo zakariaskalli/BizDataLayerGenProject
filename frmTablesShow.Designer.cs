@@ -369,7 +369,7 @@
             this.rbBoth.CheckedState.InnerColor = System.Drawing.Color.White;
             this.rbBoth.CheckedState.InnerOffset = -4;
             this.rbBoth.Location = new System.Drawing.Point(119, 84);
-            this.rbBoth.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbBoth.Margin = new System.Windows.Forms.Padding(2);
             this.rbBoth.Name = "rbBoth";
             this.rbBoth.Size = new System.Drawing.Size(60, 25);
             this.rbBoth.TabIndex = 40;
@@ -423,7 +423,7 @@
             this.rbSynchronous.CheckedState.InnerColor = System.Drawing.Color.White;
             this.rbSynchronous.CheckedState.InnerOffset = -4;
             this.rbSynchronous.Location = new System.Drawing.Point(119, 24);
-            this.rbSynchronous.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbSynchronous.Margin = new System.Windows.Forms.Padding(2);
             this.rbSynchronous.Name = "rbSynchronous";
             this.rbSynchronous.Size = new System.Drawing.Size(119, 25);
             this.rbSynchronous.TabIndex = 36;
@@ -442,7 +442,7 @@
             this.rbAsynchronous.CheckedState.InnerColor = System.Drawing.Color.White;
             this.rbAsynchronous.CheckedState.InnerOffset = -4;
             this.rbAsynchronous.Location = new System.Drawing.Point(119, 55);
-            this.rbAsynchronous.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbAsynchronous.Margin = new System.Windows.Forms.Padding(2);
             this.rbAsynchronous.Name = "rbAsynchronous";
             this.rbAsynchronous.Size = new System.Drawing.Size(127, 25);
             this.rbAsynchronous.TabIndex = 35;

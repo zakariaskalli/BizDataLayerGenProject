@@ -58,5 +58,7 @@ namespace BizDataLayerGen
         public static string TimeInMillisecond = "";
 
         public static bool AICodeDocsEnabled = false;
+
+
     }
 }

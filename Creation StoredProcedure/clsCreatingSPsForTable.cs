@@ -15,16 +15,19 @@ namespace BizDataLayerGen.DataAccessLayer
         private string[] _dataTypes;
         private bool[] _nullabilityColumns;
         private bool AutoExcuteSP;
+        private bool _Paggination = false;
 
         public clsCreatingSPsForTable(string filePath, string tableName, string[] columns,
-            string[] dataTypes, bool[] nullabilityColumns, bool autoExcuteSP)
+            string[] dataTypes, bool[] nullabilityColumns, bool autoExcuteSP,bool Paggination)
         {
             this._filePath = filePath;
             this._tableName = tableName;
             this._columns = columns;
             this._dataTypes = dataTypes;
             this._nullabilityColumns = nullabilityColumns;
+            this._Paggination = Paggination;
             AutoExcuteSP = autoExcuteSP;
+
         }
 
         public static void ExecuteSqlFile(string filePath)
@@ -67,7 +70,7 @@ namespace BizDataLayerGen.DataAccessLayer
             sb.AppendLine();
 
             sb.AppendLine(CreateSP_GetByID());
-            sb.AppendLine(CreateSP_GetAll());
+            sb.AppendLine(_Paggination? CreateSP_GetAllPaggined() :   CreateSP_GetAll());
             sb.AppendLine(CreateSP_Add());
             sb.AppendLine(CreateSP_UpdateByID());
             sb.AppendLine(CreateSP_DeleteByID());
@@ -159,6 +162,41 @@ END;
 GO
 ";
         }
+
+
+        private string CreateSP_GetAllPaggined()
+        {
+            return $@"
+CREATE OR ALTER PROCEDURE SP_Get_All_{_tableName}
+    @PageNumber    INT           = 1,
+    @PageSize      INT           = 20,
+    @TotalCount    INT           OUTPUT
+AS
+BEGIN
+    IF @PageNumber < 1 SET @PageNumber = 1;
+    IF @PageSize < 1 OR @PageSize > 200 SET @PageSize = 20;
+
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    BEGIN TRY
+
+        -- Get total number of students
+        SELECT @TotalCount = COUNT(*)
+        FROM {_tableName};
+        -- Attempt to retrieve all data from the table
+        SELECT *
+        FROM {_tableName}
+        Order By {_columns[0]}  -- Assuming the first column is the primary key for ordering
+        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+    END TRY
+    BEGIN CATCH
+        -- Call the centralized error handling procedure
+        EXEC SP_HandleError;
+    END CATCH
+END;
+GO
+";
+        }
+
 
         private string CreateSP_Add()
         {

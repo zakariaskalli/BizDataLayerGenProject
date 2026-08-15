@@ -187,7 +187,7 @@ END;
         }
 
 
-        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI,
+        public static async Task<clsGlobal.enTypeRaisons> AddLayers(string[] NameTables, bool FKOfAll, bool AddingStaticMethods, bool AutoExcuteSP, bool UseDTO, bool AddAPI,bool AddPagination,
             clsGlobal.enExuctionMethods ExuctionMethod)
         {
             Stopwatch stopwatch1 = Stopwatch.StartNew();
@@ -273,7 +273,7 @@ END;
                 else if (UseDTO)
                 {
                     // DAL
-                    clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns, ExuctionMethod);
+                    clsCreateDTODataAccessFile AddDataAccessLayer = new clsCreateDTODataAccessFile(clsGlobal.dataAccessLayerPath, NameTables[i], Columns, DataTypes, NullibietyColumns,true, ExuctionMethod);
 
                     clsGlobal.enTypeRaisons enRaisonForProjectDataAccess = await AddDataAccessLayer.CreateDTODataAccessClassFile();
 
@@ -286,7 +286,7 @@ END;
                     // BL
 
                     clsCreateDTOBusinessLayerFile AddBusinessAccessLayer = new clsCreateDTOBusinessLayerFile(clsGlobal.businessLayerPath, NameTables[i], Columns,
-                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods, ExuctionMethod);
+                        DataTypes, NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _ReferencedColumn, AddingStaticMethods,true, ExuctionMethod);
 
                     clsGlobal.enTypeRaisons enRaisonForProjectBusiness = await AddBusinessAccessLayer.CreateDTOBusinessLayerFile();
 
@@ -331,7 +331,7 @@ END;
 
                 string[] DataTypesForCreating = clsGeneralWithData.GetDataTypesForCreating(NameTables[i], clsGlobal.DataBaseName);
                 // Create the instance of clsCreatingSPsForTable with the new folder path
-                clsCreatingSPsForTable AddSPs = new clsCreatingSPsForTable(spTablesFolderPath, NameTables[i], Columns, DataTypesForCreating, NullibietyColumns, AutoExcuteSP);
+                clsCreatingSPsForTable AddSPs = new clsCreatingSPsForTable(spTablesFolderPath, NameTables[i], Columns, DataTypesForCreating, NullibietyColumns, AutoExcuteSP,true);
 
                 // Generate the stored procedures
                 clsGlobal.enTypeRaisons enRaisonForProjectSPs = AddSPs.GenerateAllSPs();
