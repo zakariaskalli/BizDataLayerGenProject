@@ -1,5 +1,6 @@
 ﻿using BizDataLayerGen.AI;
 using BizDataLayerGen.DataAccessLayer; // Imports layer containing clsGeneralWithData and clsColumnMetadata
+using Humanizer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -187,23 +188,156 @@ namespace BizDataLayerGen.GeneralClasses
             return sb.ToString();
         }
 
+
+        private clsGlobal.enTypeRaisons AddingCommonPagginationsDTOs()
+        {
+
+            string PageResultDTOCode = @$"namespace {clsGlobal.ProjectName}.DTO.Common
+            {{
+                public class PagedResultDTO<T>
+                {{
+                    public List<T> Items {{ get; set; }} = new();
+                    public int PageNumber {{ get; set; }}
+                    public int PageSize {{ get; set; }}
+                    public int TotalCount {{ get; set; }}
+                    public int TotalPages => PageSize >0 ? (int)Math.Ceiling((double)TotalCount / PageSize) : 0;
+                }}
+            }}";
+
+            string QueryParametersCode = @$"namespace {clsGlobal.ProjectName}.DTO.Common
+            {{/// <summary>
+            /// Base query parameters shared by every paginated/filterable/sortable resource
+            /// in the API. Lives in DealPart_Shared so every EntityQueryParametersDto
+            /// (Addresses, Employees, Products, etc.) inherits the same contract.
+            /// </summary>
+            public abstract class QueryParameters
+            {{
+                private const int DefaultPageSize = 10;
+                private const int MaxPageSize = 100;
+
+                private int _pageNumber = 1;
+                private int _pageSize = DefaultPageSize;
+
+                /// <summary>1-based page index. Values &lt; 1 are clamped to 1.</summary>
+
+                public int PageNumber
+                {{
+                    get => _pageNumber;
+                    set => _pageNumber = value < 1 ? 1 : value;
+                }}
+
+                /// <summary>
+                /// Number of records per page. Hard-capped at MaxPageSize so a client
+                /// can never request ?pageSize=100000 and blow up the SP / API.
+                /// </summary>
+
+                public int PageSize
+                {{
+                    get => _pageSize;
+                    set => _pageSize = value < 1 ? DefaultPageSize
+                         : value > MaxPageSize ? MaxPageSize
+                         : value;
+                }}
+
+                /// <summary>
+                /// Column to sort by. Validated against a per-entity allow-list in the
+                /// business layer (never interpolated directly into SQL/dynamic SQL).
+                /// </summary>
+
+                public string? SortBy {{ get; set; }}
+
+                /// <summary>True = descending, false (default) = ascending.</summary>
+
+                public bool SortDescending {{ get; set; }} = false;
+            }}
+            }}";
+
+
+            string fullPath = Path.Combine(clsGlobal.DTOLayerPath, "Common");
+
+            if (!Directory.Exists(fullPath))
+            {
+                Directory.CreateDirectory(fullPath);
+
+            }
+            try
+            {
+      
+                string PageResultPath = Path.Combine(fullPath, $"PageResultDTO.cs");
+                string QueryParametersPath = Path.Combine(fullPath, $"QueryParameters.cs");
+
+
+                File.WriteAllText(PageResultPath, PageResultDTOCode);
+                File.WriteAllText(QueryParametersPath, QueryParametersCode);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+
+
+            return clsGlobal.enTypeRaisons.enPerfect;
+
+
+        }
+        
+        private clsGlobal.enTypeRaisons AddingQueryParamterForTable(string ClassName)
+        {
+            string path = Path.Combine(clsGlobal.DTOLayerPath, ClassName);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+           
+            string code = @$"
+
+            using {clsGlobal.ProjectName}.DTO.Common;
+            namespace {clsGlobal.ProjectName}.DTO
+            {{
+                public class {ClassName}QueryParameters : QueryParameters
+                {{
+       
+       
+                }}
+            }}";
+
+            File.WriteAllText(Path.Combine(path, $"{ClassName}QueryParameters.cs"),code );
+
+            return clsGlobal.enTypeRaisons.enPerfect;
+
+
+        }
+        
         public async Task<clsGlobal.enTypeRaisons> CreateDTOLayerFile()
         {
-            string fullPath = Path.Combine(_filePath, $"cls{_TableName}DTO.cs");
 
+            var filePath = Path.Combine(_filePath, _TableName.Singularize());
+            if (!Directory.Exists(filePath))
+            {
+                    Directory.CreateDirectory(filePath);
+            }
+            string fullPath = Path.Combine(filePath, $"cls{_TableName.Singularize()}DTO.cs");
+
+
+            AddingCommonPagginationsDTOs();
+            AddingQueryParamterForTable(clsGeneraleThings.Singularize(_TableName));
             string StringAddFlatDTO = AddAddingFlatDTO(_Columns, _TableName, _DataTypes, _NullibietyColumns);
             string StringAddRichDTO = AddAddingRichDTO(_Columns, _TableName, _DataTypes, _NullibietyColumns);
 
-            string code = @$"using System;
+            string code = @$"
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using {clsGlobal.ProjectName}.DTO;
 
-namespace {clsGlobal.ProjectName}.DTO{{{StringAddFlatDTO}{StringAddRichDTO}}}
-";
+            namespace {clsGlobal.ProjectName}.DTO{{{StringAddFlatDTO}{StringAddRichDTO}}}
+            ";
 
-            File.WriteAllText(fullPath, code);
+                        File.WriteAllText(fullPath, code);
 
-            return clsGlobal.enTypeRaisons.enPerfect;
+                        return clsGlobal.enTypeRaisons.enPerfect;
+           }
         }
-    }
-}
+                
+        }

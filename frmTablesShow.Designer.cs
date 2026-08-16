@@ -53,6 +53,8 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.rbBoth = new Guna.UI2.WinForms.Guna2RadioButton();
             this.rbAsynchronous = new Guna.UI2.WinForms.Guna2RadioButton();
+            this.label5 = new System.Windows.Forms.Label();
+            this.rbPaggination = new Guna.UI2.WinForms.Guna2ToggleSwitch();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -67,8 +69,8 @@
             this.btnGenerate.ForeColor = System.Drawing.Color.White;
             this.btnGenerate.Image = global::BizDataLayerGen.Properties.Resources.magic_wand;
             this.btnGenerate.ImageAlign = System.Windows.Forms.HorizontalAlignment.Left;
-            this.btnGenerate.Location = new System.Drawing.Point(549, 636);
-            this.btnGenerate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnGenerate.Location = new System.Drawing.Point(547, 683);
+            this.btnGenerate.Margin = new System.Windows.Forms.Padding(4);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(215, 59);
             this.btnGenerate.TabIndex = 13;
@@ -94,7 +96,7 @@
             this.chBAllTables.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chBAllTables.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chBAllTables.Location = new System.Drawing.Point(56, 122);
-            this.chBAllTables.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chBAllTables.Margin = new System.Windows.Forms.Padding(4);
             this.chBAllTables.Name = "chBAllTables";
             this.chBAllTables.Size = new System.Drawing.Size(195, 29);
             this.chBAllTables.TabIndex = 15;
@@ -108,7 +110,7 @@
             this.rbAll.Checked = true;
             this.rbAll.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rbAll.Location = new System.Drawing.Point(31, 33);
-            this.rbAll.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rbAll.Margin = new System.Windows.Forms.Padding(4);
             this.rbAll.Name = "rbAll";
             this.rbAll.Size = new System.Drawing.Size(56, 29);
             this.rbAll.TabIndex = 18;
@@ -121,7 +123,7 @@
             this.rbJustThis.AutoSize = true;
             this.rbJustThis.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rbJustThis.Location = new System.Drawing.Point(159, 33);
-            this.rbJustThis.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rbJustThis.Margin = new System.Windows.Forms.Padding(4);
             this.rbJustThis.Name = "rbJustThis";
             this.rbJustThis.Size = new System.Drawing.Size(105, 29);
             this.rbJustThis.TabIndex = 19;
@@ -134,7 +136,7 @@
             this.rbAddingStaticMethodsYes.Checked = true;
             this.rbAddingStaticMethodsYes.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rbAddingStaticMethodsYes.Location = new System.Drawing.Point(31, 33);
-            this.rbAddingStaticMethodsYes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rbAddingStaticMethodsYes.Margin = new System.Windows.Forms.Padding(4);
             this.rbAddingStaticMethodsYes.Name = "rbAddingStaticMethodsYes";
             this.rbAddingStaticMethodsYes.Size = new System.Drawing.Size(62, 29);
             this.rbAddingStaticMethodsYes.TabIndex = 21;
@@ -148,9 +150,9 @@
             this.groupBox1.Controls.Add(this.rbAll);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(860, 112);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(352, 85);
             this.groupBox1.TabIndex = 23;
             this.groupBox1.TabStop = false;
@@ -162,9 +164,9 @@
             this.groupBox2.Controls.Add(this.rbAddingStaticMethodsYes);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(860, 223);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox2.Size = new System.Drawing.Size(352, 84);
             this.groupBox2.TabIndex = 24;
             this.groupBox2.TabStop = false;
@@ -175,7 +177,7 @@
             this.rbAddingStaticMethodsNo.AutoSize = true;
             this.rbAddingStaticMethodsNo.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rbAddingStaticMethodsNo.Location = new System.Drawing.Point(159, 33);
-            this.rbAddingStaticMethodsNo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rbAddingStaticMethodsNo.Margin = new System.Windows.Forms.Padding(4);
             this.rbAddingStaticMethodsNo.Name = "rbAddingStaticMethodsNo";
             this.rbAddingStaticMethodsNo.Size = new System.Drawing.Size(60, 29);
             this.rbAddingStaticMethodsNo.TabIndex = 20;
@@ -191,7 +193,7 @@
             this.guna2CircleButton1.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.guna2CircleButton1.ForeColor = System.Drawing.Color.White;
             this.guna2CircleButton1.Location = new System.Drawing.Point(1153, 15);
-            this.guna2CircleButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.guna2CircleButton1.Margin = new System.Windows.Forms.Padding(4);
             this.guna2CircleButton1.Name = "guna2CircleButton1";
             this.guna2CircleButton1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.guna2CircleButton1.Size = new System.Drawing.Size(47, 43);
@@ -204,7 +206,7 @@
             this.LBTables.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
             this.LBTables.FormattingEnabled = true;
             this.LBTables.Location = new System.Drawing.Point(56, 159);
-            this.LBTables.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LBTables.Margin = new System.Windows.Forms.Padding(4);
             this.LBTables.Name = "LBTables";
             this.LBTables.Size = new System.Drawing.Size(472, 178);
             this.LBTables.Sorted = true;
@@ -217,8 +219,8 @@
             this.switchAutoExcuteSP.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.switchAutoExcuteSP.CheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.switchAutoExcuteSP.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.switchAutoExcuteSP.Location = new System.Drawing.Point(29, 131);
-            this.switchAutoExcuteSP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.switchAutoExcuteSP.Location = new System.Drawing.Point(29, 168);
+            this.switchAutoExcuteSP.Margin = new System.Windows.Forms.Padding(4);
             this.switchAutoExcuteSP.Name = "switchAutoExcuteSP";
             this.switchAutoExcuteSP.Size = new System.Drawing.Size(47, 25);
             this.switchAutoExcuteSP.TabIndex = 26;
@@ -229,6 +231,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Controls.Add(this.rbPaggination);
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.ckGenerateAPI);
             this.groupBox3.Controls.Add(this.label3);
@@ -239,10 +243,10 @@
             this.groupBox3.Controls.Add(this.switchAutoExcuteSP);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(860, 315);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.groupBox3.Size = new System.Drawing.Size(361, 213);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox3.Size = new System.Drawing.Size(361, 251);
             this.groupBox3.TabIndex = 25;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Pro Things:";
@@ -266,7 +270,7 @@
             this.ckGenerateAPI.CheckedState.InnerColor = System.Drawing.Color.White;
             this.ckGenerateAPI.Enabled = false;
             this.ckGenerateAPI.Location = new System.Drawing.Point(31, 81);
-            this.ckGenerateAPI.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ckGenerateAPI.Margin = new System.Windows.Forms.Padding(4);
             this.ckGenerateAPI.Name = "ckGenerateAPI";
             this.ckGenerateAPI.Size = new System.Drawing.Size(47, 25);
             this.ckGenerateAPI.TabIndex = 32;
@@ -279,7 +283,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(94, 169);
+            this.label3.Location = new System.Drawing.Point(94, 206);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(129, 25);
@@ -292,8 +296,8 @@
             this.ckAiCodeDocs.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.ckAiCodeDocs.CheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.ckAiCodeDocs.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.ckAiCodeDocs.Location = new System.Drawing.Point(31, 171);
-            this.ckAiCodeDocs.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ckAiCodeDocs.Location = new System.Drawing.Point(31, 208);
+            this.ckAiCodeDocs.Margin = new System.Windows.Forms.Padding(4);
             this.ckAiCodeDocs.Name = "ckAiCodeDocs";
             this.ckAiCodeDocs.Size = new System.Drawing.Size(47, 25);
             this.ckAiCodeDocs.TabIndex = 30;
@@ -315,7 +319,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(92, 129);
+            this.label1.Location = new System.Drawing.Point(92, 166);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(153, 25);
@@ -331,7 +335,7 @@
             this.switchUsingDTO.CheckedState.InnerColor = System.Drawing.Color.White;
             this.switchUsingDTO.Enabled = false;
             this.switchUsingDTO.Location = new System.Drawing.Point(31, 34);
-            this.switchUsingDTO.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.switchUsingDTO.Margin = new System.Windows.Forms.Padding(4);
             this.switchUsingDTO.Name = "switchUsingDTO";
             this.switchUsingDTO.Size = new System.Drawing.Size(47, 25);
             this.switchUsingDTO.TabIndex = 27;
@@ -345,7 +349,7 @@
             // 
             this.progressBar.BorderRadius = 10;
             this.progressBar.Location = new System.Drawing.Point(56, 491);
-            this.progressBar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.progressBar.Margin = new System.Windows.Forms.Padding(4);
             this.progressBar.Name = "progressBar";
             this.progressBar.ProgressColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
             this.progressBar.ProgressColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(142)))), ((int)(((byte)(163)))));
@@ -359,7 +363,7 @@
             this.lbCurrentFile.BackColor = System.Drawing.Color.Transparent;
             this.lbCurrentFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbCurrentFile.Location = new System.Drawing.Point(56, 449);
-            this.lbCurrentFile.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lbCurrentFile.Margin = new System.Windows.Forms.Padding(4);
             this.lbCurrentFile.Name = "lbCurrentFile";
             this.lbCurrentFile.Size = new System.Drawing.Size(99, 27);
             this.lbCurrentFile.TabIndex = 27;
@@ -370,10 +374,10 @@
             this.groupBox4.Controls.Add(this.rbBoth);
             this.groupBox4.Controls.Add(this.rbAsynchronous);
             this.groupBox4.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox4.Location = new System.Drawing.Point(860, 546);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Location = new System.Drawing.Point(860, 593);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox4.Size = new System.Drawing.Size(352, 149);
             this.groupBox4.TabIndex = 34;
             this.groupBox4.TabStop = false;
@@ -421,12 +425,39 @@
             this.rbAsynchronous.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
             this.rbAsynchronous.CheckedChanged += new System.EventHandler(this.rbAsynchronous_CheckedChanged);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(96, 125);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(143, 25);
+            this.label5.TabIndex = 37;
+            this.label5.Text = "Use Pagination";
+            // 
+            // rbPaggination
+            // 
+            this.rbPaggination.Checked = true;
+            this.rbPaggination.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbPaggination.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.rbPaggination.CheckedState.InnerBorderColor = System.Drawing.Color.White;
+            this.rbPaggination.CheckedState.InnerColor = System.Drawing.Color.White;
+            this.rbPaggination.Location = new System.Drawing.Point(31, 125);
+            this.rbPaggination.Margin = new System.Windows.Forms.Padding(4);
+            this.rbPaggination.Name = "rbPaggination";
+            this.rbPaggination.Size = new System.Drawing.Size(47, 25);
+            this.rbPaggination.TabIndex = 36;
+            this.rbPaggination.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.rbPaggination.UncheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.rbPaggination.UncheckedState.InnerBorderColor = System.Drawing.Color.White;
+            this.rbPaggination.UncheckedState.InnerColor = System.Drawing.Color.White;
+            // 
             // frmTablesShow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.HighlightText;
-            this.ClientSize = new System.Drawing.Size(1271, 708);
+            this.ClientSize = new System.Drawing.Size(1271, 755);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.lbCurrentFile);
             this.Controls.Add(this.progressBar);
@@ -439,7 +470,7 @@
             this.Controls.Add(this.guna2HtmlLabel2);
             this.Controls.Add(this.btnGenerate);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmTablesShow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Tables Shows";
@@ -483,5 +514,7 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private Guna.UI2.WinForms.Guna2RadioButton rbAsynchronous;
         private Guna.UI2.WinForms.Guna2RadioButton rbBoth;
+        private System.Windows.Forms.Label label5;
+        private Guna.UI2.WinForms.Guna2ToggleSwitch rbPaggination;
     }
 }

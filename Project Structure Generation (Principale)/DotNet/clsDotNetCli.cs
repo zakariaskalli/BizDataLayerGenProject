@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace BizDataLayerGen.Project_Structure_Generation__Principale_.DotNet
 {
     public sealed class clsDotNetCli
     {
-        public static async Task ExecuteAsync(
-            string arguments,
-            string workingDirectory)
+        public static async Task ExecuteAsync(string arguments, string workingDirectory)
         {
             using var process = new Process();
 
@@ -29,13 +23,11 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.DotNet
 
             process.Start();
 
-            var outputTask =
-                process.StandardOutput.ReadToEndAsync();
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            var errorTask = process.StandardError.ReadToEndAsync();
 
-            var errorTask =
-                process.StandardError.ReadToEndAsync();
-
-            process.WaitForExit();
+            // جعل العملية تنتظر انتهاء الـ Process بدون إغلاق الـ UI thread
+            await Task.Run(() => process.WaitForExit());
 
             var output = await outputTask;
             var error = await errorTask;
@@ -43,11 +35,11 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.DotNet
             if (process.ExitCode != 0)
             {
                 throw new InvalidOperationException(
-                $"dotnet command failed.\n\n" +
-                $"Arguments: {arguments}\n\n" +
-                $"Exit Code: {process.ExitCode}\n\n" +
-                $"Output:\n{output}\n\n" +
-                $"Error:\n{error}");
+                    $"dotnet command failed.\n\n" +
+                    $"Arguments: {arguments}\n\n" +
+                    $"Exit Code: {process.ExitCode}\n\n" +
+                    $"Output:\n{output}\n\n" +
+                    $"Error:\n{error}");
             }
         }
     }

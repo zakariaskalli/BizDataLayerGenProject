@@ -171,9 +171,9 @@
             this.label2.Location = new System.Drawing.Point(355, 404);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(118, 26);
+            this.label2.Size = new System.Drawing.Size(130, 26);
             this.label2.TabIndex = 22;
-            this.label2.Text = "Version 2.5";
+            this.label2.Text = "Version 2.75";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // frmLogin
