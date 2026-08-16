@@ -4,12 +4,14 @@ using BizDataLayerGen.DocumentationGenerator;
 using BizDataLayerGen.GeneralClasses;
 using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
 using Guna.UI2.WinForms;
+using Guna.UI2.WinForms.Suite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -64,6 +66,13 @@ namespace BizDataLayerGen
 
         private void frmTablesShow_Load(object sender, EventArgs e)
         {
+
+            //foreach (var TableName in AllTables)
+            //{
+            //    dvTables.Rows.Add(true,TableName,true);
+            //}
+            
+
             this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 35, 35));
 
             //LBTables.Items.Clear();
@@ -82,12 +91,6 @@ namespace BizDataLayerGen
 
             //LBTables.Enabled = false;
 
-
-        }
-
-        private void cbTablesName_DropDown(object sender, EventArgs e)
-        {
-            //guna2CheckBox1.Visible = true;
 
         }
 
@@ -207,19 +210,32 @@ namespace BizDataLayerGen
             }
 
 
+            if (rbPaggination.Checked)
+            {
+                clsGlobal.EnablePagination = true;
+            }
+            else
+                { clsGlobal.EnablePagination = false; }
+
             Stopwatch stopwatch1 = Stopwatch.StartNew();
 
             await GenerateProjectStructureAsync(AddAPI, UseDTO);
 
-            if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI,clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
+
+            if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI, clsGlobal.EnablePagination, clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
             {
                 stopwatch1.Stop();
 
-                double timeInSeconds = stopwatch1.Elapsed.TotalSeconds;
+                // استخراج الدقائق والثواني مباشرة من الـ Stopwatch
+                int minutes = stopwatch1.Elapsed.Minutes;
+                double seconds = stopwatch1.Elapsed.Seconds + (stopwatch1.Elapsed.Milliseconds / 1000.0);
 
-                clsGlobal.TimeInMillisecond = timeInSeconds.ToString("0.00");
+                // صياغة النص بالشكل المطلوب (مثال: 2m 15.42s أو 0m 5.12s)
+                string formattedTime = $"{minutes}m {seconds:0.00}s";
 
-                MessageBox.Show($"Project structure generated succesfully:), In: {clsGlobal.TimeInMillisecond}s", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                clsGlobal.TimeInMillisecond = formattedTime;
+
+                MessageBox.Show($"Project structure generated successfully :), In: {formattedTime}", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
 
@@ -263,7 +279,6 @@ namespace BizDataLayerGen
         private async Task GenerateProjectStructureAsync(bool AddAPI,bool UseDTO)
         {
 
-
             var progress = new Progress<ProjectStructureGenerationProgress>(p =>
             {
                 progressBar.Maximum = p.TotalSteps;
@@ -289,11 +304,6 @@ namespace BizDataLayerGen
 
 
             },progress);
-
-
-
-
-
 
 
         }
@@ -424,9 +434,6 @@ namespace BizDataLayerGen
 
             }
         }
-
-
-
 
     }
 }

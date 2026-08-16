@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using BizDataLayerGen.DataAccessLayer;
 using Newtonsoft.Json;
 using BizDataLayerGen.AI;
+using Humanizer;
 
 namespace BizDataLayerGen.GeneralClasses
 {
@@ -306,13 +307,13 @@ namespace BizDataLayerGen.GeneralClasses
         {{
             using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {{
-                string query = @""SP_Add_{_TableName}"";
+                string query = @""SP_Add_{_TableName.Singularize()}"";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {{
                     command.CommandType = CommandType.StoredProcedure;
 
-{clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns)}
+                    {clsGenDataBizLayerMethods.CreatingCommandParameter(_Columns, _NullibietyColumns)}
 
                     SqlParameter outputIdParam = new SqlParameter(""@NewID"", SqlDbType.Int)
                     {{
@@ -499,12 +500,14 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
+using Students.DTO.Student;
+using {clsGlobal.ProjectName}.DTO.Common;
 using {clsGlobal.ProjectName}_DataAccess;
 using Newtonsoft.Json;
 
 namespace {clsGlobal.ProjectName}_DataAccess
 {{
-    public class cls{_TableName}Data
+    public class cls{_TableName.Singularize()}Data
     {{
         //#nullable enable
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Humanizer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -137,6 +138,7 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
         public static string ParameterCodeBL(string[] Columns, string[] DataTypes, bool[] NullibietyColumns, bool IsStatic, int StartBy = 0)
+
         {
             var parameterCodeBuilder = new StringBuilder();
             var nonNullableList = new List<string>();
@@ -210,13 +212,13 @@ namespace BizDataLayerGen.GeneralClasses
                 if (NullibietyColumns[i])
                 {
                     parameterCommandsBuilder.AppendLine(
-                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {TableName}DTO.{cleanedColumn} ?? (object)DBNull.Value);"
+                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {TableName.Singularize()}DTO.{cleanedColumn} ?? (object)DBNull.Value);"
                     );
                 }
                 else
                 {
                     parameterCommandsBuilder.AppendLine(
-                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {TableName}DTO.{cleanedColumn});"
+                        $"                    command.Parameters.AddWithValue(\"@{cleanedColumn}\", {TableName.Singularize()}DTO.{cleanedColumn});"
                     );
                 }
             }
