@@ -1,7 +1,6 @@
 # Code Generator
 <img width="1150" height="525" alt="image" src="https://github.com/user-attachments/assets/d9f02c8c-14ca-4e86-ac16-5c87acf17324" />
-<img width="1274" height="715" alt="image" src="https://github.com/user-attachments/assets/91ec6c99-2a3d-41cd-b75c-4e8138a9e218" />
-
+<img width="1271" height="757" alt="Screenshot 2026-08-16 235324" src="https://github.com/user-attachments/assets/e1e29567-10bc-4ebd-8f6f-66ff4dfb9cda" />
 
 ## Project Overview
 Code Generator is a powerful tool designed to automate the generation of Data Access Layer (DAL) and Business Layer (BL) code for CRUD operations. Instead of manually writing repetitive methods for each database table, this project generates the complete DAL, BL, DTO, API, and Migration layers in seconds, saving hours of development time and minimizing human errors.
@@ -63,6 +62,18 @@ For example, generating the full data stack (DAL + BL + DTO + API + SPs) for 20 
 - **Error Handling and Logging (Publisher-Subscriber design pattern)**  
   Captures runtime errors from methods or SPs and logs them into an `ErrorLog` table inside the database.  
   Also stores detailed error information in JSON files using a Publisher-Subscriber design pattern, allowing easy future extensions for error tracking or notification.
+
+- **Automated Dynamic Pagination & Query Management (New)**  
+  Generates an end-to-end, high-performance pagination and filtering pipeline across all solution layers. Instead of fetching huge datasets into memory, record slicing is offloaded directly to SQL Server via index-backed `OFFSET / FETCH NEXT` operations.
+
+[Client Request] ──(PageNumber & PageSize)──▶ [API Layer]
+│
+[Database (OFFSET-FETCH)] ◀── [DAL] ◀── [Business Layer (Validation)]
+
+
+- **Bounded Input Contract (`QueryParameters`):** Enforces safe page boundaries, dynamic sorting parameters, and a hard-capped maximum page size (`MaxPageSize = 100`) to protect memory and prevent Denial of Service (DoS) attacks.
+- **Standardized Response Envelope (`PagedResultDTO<T>`):** Wraps returned data along with complete pagination metadata (`PageNumber`, `PageSize`, `TotalCount`, and `TotalPages`).
+- **Zero-Boilerplate Generation:** Automatically builds the query DTOs, Business Layer validation, Data Access data streams, and REST API query-string bindings out of the box.
 
 - **User-Friendly UI**  
   Simple and clean interface for:
