@@ -78,103 +78,103 @@ namespace BizDataLayerGen.GeneralClasses
         {
             string ordinal = $"reader.GetOrdinal(\"{columnName}\")";
 
-            // 1. معالجة مشكلة الـ Normalize للأحجام مثل nvarchar(100) أو decimal(18,2)
-            string lowerType = dataType.ToLower().Split('(')[0].Trim();
+            // 1. تنظيف نوع البيانات من System. و النطاقات المزدوجة والأحجام مثل nvarchar(100) أو Nullable<T>
+            string lowerType = dataType.ToLower()
+                                       .Replace("system.", "")
+                                       .Replace("nullable<", "")
+                                       .Replace(">", "")
+                                       .Split('(')[0]
+                                       .Trim();
 
-            // القاموس الموحد لربط الأنواع
-            var typeMapping = new Dictionary<string, string>
-    {
-        { "int", "GetInt32" },
-        { "int32", "GetInt32" },
-        { "bigint", "GetInt64" },
-        { "int64", "GetInt64" },
-        { "smallint", "GetInt16" },
-        { "int16", "GetInt16" },
-        { "tinyint", "GetByte" },
-        { "byte", "GetByte" },
-        { "bit", "GetBoolean" },
-        { "bool", "GetBoolean" },
-        { "boolean", "GetBoolean" },
-        { "decimal", "GetDecimal" },
-        { "numeric", "GetDecimal" },
-        { "money", "GetDecimal" },
-        { "smallmoney", "GetDecimal" },
-        { "float", "GetDouble" },
-        { "double", "GetDouble" },
-        { "real", "GetFloat" },
-        { "char", "GetString" },
-        { "varchar", "GetString" },
-        { "text", "GetString" },
-        { "nchar", "GetString" },
-        { "nvarchar", "GetString" },
-        { "ntext", "GetString" },
-        { "string", "GetString" },
-        { "date", "GetDateTime" },
-        { "datetime", "GetDateTime" },
-        { "datetime2", "GetDateTime" },
-        { "smalldatetime", "GetDateTime" },
-        { "time", "GetTimeSpan" },
-        { "timestamp", "GetValue" },
-        { "binary", "GetValue" },
-        { "varbinary", "GetValue" },
-        { "uniqueidentifier", "GetGuid" },
-        { "guid", "GetGuid" },
-        { "xml", "GetValue" }
-    };
-
-            string readerMethod = typeMapping.ContainsKey(lowerType) ? typeMapping[lowerType] : "GetValue";
-
-            // بناء التعبير بناءً على Nullability
+            // 2. معالجة الحالات بناءً على هل الحقل يقبل Null أم لا
             if (isNullable)
             {
                 switch (lowerType)
                 {
-                    case "int":
-                    case "int32": return $"reader.IsDBNull({ordinal}) ? (int?)null : reader.{readerMethod}({ordinal})";
-                    case "bigint":
-                    case "int64": return $"reader.IsDBNull({ordinal}) ? (long?)null : reader.{readerMethod}({ordinal})";
                     case "smallint":
-                    case "int16": return $"reader.IsDBNull({ordinal}) ? (short?)null : reader.{readerMethod}({ordinal})";
+                    case "int16":
+                    case "short": return $"reader.IsDBNull({ordinal}) ? (short?)null : reader.GetInt16({ordinal})";
+
+                    case "int":
+                    case "int32":
+                    case "integer": return $"reader.IsDBNull({ordinal}) ? (int?)null : reader.GetInt32({ordinal})";
+
+                    case "bigint":
+                    case "int64":
+                    case "long": return $"reader.IsDBNull({ordinal}) ? (long?)null : reader.GetInt64({ordinal})";
+
                     case "tinyint":
-                    case "byte": return $"reader.IsDBNull({ordinal}) ? (byte?)null : reader.{readerMethod}({ordinal})";
+                    case "byte": return $"reader.IsDBNull({ordinal}) ? (byte?)null : reader.GetByte({ordinal})";
+
                     case "bit":
                     case "bool":
-                    case "boolean": return $"reader.IsDBNull({ordinal}) ? (bool?)null : reader.{readerMethod}({ordinal})";
+                    case "boolean": return $"reader.IsDBNull({ordinal}) ? (bool?)null : reader.GetBoolean({ordinal})";
+
                     case "decimal":
                     case "numeric":
                     case "money":
-                    case "smallmoney": return $"reader.IsDBNull({ordinal}) ? (decimal?)null : reader.{readerMethod}({ordinal})";
+                    case "smallmoney": return $"reader.IsDBNull({ordinal}) ? (decimal?)null : reader.GetDecimal({ordinal})";
+
                     case "float":
-                    case "double": return $"reader.IsDBNull({ordinal}) ? (double?)null : reader.{readerMethod}({ordinal})";
-                    case "real": return $"reader.IsDBNull({ordinal}) ? (float?)null : reader.{readerMethod}({ordinal})";
+                    case "double": return $"reader.IsDBNull({ordinal}) ? (double?)null : reader.GetDouble({ordinal})";
+
+                    case "real":
+                    case "single": return $"reader.IsDBNull({ordinal}) ? (float?)null : reader.GetFloat({ordinal})";
+
                     case "char":
                     case "varchar":
                     case "text":
                     case "nchar":
                     case "nvarchar":
                     case "ntext":
-                    case "string": return $"reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal})";
+                    case "string":
+                    case "sysname": return $"reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal})";
+
                     case "datetime":
                     case "date":
                     case "datetime2":
-                    case "smalldatetime": return $"reader.IsDBNull({ordinal}) ? (DateTime?)null : reader.{readerMethod}({ordinal})";
-                    case "time": return $"reader.IsDBNull({ordinal}) ? (TimeSpan?)null : reader.{readerMethod}({ordinal})";
+                    case "smalldatetime": return $"reader.IsDBNull({ordinal}) ? (DateTime?)null : reader.GetDateTime({ordinal})";
+
+                    case "time":
+                    case "timespan": return $"reader.IsDBNull({ordinal}) ? (TimeSpan?)null : reader.GetTimeSpan({ordinal})";
+
                     case "uniqueidentifier":
-                    case "guid": return $"reader.IsDBNull({ordinal}) ? (Guid?)null : reader.{readerMethod}({ordinal})";
+                    case "guid": return $"reader.IsDBNull({ordinal}) ? (Guid?)null : reader.GetGuid({ordinal})";
+
                     case "timestamp":
                     case "binary":
-                    case "varbinary": return $"reader.IsDBNull({ordinal}) ? null : (byte[])reader.GetValue({ordinal})";
-                    case "xml": return $"reader.IsDBNull({ordinal}) ? null : (XDocument)reader.GetValue({ordinal})";
+                    case "varbinary":
+                    case "image":
+                    case "byte[]": return $"reader.IsDBNull({ordinal}) ? null : (byte[])reader.GetValue({ordinal})";
 
-                    // إصلاح مشكلة الـ Default لتعيد القيمة الأصلية الخام دون تحويل نصي مكسور
+                    case "xml": return $"reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal})";
+
                     default: return $"reader.IsDBNull({ordinal}) ? null : reader.GetValue({ordinal})";
                 }
             }
             else
             {
-                // Non-nullable
+                // Non-nullable (لا يقبل Null)
                 switch (lowerType)
                 {
+                    case "smallint":
+                    case "int16": return $"reader.GetInt16({ordinal})";
+                    case "int":
+                    case "int32": return $"reader.GetInt32({ordinal})";
+                    case "bigint":
+                    case "int64": return $"reader.GetInt64({ordinal})";
+                    case "tinyint":
+                    case "byte": return $"reader.GetByte({ordinal})";
+                    case "bit":
+                    case "bool":
+                    case "boolean": return $"reader.GetBoolean({ordinal})";
+                    case "decimal":
+                    case "numeric":
+                    case "money":
+                    case "smallmoney": return $"reader.GetDecimal({ordinal})";
+                    case "float":
+                    case "double": return $"reader.GetDouble({ordinal})";
+                    case "real": return $"reader.GetFloat({ordinal})";
                     case "char":
                     case "varchar":
                     case "text":
@@ -182,15 +182,26 @@ namespace BizDataLayerGen.GeneralClasses
                     case "nvarchar":
                     case "ntext":
                     case "string": return $"reader.GetString({ordinal})";
+                    case "datetime":
+                    case "date":
+                    case "datetime2":
+                    case "smalldatetime": return $"reader.GetDateTime({ordinal})";
 
-                    // إصلاح خطأ الـ Cast المكسور للـ time ليصبح تعبيراً سليماً ومباشراً
-                    case "time": return $"reader.{readerMethod}({ordinal})";
+                    case "time":
+                    case "timespan": return $"reader.GetTimeSpan({ordinal})";
+
+                    case "uniqueidentifier":
+                    case "guid": return $"reader.GetGuid({ordinal})";
 
                     case "timestamp":
                     case "binary":
-                    case "varbinary": return $"(byte[])reader.GetValue({ordinal})";
-                    case "xml": return $"(XDocument)reader.GetValue({ordinal})";
-                    default: return $"reader.{readerMethod}({ordinal})";
+                    case "varbinary":
+                    case "image":
+                    case "byte[]": return $"(byte[])reader.GetValue({ordinal})";
+
+                    case "xml": return $"reader.GetString({ordinal})";
+
+                    default: return $"reader.GetValue({ordinal})";
                 }
             }
         }

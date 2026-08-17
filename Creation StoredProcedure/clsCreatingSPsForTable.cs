@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BizDataLayerGen.DataAccessLayer
 {
@@ -32,9 +33,12 @@ namespace BizDataLayerGen.DataAccessLayer
         {
             string script = File.ReadAllText(filePath);
 
-            // Split script on "GO" (case-insensitive) with trimming
-            string[] commands = script
-                .Split(new[] { "GO", "go", "Go", "gO" }, StringSplitOptions.RemoveEmptyEntries);
+            // تقسيم النص عند كلمة GO المنفصلة في سطر مستقل فقط (غير حساسة لحالة الأحرف)
+            string[] commands = Regex.Split(
+                script,
+                @"^\s*GO\s*$",
+                RegexOptions.IgnoreCase | RegexOptions.Multiline
+            );
 
             using (SqlConnection conn = new SqlConnection(clsDataAccessSettings.ConnectionString))
             {
