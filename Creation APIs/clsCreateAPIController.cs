@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -12,7 +13,7 @@ namespace BizDataLayerGen.Creation_APIs
 {
     public class clsCreateAPIController
     {
-        private string _filePath;
+        private string _apiLayerPath;
         private string _TableName;
         private string[] _Columns;
         private string[] _DataTypes;
@@ -20,12 +21,13 @@ namespace BizDataLayerGen.Creation_APIs
         private string[] _ColumnNamesHasFK;
         private string[] _TablesNameHasFK;
         private string[] _ReferencedColumn;
+        private bool _AddPaggination;
 
-        public clsCreateAPIController(string filePath, string TableName, string[] Columns, string[] DataTypes,
+        public clsCreateAPIController(string apiLayerPath, string TableName, string[] Columns, string[] DataTypes,
                                   bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[]
-                                  ReferencedColumn)
+                                  ReferencedColumn,bool AddPaggination=true)
         {
-            this._filePath = filePath;
+            this._apiLayerPath = apiLayerPath;
             this._TableName = TableName;
             this._Columns = Columns;
 
@@ -39,6 +41,7 @@ namespace BizDataLayerGen.Creation_APIs
             this._ColumnNamesHasFK = ColumnNamesHasFK;
             this._TablesNameHasFK = TablesNameHasFK;
             this._ReferencedColumn = ReferencedColumn;
+            this._AddPaggination = AddPaggination;
         }
 
         // Returns appropriate Route Constraint based on C# Data Type
@@ -63,6 +66,23 @@ namespace BizDataLayerGen.Creation_APIs
         public string CreateGetAllEndPoint(string _TableName)
         {
             string entityNameLowerPlural = _TableName.Pluralize().ToLower();
+
+            string EndPointWithPaggination = $@"
+                [HttpGet("""", Name = ""GetAll{_TableName.Pluralize()}"")]
+                [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName.Singularize()}DTO>))]
+                public async Task<ActionResult<PagedResultDTO<cls{_TableName.Singularize()}DTO>>> GetAll{_TableName.Pluralize()}([FromQuery] {_TableName.Singularize()}QueryParameters query)
+                {{
+                     PagedResultDTO<cls{_TableName.Singularize()}DTO>  {entityNameLowerPlural} = await cls{_TableName}.GetAll{_TableName.Pluralize()}PagedAsync(query.PageNumber, query.PageSize);
+        
+                    if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Items.Any())
+                    {{
+                        return Ok(Enumerable.Empty<cls{_TableName.Singularize()}DTO>());
+                    }}
+        
+                    return Ok({entityNameLowerPlural});
+            }}";
+
+
             string EndPoint = $@"
         [HttpGet("""", Name = ""GetAll{_TableName.Pluralize()}"")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName.Singularize()}DTO>))]
@@ -78,12 +98,13 @@ namespace BizDataLayerGen.Creation_APIs
             return Ok({entityNameLowerPlural});
         }}";
 
-            return EndPoint;
+            return _AddPaggination ? EndPointWithPaggination : EndPoint ;
         }
 
         public string CreateGetByIDEndPoint(string _TableName, string IdColumnName, string IdColumnDataType)
         {
             string idParamName = char.ToLower(IdColumnName[0]) + IdColumnName.Substring(1);
+
             string routeConstraint = GetRouteConstraint(IdColumnDataType);
             string EndPoint = $@"
         [HttpGet(""{{{idParamName}{routeConstraint}}}"", Name = ""Get{_TableName.Singularize()}ById"")]
@@ -101,7 +122,7 @@ namespace BizDataLayerGen.Creation_APIs
         
             if ({_TableName.Singularize().ToLower()} == null)
             {{
-                return NotFound(""{_TableName} with ID "" + {idParamName} + "" was not found."");
+                return NotFound(""{_TableName.Singularize()} with ID "" + {idParamName} + "" was not found."");
             }}
         
             return Ok({_TableName.Singularize().ToLower()}.Data);
@@ -198,38 +219,78 @@ namespace BizDataLayerGen.Creation_APIs
 
         public string CreateSearchEndPoint(string _TableName)
         {
+            string entityNameLowerPlural = _TableName.Pluralize().ToLower();
 
-            string EndPoint = $@"
+            string EndPointWithPaggination = $@"
         [HttpGet(""search"", Name = ""Search{_TableName.Pluralize()}"")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName.Singularize()}DTO>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResultDTO<cls{_TableName.Singularize()}DTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<cls{_TableName.Singularize()}DTO>>> Search{_TableName.Pluralize()}(
+        public async Task<ActionResult<PagedResultDTO<cls{_TableName.Singularize()}DTO>>> Search{_TableName.Pluralize()}(
             [FromQuery] cls{_TableName}.{_TableName}Column column,
             [FromQuery] string value,
-            [FromQuery] cls{_TableName}.SearchMode mode = cls{_TableName}.SearchMode.Anywhere)
+            [FromQuery] cls{_TableName}.SearchMode mode = cls{_TableName}.SearchMode.Anywhere,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20,
+            CancellationToken cancellationToken = default)
         {{
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(value))
             {{
                 return BadRequest(""Search value cannot be empty."");
             }}
 
-            List<cls{_TableName.Singularize()}DTO>? {_TableName.Pluralize()} = await cls{_TableName}.SearchDataAsync(column, value, mode);
+            PagedResultDTO<cls{_TableName.Singularize()}DTO> {entityNameLowerPlural} = await cls{_TableName}.SearchDataPagedAsync(column, value, mode, pageNumber, pageSize, cancellationToken);
 
-            if ({_TableName.Pluralize()} == null || !{_TableName.Pluralize()}.Any())
+            if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Items.Any())
+            {{
+                return Ok(new PagedResultDTO<cls{_TableName.Singularize()}DTO> 
+                {{ 
+                    PageNumber = pageNumber, 
+                    PageSize = pageSize, 
+                    TotalCount = 0 
+                }});
+            }}
+
+            return Ok({entityNameLowerPlural});
+        }}";
+
+            string EndPoint = $@"
+        [HttpGet(""search"", Name = ""Search{_TableName.Pluralize()}"")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<cls{_TableName.Singularize()}DTO>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<cls{_TableName.Singularize()}DTO>>> Search{_TableName.Pluralize()}(
+            [FromQuery] cls{_TableName.Singularize()}.{_TableName}Column column,
+            [FromQuery] string value,
+            [FromQuery] cls{_TableName.Singularize()}.SearchMode mode = cls{_TableName.Singularize()}.SearchMode.Anywhere,
+            CancellationToken cancellationToken = default)
+        {{
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(value))
+            {{
+                return BadRequest(""Search value cannot be empty."");
+            }}
+
+            List<cls{_TableName.Singularize()}DTO> {entityNameLowerPlural} = await cls{_TableName.Singularize()}.SearchDataAsync(column, value, mode, cancellationToken);
+
+            if ({entityNameLowerPlural} == null || !{entityNameLowerPlural}.Any())
             {{
                 return Ok(Enumerable.Empty<cls{_TableName.Singularize()}DTO>());
             }}
 
-            return Ok({_TableName.Pluralize()});
+            return Ok({entityNameLowerPlural});
         }}";
 
-            return EndPoint;
+            return _AddPaggination ? EndPointWithPaggination : EndPoint;
         }
 
         public async Task<clsGlobal.enTypeRaisons> CreateAPILayerFile()
         {
+            var controllerFolderPath = Path.Combine(_apiLayerPath, "Controllers","V1");
+            if (!Directory.Exists(controllerFolderPath))
+            {
+                Directory.CreateDirectory(controllerFolderPath);
+            };
+
             // Define the full path for the file
-            string fullPath = Path.Combine(_filePath, $"cls{_TableName}Controller.cs");
+            string fullPath = Path.Combine(controllerFolderPath, $"cls{_TableName}Controller.cs");
 
             // Names Of Methods to generate the EndPoints
             string StringGetAllEndPoint = CreateGetAllEndPoint(_TableName);
@@ -243,9 +304,9 @@ namespace BizDataLayerGen.Creation_APIs
 using Microsoft.AspNetCore.Mvc; 
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using {clsGlobal.ProjectName}.DTO.Common;
 using {clsGlobal.ProjectName}.DTO;
 using {clsGlobal.ProjectName}_BusinessLayer;
-using static {clsGlobal.ProjectName}_BusinessLayer.cls{_TableName};
 
 namespace {clsGlobal.ProjectName}Api.Controllers
 {{
@@ -276,10 +337,11 @@ namespace {clsGlobal.ProjectName}Api.Controllers
             // Write the code to the file
             await Task.Run(() => File.WriteAllText(fullPath, code));
 
-            await CreateProgramAndConfigurationFiles(_filePath);
+            await CreateProgramAndConfigurationFiles(_apiLayerPath);
 
             return clsGlobal.enTypeRaisons.enPerfect;
         }
+
 
         public static async Task<clsGlobal.enTypeRaisons> CreateAPILayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
                                   bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[]
@@ -292,12 +354,16 @@ namespace {clsGlobal.ProjectName}Api.Controllers
 
             return await Files.CreateAPILayerFile();
         }
+        
 
         /// <summary>
         /// Generates the Program.cs and modular Configuration files (DependencyInjection.cs) for the API project.
         /// </summary>
         /// <param name="apiFolderPath">The root directory path of the generated API project.</param>
         /// <returns>Execution status enum indicating successful creation.</returns>
+        
+        
+
         public static async Task<clsGlobal.enTypeRaisons> CreateProgramAndConfigurationFiles(string apiFolderPath)
         {
             // Create the Configurations directory inside the root API directory

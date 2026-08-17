@@ -17,16 +17,19 @@ namespace BizDataLayerGen.DataAccessLayer
         private string[] _dataTypes;
         private bool[] _nullabilityColumns;
         private bool AutoExcuteSP;
+        private bool _Paggination = false;
 
         public clsCreatingSPsForTable(string filePath, string tableName, string[] columns,
-            string[] dataTypes, bool[] nullabilityColumns, bool autoExcuteSP)
+            string[] dataTypes, bool[] nullabilityColumns, bool autoExcuteSP,bool Paggination)
         {
             this._filePath = filePath;
             this._tableName = tableName;
             this._columns = columns;
             this._dataTypes = dataTypes;
             this._nullabilityColumns = nullabilityColumns;
+            this._Paggination = Paggination;
             AutoExcuteSP = autoExcuteSP;
+
         }
 
         public static void ExecuteSqlFile(string filePath)
@@ -72,11 +75,11 @@ namespace BizDataLayerGen.DataAccessLayer
             sb.AppendLine();
 
             sb.AppendLine(CreateSP_GetByID());
-            sb.AppendLine(CreateSP_GetAll());
+            sb.AppendLine(_Paggination? CreateSP_GetAllPaggined() :   CreateSP_GetAll());
             sb.AppendLine(CreateSP_Add());
             sb.AppendLine(CreateSP_UpdateByID());
             sb.AppendLine(CreateSP_DeleteByID());
-            sb.AppendLine(CreateSP_SearchByColumn());
+            sb.AppendLine(_Paggination ? CreateSP_SearchByColumnPaggined() : CreateSP_SearchByColumn()  );
 
             // Ensure the directory exists
             string directory = Path.GetDirectoryName(fullPath);
@@ -164,6 +167,41 @@ END;
 GO
 ";
         }
+
+
+        private string CreateSP_GetAllPaggined()
+        {
+            return $@"
+CREATE OR ALTER PROCEDURE SP_Get_All_{_tableName.Pluralize()}Paggined
+    @PageNumber    INT           = 1,
+    @PageSize      INT           = 20,
+    @TotalCount    INT           OUTPUT
+AS
+BEGIN
+    IF @PageNumber < 1 SET @PageNumber = 1;
+    IF @PageSize < 1 OR @PageSize > 200 SET @PageSize = 20;
+
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    BEGIN TRY
+
+        -- Get total number of students
+        SELECT @TotalCount = COUNT(*)
+        FROM {_tableName};
+        -- Attempt to retrieve all data from the table
+        SELECT *
+        FROM {_tableName}
+        Order By {_columns[0]}  -- Assuming the first column is the primary key for ordering
+        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+    END TRY
+    BEGIN CATCH
+        -- Call the centralized error handling procedure
+        EXEC SP_HandleError;
+    END CATCH
+END;
+GO
+";
+        }
+
 
         private string CreateSP_Add()
         {
@@ -479,6 +517,98 @@ BEGIN
 
         -- Execute the dynamic SQL with parameterized search pattern
         EXEC sp_executesql @SQL, N'@SearchPattern NVARCHAR(255)', @SearchPattern;
+    END TRY
+    BEGIN CATCH
+        -- Handle errors
+        EXEC SP_HandleError;
+    END CATCH
+END;
+GO";
+        }
+
+        private string CreateSP_SearchByColumnPaggined()
+        {
+            // Build the CASE statement for column mapping
+            string searchConditions = string.Join("\n        ",
+                _columns.Select(col => $"WHEN '{col.Replace(" ", "")}' THEN '{col}'")
+            );
+
+            return $@"CREATE OR ALTER PROCEDURE SP_Search_{_tableName.Singularize()}_ByColumnPaggined
+(
+    @ColumnName   NVARCHAR(128),  -- Column name without spaces
+    @SearchValue  NVARCHAR(255),  -- Value to search for
+    @Mode         NVARCHAR(20) = 'Anywhere', -- Search mode (default: Anywhere)
+    @PageNumber   INT          = 1,
+    @PageSize     INT          = 20,
+    @TotalCount   INT          OUTPUT
+)
+AS
+BEGIN
+    BEGIN TRY
+        DECLARE @ActualColumn NVARCHAR(128);
+        DECLARE @SQL NVARCHAR(MAX);
+        DECLARE @CountSQL NVARCHAR(MAX);
+        DECLARE @SearchPattern NVARCHAR(255);
+
+        -- Map input column name to actual database column name
+        SET @ActualColumn = 
+            CASE @ColumnName
+                {searchConditions}
+                ELSE NULL
+            END;
+
+        -- Validate the column name
+        IF @ActualColumn IS NULL
+        BEGIN
+            RAISERROR('Invalid Column Name provided.', 16, 1);
+            RETURN;
+        END
+
+        -- Validate the search value (ensure it's not empty or NULL)
+        IF ISNULL(LTRIM(RTRIM(@SearchValue)), '') = ''
+        BEGIN
+            RAISERROR('Search value cannot be empty.', 16, 1);
+            RETURN;
+        END
+
+        -- Validate pagination parameters
+        IF @PageNumber < 1 SET @PageNumber = 1;
+        IF @PageSize < 1 OR @PageSize > 200 SET @PageSize = 20;
+
+        DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+
+        -- Prepare the search pattern based on the mode
+        SET @SearchPattern =
+            CASE 
+                WHEN @Mode = 'Anywhere' THEN '%' + LTRIM(RTRIM(@SearchValue)) + '%'
+                WHEN @Mode = 'StartsWith' THEN LTRIM(RTRIM(@SearchValue)) + '%'
+                WHEN @Mode = 'EndsWith' THEN '%' + LTRIM(RTRIM(@SearchValue))
+                WHEN @Mode = 'ExactMatch' THEN LTRIM(RTRIM(@SearchValue))
+                ELSE '%' + LTRIM(RTRIM(@SearchValue)) + '%'
+            END;
+
+        -- Get total count matching the search criteria
+        SET @CountSQL = N'SELECT @TotalCountOut = COUNT(*) FROM ' + QUOTENAME('{_tableName}') + 
+                        N' WHERE ' + QUOTENAME(@ActualColumn) + N' LIKE @SearchPattern';
+
+        EXEC sp_executesql @CountSQL, 
+             N'@SearchPattern NVARCHAR(255), @TotalCountOut INT OUTPUT', 
+             @SearchPattern, 
+             @TotalCountOut = @TotalCount OUTPUT;
+
+        -- Build the dynamic SQL query with pagination safely
+        SET @SQL = N'SELECT * FROM ' + QUOTENAME('{_tableName}') + 
+                    N' WHERE ' + QUOTENAME(@ActualColumn) + N' LIKE @SearchPattern' +
+                    N' ORDER BY ' + QUOTENAME('{_columns[0]}') + 
+                    N' OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY OPTION (RECOMPILE)';
+
+        -- Execute the dynamic SQL with parameterized search pattern and pagination variables
+        EXEC sp_executesql @SQL, 
+             N'@SearchPattern NVARCHAR(255), @Offset INT, @PageSize INT', 
+             @SearchPattern, 
+             @Offset, 
+             @PageSize;
+
     END TRY
     BEGIN CATCH
         -- Handle errors

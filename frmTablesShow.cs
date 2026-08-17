@@ -2,13 +2,16 @@
 using BizDataLayerGen.DataAccessLayer;
 using BizDataLayerGen.DocumentationGenerator;
 using BizDataLayerGen.GeneralClasses;
+using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
 using Guna.UI2.WinForms;
+using Guna.UI2.WinForms.Suite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -63,6 +66,13 @@ namespace BizDataLayerGen
 
         private void frmTablesShow_Load(object sender, EventArgs e)
         {
+
+            //foreach (var TableName in AllTables)
+            //{
+            //    dvTables.Rows.Add(true,TableName,true);
+            //}
+            
+
             this.Region = System.Drawing.Region.FromHrgn(clsGlobal.CreateRoundRectRgn(0, 0, Width, Height, 35, 35));
 
             //LBTables.Items.Clear();
@@ -81,12 +91,6 @@ namespace BizDataLayerGen
 
             //LBTables.Enabled = false;
 
-
-        }
-
-        private void cbTablesName_DropDown(object sender, EventArgs e)
-        {
-            //guna2CheckBox1.Visible = true;
 
         }
 
@@ -179,253 +183,6 @@ namespace BizDataLayerGen
             }
 
 
-            // Test NameTables
-
-            // the CreatebyUseName in People in GymDB is Not Nullable
-
-            // Adding Record
-
-            /*
-            MessageBox.Show(clsPeopleData.AddNewPeople(" Zamil Moha     ", "  Zomala  ", "nan", "Malki", "Arzaz@gmail.com",
-                                   "   064545125455  ", DateTime.Now, true, "Fes", 123, DateTime.Now, DateTime.Now,
-                                   null).ToString());
-            */
-
-
-            /*
-            MessageBox.Show(clsUsersData.AddNewUsers(74, "  Zakaria Ziko  ", "1212 ", DateTime.Now, null, true).ToString());
-            */
-
-
-
-
-            //GetPeopleInfoByID
-
-
-            /*
-            int PersonID = 56;
-            string FirstName = "";
-            string? SecondName = "";
-            string? ThirdName = "";
-            string LastName = "";
-            string? Email = "";
-            string? Phone = "";
-            DateTime? DateOfBirth = DateTime.Now;
-            bool Gender = false;
-            string? Address = "";
-            int CityID = -1;
-            DateTime CreatedTime = DateTime.Now;
-            DateTime LastUpdate = DateTime.Now; // Corrected variable name
-            string? ProfilePicture = "";
-            
-           clsPeopleData.GetPeopleInfoByID(PersonID, ref FirstName, ref SecondName, ref ThirdName,
-               ref LastName, ref Email, ref Phone, ref DateOfBirth, ref Gender, ref Address, ref CityID,
-               ref CreatedTime, ref LastUpdate, ref ProfilePicture); // Removed extra paramet
-            
-            
-
-
-            // GetAllPeople
-
-
-            /*
-            DataTable dt = clsPeopleData.GetAllPeople();
-
-            // تأكد من أن الجدول يحتوي على بيانات
-            if (dt.Rows.Count == 0)
-            {
-                MessageBox.Show("No data available.");
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-
-            // إضافة أسماء الأعمدة
-            foreach (DataColumn column in dt.Columns)
-            {
-                sb.Append(column.ColumnName).Append("\t");
-            }
-            sb.AppendLine();
-
-            // إضافة الصفوف
-            foreach (DataRow row in dt.Rows)
-            {
-                foreach (var item in row.ItemArray)
-                {
-                    sb.Append(item.ToString()).Append("\t");
-                }
-                sb.AppendLine();
-            }
-
-            // عرض البيانات في رسالة
-            MessageBox.Show(sb.ToString(), "People Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            */
-
-
-
-            // First Mythologic to read Last Error from JsonFile
-
-            /*
-            
-            // Path to the JSON file provided by the user
-            string userProvidedPath = "C:\\Programation Level 2\\BizDataLayerGen\\TestCodeGenerator\\GymDB_DataAccess\\ErrorHandler\\JsonFile\\ErrorHandling_JsonFile.json"; 
-
-            
-            try
-            {
-                // Read the JSON file
-                string jsonContent = File.ReadAllText(userProvidedPath);
-
-                // Deserialize the JSON content into a list of ErrorLog objects
-                List<Log> errorLogs = JsonConvert.DeserializeObject<List<Log>>(jsonContent);
-
-                // Check if there are any errors in the file
-                if (errorLogs == null || errorLogs.Count == 0)
-                {
-                    MessageBox.Show("No errors found in the file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                // Replace the problematic line with the following code
-                Log lastError = errorLogs.Last(); // Retrieves the last element
-
-                // Prepare the message to display
-                string errorMessage = $"Error Message: {lastError.ErrorMessage}\n" +
-                                      $"Severity: {lastError.Severity}\n" +
-                                      $"Additional Info: {lastError.AdditionalInfo}\n" +
-                                      $"Stack Trace: {lastError.StackTrace}";
-
-                // Display the error in a MessageBox
-                MessageBox.Show(errorMessage, "Last Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (FileNotFoundException)
-            {
-                MessageBox.Show($"The file was not found at the provided path: {userProvidedPath}", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (JsonException)
-            {
-                MessageBox.Show("The file does not contain valid JSON data.", "Invalid JSON", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-
-            */
-
-            // Second Mythologic to read Last Error from JsonFile
-
-            /*
-
-           // Path to the JSON file provided by the user
-           string userProvidedPath = "C:\\Programation Level 2\\BizDataLayerGen\\TestCodeGenerator\\GymDB_DataAccess\\ErrorHandler\\JsonFile\\ErrorHandling_JsonFile.json"; 
-
-
-           try
-           {
-               // Open the file for reading
-               using (StreamReader file = File.OpenText(userProvidedPath))
-               using (JsonTextReader reader = new JsonTextReader(file))
-               {
-                   // Parse the JSON file as a JArray
-                   JArray errorsArray = JArray.Load(reader);
-
-                   // Check if the JSON array has any errors
-                   if (errorsArray.Count == 0)
-                   {
-                       MessageBox.Show("No errors found in the file.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                       return;
-                   }
-
-                   // Get the last error as a JObject
-                   JObject lastError = (JObject)errorsArray.Last;
-
-                   // Extract error details
-                   string errorMessage = lastError["ErrorMessage"]?.ToString();
-                   string stackTrace = lastError["StackTrace"]?.ToString();
-                   string severity = lastError["Severity"]?.ToString();
-                   string additionalInfo = lastError["AdditionalInfo"]?.ToString();
-
-                   // Prepare the message to display
-                   string displayMessage = $"Error Message: {errorMessage}\n" +
-                                           $"Severity: {severity}\n" +
-                                           $"Additional Info: {additionalInfo}\n" +
-                                           $"Stack Trace: {stackTrace}";
-
-                   // Display the error in a MessageBox
-                   MessageBox.Show(displayMessage, "Last Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-               }
-           }
-           catch (FileNotFoundException)
-           {
-               MessageBox.Show($"The file was not found at the provided path: {userProvidedPath}", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-           }
-           catch (JsonException)
-           {
-               MessageBox.Show("The file does not contain valid JSON data.", "Invalid JSON", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-           }
-           catch (Exception ex)
-           {
-               MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-           }
-
-           */
-
-
-
-            // Update Person
-
-            /*
-            MessageBox.Show(clsPeopleData.UpdatePeopleByID(74, "Zakaria", "zaki", "nan", "Malki", "Arzaz@gmail.com",
-                                   "  06454556 ", DateTime.Now, true, "Fes hakma l3alam", 125, DateTime.Now, DateTime.Now,
-                                   null).ToString());
-            */
-
-            // Update Payment
-
-            //MessageBox.Show(clsPaymentsData.UpdatePaymentsByID(3,1, 3, DateTime.Now, true, 2).ToString());
-
-
-
-
-            // Tests For Delete 
-
-
-            //MessageBox.Show(clsPeopleData.DeletePeople(28).ToString());
-            //MessageBox.Show(clsPeople.DeletePeople(30).ToString());
-
-
-
-            //MessageBox.Show(clsPayments.DeletePayments(7).ToString());
-
-
-            // Test SearchData
-
-            /*
-            
-            DataTable dt = clsUsers.SearchData(clsUsers.UsersColumn.CreatedDate, "-");
-            ShowDataTableContents(dt);
-
-            
-            //string result = "DataTable Contents:\n";
-            //foreach (DataRow row in dt.Rows)
-            //{
-                //foreach (DataColumn column in dt.Columns)
-                //{
-                    //result += $"{column.ColumnName}: {row[column]} \t";
-                //}
-                //result += "\n";
-            //}
-
-            //MessageBox.Show(result, "DataTable Data");
-            
-
-
-            */
-
-
             clsGlobal.AICodeDocsEnabled = ckAiCodeDocs.Checked;
 
             
@@ -443,23 +200,48 @@ namespace BizDataLayerGen
             {
                 clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enAsynchronous;
             }
-            else if (rbSynchronous.Checked)
-            {
-                clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enSynchronous;
-            }
+            //else if (rbSynchronous.Checked)
+            //{
+            //    clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enSynchronous;
+            //}
             else
             {
                 clsGlobal.ExuctionMethod = clsGlobal.enExuctionMethods.enBoth;
             }
 
 
+            if (rbPaggination.Checked)
+            {
+                clsGlobal.EnablePagination = true;
+            }
+            else
+                { clsGlobal.EnablePagination = false; }
 
-            if (await clsAddLayers.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI, clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
-                MessageBox.Show($"Code Generated Success, In: {clsGlobal.TimeInMillisecond}ms", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Stopwatch stopwatch1 = Stopwatch.StartNew();
+
+            await GenerateProjectStructureAsync(AddAPI, UseDTO);
+
+
+            if (await clsAddLayersCode.AddLayers(NameTables, FkOfAll, AddingStaticMethods, AutoExcuteSP, UseDTO, AddAPI, clsGlobal.EnablePagination, clsGlobal.ExuctionMethod) == clsGlobal.enTypeRaisons.enPerfect)
+            {
+                stopwatch1.Stop();
+
+                // استخراج الدقائق والثواني مباشرة من الـ Stopwatch
+                int minutes = stopwatch1.Elapsed.Minutes;
+                double seconds = stopwatch1.Elapsed.Seconds + (stopwatch1.Elapsed.Milliseconds / 1000.0);
+
+                // صياغة النص بالشكل المطلوب (مثال: 2m 15.42s أو 0m 5.12s)
+                string formattedTime = $"{minutes}m {seconds:0.00}s";
+
+                clsGlobal.TimeInMillisecond = formattedTime;
+
+                MessageBox.Show($"Project structure generated successfully :), In: {formattedTime}", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
 
             if (ckAiCodeDocs.Checked)
             {
+
 
                 await GenerateDocumentationAsync();
 
@@ -494,7 +276,37 @@ namespace BizDataLayerGen
                 MessageBoxIcon.Information);
         }
 
+        private async Task GenerateProjectStructureAsync(bool AddAPI,bool UseDTO)
+        {
 
+            var progress = new Progress<ProjectStructureGenerationProgress>(p =>
+            {
+                progressBar.Maximum = p.TotalSteps;
+                progressBar.Value = p.ProcessedSteps;
+
+                lbCurrentFile.Text =
+                    $"Processing: {p.CurrentStep} ({p.ProcessedSteps}/{p.TotalSteps}) - {p.Percentage:F2}%";
+            });
+
+            // Generate the solution using clsSolutionGenerator 
+            await clsSolutionGenerator.GenerateSolutionAsync(new SolutionConfiguration
+            {
+                SolutionName = clsGlobal.ProjectName,
+                EnableSwagger = true,
+                EnableApiVersioning = true,
+                IncludeApi = AddAPI,
+                IncludeBusiness = true,
+                IncludeDataAccess = true,
+                IncludeDto = UseDTO,
+                IncludeMigrations = true,
+                DotNetVersion = "net8.0",
+                OutputDirectory = clsGlobal.PathFilesToGenerate,
+
+
+            },progress);
+
+
+        }
         private void rbAddingStaticMethodsNo_CheckedChanged(object sender, EventArgs e)
         {
             // In Button Ok Less rbNo And Cancel Checked RbYes
@@ -622,9 +434,6 @@ namespace BizDataLayerGen
 
             }
         }
-
-
-
 
     }
 }

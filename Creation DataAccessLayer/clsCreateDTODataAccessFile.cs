@@ -23,7 +23,8 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _DataTypes;
         private bool[] _NullibietyColumns;
         private clsGlobal.enExuctionMethods _ExuctionMethod;
-        public clsCreateDTODataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns, clsGlobal.enExuctionMethods ExuctionMethod)
+        private bool _AddPaggination = false;
+        public clsCreateDTODataAccessFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns,bool AddPaggination, clsGlobal.enExuctionMethods ExuctionMethod)
         {
             this._filePath = filePath;
             this._TableName = TableName;
@@ -31,6 +32,7 @@ namespace BizDataLayerGen.GeneralClasses
             this._DataTypes = DataTypes;
             this._NullibietyColumns = NullibietyColumns;
             this._ExuctionMethod = ExuctionMethod;
+            this._AddPaggination = AddPaggination;
         }
 
 
@@ -210,7 +212,7 @@ namespace BizDataLayerGen.GeneralClasses
         {
             var dataReaderCodeBuilder = new StringBuilder();
 
-            dataReaderCodeBuilder.AppendLine(GetReaderExpression(_Columns[0].Replace(" ", ""), _DataTypes[0], false) + ",");
+            dataReaderCodeBuilder.AppendLine(GetReaderExpression(_Columns[0].Replace(" ", ""), _DataTypes[0], _NullibietyColumns[0]) + ",");
 
             for (int i = 1; i < _Columns.Length; i++) // Start from 1 to skip the first column
             {
@@ -220,11 +222,11 @@ namespace BizDataLayerGen.GeneralClasses
 
                 if (i == _Columns.Length - 1)
                 {
-                    dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) );
+                    dataReaderCodeBuilder.AppendLine(GetReaderExpression(column, dataType, isNullable));
                 }
                 else
                 {
-                    dataReaderCodeBuilder.AppendLine( GetReaderExpression(column, dataType, isNullable) + "," );
+                    dataReaderCodeBuilder.AppendLine(GetReaderExpression(column, dataType, isNullable) + ",");
                 }
 
 
@@ -232,6 +234,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             return dataReaderCodeBuilder.ToString();
         }
+
 
         public static string parameterForUpdateQuery(string[] Columns)
         {
@@ -552,6 +555,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         // Asynchronous Methods
 
+
         public string AddGetTableInfoByIDAsyncMethod()
         {
             string GetTableByIDCode = @$"
@@ -595,6 +599,61 @@ namespace BizDataLayerGen.GeneralClasses
             }}
             return null;
         }}";
+
+            return GetTableByIDCode;
+        }
+
+
+
+        public string AddGetAllDataPagginedAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+            public static async Task<PagedResultDTO<cls{_TableName.Singularize()}DTO>> GetAll{_TableName.Pluralize()}PagedAsync(int PageNumber=1,int PageSize=20,CancellationToken cancellationToken = default)
+                {{
+                    var {_TableName.Singularize()}Result = new PagedResultDTO<cls{_TableName.Singularize()}DTO>();
+                    {_TableName.Singularize()}Result.PageNumber = PageNumber;
+                    {_TableName.Singularize()}Result.PageSize = PageSize;
+
+                    try
+                    {{
+                        using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                        {{
+                            string query = ""SP_Get_All_{_TableName.Pluralize()}Paggined"";
+
+                            using (SqlCommand command = new SqlCommand(query, connection))
+                            {{
+                                command.CommandType = CommandType.StoredProcedure; 
+                                command.Parameters.AddWithValue(""@PageNumber"", PageNumber);
+                                command.Parameters.AddWithValue(""@PageSize"", PageSize);
+                                command.Parameters.Add(""@TotalCount"", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+                                await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+                                using (SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+                                {{
+                                    while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                                    {{
+                                        {_TableName.Singularize()}Result.Items.Add(new cls{_TableName.Singularize()}DTO
+                                        (
+                                            {AddDataReaderToVariablesDTO()}
+                                        ));
+                                    }}
+                                }}
+                            {_TableName.Singularize()}Result.TotalCount = command.Parameters[""@TotalCount""].Value != DBNull.Value
+                        ? (int)command.Parameters[""@TotalCount""].Value
+                        : 0;
+                            }}
+                          
+                        }}
+                    }}
+                    catch (Exception ex)
+                    {{
+                        // Handle all exceptions in a general way
+                        ErrorHandler.HandleException(ex, nameof(GetAll{_TableName.Pluralize()}PagedAsync), ""No parameters for this method."");
+                    }}
+
+                    return {_TableName.Singularize()}Result;
+                }}";
 
             return GetTableByIDCode;
         }
@@ -818,6 +877,62 @@ namespace BizDataLayerGen.GeneralClasses
             return GetTableByIDCode;
         }
 
+        public string AddSearchPagginedAsyncMethod()
+        {
+            string GetTableByIDCode = @$"
+    public static async Task<PagedResultDTO<cls{_TableName.Singularize()}DTO>> SearchDataPagedAsync(string ColumnName, string SearchValue, string Mode = ""Anywhere"", int PageNumber = 1, int PageSize = 20, CancellationToken cancellationToken = default)
+    {{
+        var {_TableName.Singularize()}Result = new PagedResultDTO<cls{_TableName.Singularize()}DTO>();
+        {_TableName.Singularize()}Result.PageNumber = PageNumber;
+        {_TableName.Singularize()}Result.PageSize = PageSize;
+
+        try
+        {{
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+            {{
+                string query = ""SP_Search_{_TableName.Singularize()}_ByColumnPaggined"";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {{
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue(""@ColumnName"", ColumnName);
+                    command.Parameters.AddWithValue(""@SearchValue"", SearchValue);
+                    command.Parameters.AddWithValue(""@Mode"", Mode);
+                    command.Parameters.AddWithValue(""@PageNumber"", PageNumber);
+                    command.Parameters.AddWithValue(""@PageSize"", PageSize);
+                    command.Parameters.Add(""@TotalCount"", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+                    await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+                    {{
+                        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                        {{
+                            {_TableName.Singularize()}Result.Items.Add(new cls{_TableName.Singularize()}DTO
+                            (
+                                {AddDataReaderToVariablesDTO()}
+                            ));
+                        }}
+                    }}
+
+                    {_TableName.Singularize()}Result.TotalCount = command.Parameters[""@TotalCount""].Value != DBNull.Value
+                        ? (int)command.Parameters[""@TotalCount""].Value
+                        : 0;
+                }}
+            }}
+        }}
+        catch (Exception ex)
+        {{
+            // Handle all exceptions in a general way
+            ErrorHandler.HandleException(ex, nameof(SearchDataPagedAsync), $""ColumnName: {{ColumnName}}, SearchValue: {{SearchValue}}, Mode: {{Mode}}, PageNumber: {{PageNumber}}, PageSize: {{PageSize}}"");
+        }}
+
+        return {_TableName.Singularize()}Result;
+    }}";
+
+            return GetTableByIDCode;
+        }
+
 
         public async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile()
         {
@@ -836,11 +951,12 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Linq;
+using {clsGlobal.ProjectName}.DTO;
+using {clsGlobal.ProjectName}.DTO.Common;
 using {clsGlobal.ProjectName}_DataAccess;
 using Newtonsoft.Json;
-using {clsGlobal.ProjectName}.DTO;
 
-namespace {clsGlobal.ProjectName}_DataLayer
+namespace {clsGlobal.ProjectName}_DataAccess
 {{
     public class cls{_TableName}Data
     {{
@@ -850,7 +966,7 @@ namespace {clsGlobal.ProjectName}_DataLayer
         {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddGetTableInfoByIDAsyncMethod() : string.Empty)}
 
         {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddGetAllDataMethod() : string.Empty)}
-        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddGetAllDataAsyncMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? _AddPaggination ? AddGetAllDataPagginedAsyncMethod() :  AddGetAllDataAsyncMethod() : string.Empty)}
 
         {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddAddingNewRecordMethod() : string.Empty)}
         {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddAddingNewRecordAsyncMethod() : string.Empty)}
@@ -862,11 +978,10 @@ namespace {clsGlobal.ProjectName}_DataLayer
         {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddDeleteByIDAsyncMethod() : string.Empty)}
 
         {(_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddSearchMethod() : string.Empty)}
-        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? AddSearchAsyncMethod() : string.Empty)}
+        {(_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth ? _AddPaggination ? AddSearchPagginedAsyncMethod() :  AddSearchAsyncMethod() : string.Empty)}
     }}
 }}
 ";
-
 
             // Write the code to the file
             await Task.Run(() => File.WriteAllText(fullPath, code));
@@ -874,16 +989,12 @@ namespace {clsGlobal.ProjectName}_DataLayer
 
         }
 
-        public static async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns, clsGlobal.enExuctionMethods ExuctionMethod)
+        public static async Task<clsGlobal.enTypeRaisons> CreateDTODataAccessClassFile(string filePath, string TableName, string[] Columns, string[] DataTypes, bool[] NullibietyColumns,bool AddingPaggination, clsGlobal.enExuctionMethods ExuctionMethod)
         {
-            clsCreateDTODataAccessFile Files = new clsCreateDTODataAccessFile(filePath, TableName, Columns, DataTypes, NullibietyColumns, ExuctionMethod);
+            clsCreateDTODataAccessFile Files = new clsCreateDTODataAccessFile(filePath, TableName, Columns, DataTypes, NullibietyColumns, AddingPaggination, ExuctionMethod);
 
             return await Files.CreateDTODataAccessClassFile();
         }
-
-
-
-
 
     }
 }

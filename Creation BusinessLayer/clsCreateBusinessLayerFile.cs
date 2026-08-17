@@ -38,6 +38,8 @@ namespace BizDataLayerGen.GeneralClasses
             { "bool", "false" }
         };
 
+
+
         public clsCreateBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
                                     bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] 
                                     ReferencedColumn, bool AddingStaticMethods)
@@ -535,13 +537,13 @@ namespace BizDataLayerGen.GeneralClasses
             return sb.ToString();
         }
 
-        public string AddGetAllRows(string[] _Columns, string _TableName)
+        public string AddGetAllRows(string[] _Columns, string _TableName,bool AddingPaggination =false)
         {
 
             StringBuilder sb = new StringBuilder();
 
             // Constructor signature with parameters
-            sb.AppendLine($"       public static DataTable GetAll{_TableName}()");
+            sb.AppendLine($"       public static DataTable   GetAll{_TableName}()");
             sb.AppendLine("       {");
             sb.AppendLine("");
 
@@ -689,7 +691,8 @@ namespace BizDataLayerGen.GeneralClasses
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.ProjectName}_DataLayer;
+using {clsGlobal.ProjectName}DTO.Common;
+using {clsGlobal.ProjectName}_DataAccess;
 
 namespace {clsGlobal.ProjectName}_BusinessLayer
 {{
@@ -736,6 +739,7 @@ namespace {clsGlobal.ProjectName}_BusinessLayer
             return clsGlobal.enTypeRaisons.enPerfect;
 
         }
+
 
         public static async Task<clsGlobal.enTypeRaisons> CreateBusinessLayerFile(string filePath, string TableName, string[] Columns,
             string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] ReferencedColumn, bool AddingStaticMethods)

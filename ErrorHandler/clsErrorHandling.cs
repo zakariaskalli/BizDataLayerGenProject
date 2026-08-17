@@ -52,10 +52,10 @@ namespace BizDataLayerGen.DataAccessLayer
             string Code = @$"
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using {clsGlobal.DataBaseName}_DataAccess;
+using {clsGlobal.ProjectName}_DataAccess;
 using Newtonsoft.Json;
 
     // Log model to store error details
@@ -264,7 +264,6 @@ using Newtonsoft.Json;
             ErrorHandler.HandleError(log);
         }}
     }}";
-
             // Write the content to the file
             try
             {

@@ -61,7 +61,7 @@
             this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLogin.ForeColor = System.Drawing.SystemColors.Window;
             this.btnLogin.Location = new System.Drawing.Point(297, 322);
-            this.btnLogin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(164, 62);
             this.btnLogin.TabIndex = 0;
@@ -76,7 +76,7 @@
             this.switch1.CheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.switch1.CheckedState.InnerColor = System.Drawing.Color.White;
             this.switch1.Location = new System.Drawing.Point(35, 347);
-            this.switch1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.switch1.Margin = new System.Windows.Forms.Padding(4);
             this.switch1.Name = "switch1";
             this.switch1.Size = new System.Drawing.Size(47, 25);
             this.switch1.TabIndex = 3;
@@ -156,7 +156,7 @@
             this.guna2CircleButton1.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.guna2CircleButton1.ForeColor = System.Drawing.Color.White;
             this.guna2CircleButton1.Location = new System.Drawing.Point(432, 15);
-            this.guna2CircleButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.guna2CircleButton1.Margin = new System.Windows.Forms.Padding(4);
             this.guna2CircleButton1.Name = "guna2CircleButton1";
             this.guna2CircleButton1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.guna2CircleButton1.Size = new System.Drawing.Size(47, 43);
@@ -171,9 +171,9 @@
             this.label2.Location = new System.Drawing.Point(355, 404);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(118, 26);
+            this.label2.Size = new System.Drawing.Size(130, 26);
             this.label2.TabIndex = 22;
-            this.label2.Text = "Version 2.0";
+            this.label2.Text = "Version 2.75";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // frmLogin
@@ -192,7 +192,7 @@
             this.Controls.Add(this.lblLogin);
             this.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmLogin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";

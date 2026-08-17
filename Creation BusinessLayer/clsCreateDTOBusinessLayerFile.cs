@@ -1,6 +1,6 @@
-﻿    using BizDataLayerGen.AI;
-    using BizDataLayerGen.DataAccessLayer;
-    using System;
+﻿using BizDataLayerGen.AI;
+using BizDataLayerGen.DataAccessLayer;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlTypes;
@@ -24,6 +24,7 @@ namespace BizDataLayerGen.GeneralClasses
         private string[] _TablesNameHasFK;
         private string[] _ReferencedColumn;
         private bool _AddingStaticMethods;
+        private bool _AddingPaggination;
         private clsGlobal.enExuctionMethods _ExuctionMethod;
 
         Dictionary<string, string> defaultValues = new Dictionary<string, string>
@@ -41,7 +42,7 @@ namespace BizDataLayerGen.GeneralClasses
 
         public clsCreateDTOBusinessLayerFile(string filePath, string TableName, string[] Columns, string[] DataTypes,
                                     bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] 
-                                    ReferencedColumn, bool AddingStaticMethods, clsGlobal.enExuctionMethods ExuctionMethod)
+                                    ReferencedColumn, bool AddingStaticMethods,bool AddingPaggination, clsGlobal.enExuctionMethods ExuctionMethod)
         {
             this._filePath = filePath;
             this._TableName = TableName;
@@ -58,6 +59,7 @@ namespace BizDataLayerGen.GeneralClasses
             this._TablesNameHasFK = TablesNameHasFK;
             this._ReferencedColumn = ReferencedColumn;
             this._AddingStaticMethods = AddingStaticMethods;
+            this._AddingPaggination = AddingPaggination;
             this._ExuctionMethod = ExuctionMethod;
         }
 
@@ -107,7 +109,6 @@ namespace BizDataLayerGen.GeneralClasses
         }
 
         // Consturctors
-
         public string AddNormalConstructor(string[] _Columns, string[] _DataTypes, bool[] _NullibietyColumns,
             string[] _ColumnNamesHasFK, string[] _TablesNameHasFK, string _TableName)
         {
@@ -179,6 +180,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             // Constructor signature with parameters
             sb.AppendLine($"        private cls{_TableName}(cls{_TableName.Singularize()}DTO dto)");
+
 
             //sb.Append($"{_DataTypes[0]}? {_Columns[0]}, {clsGenDataBizLayerMethods.ParameterCode(_Columns, _DataTypes, _NullibietyColumns, 1)})");
 
@@ -587,8 +589,30 @@ namespace BizDataLayerGen.GeneralClasses
             sb.AppendLine("");
             sb.AppendLine("       }");
 
+
             return sb.ToString();
         }
+
+        public string AddGetAllRowsPagginedAsync(string _TableName, bool AddingPaggination = false)
+        {
+            StringBuilder sb = new StringBuilder();
+
+                sb.AppendLine($@"
+       public static async Task<PagedResultDTO<cls{_TableName.Singularize()}DTO>> GetAll{_TableName.Pluralize()}PagedAsync(int PageNumber = 1, int PageSize = 20, CancellationToken cancellationToken = default)
+       {{
+           return await cls{_TableName}Data.GetAll{_TableName.Pluralize()}PagedAsync(PageNumber, PageSize, cancellationToken).ConfigureAwait(false) 
+               ?? new PagedResultDTO<cls{_TableName.Singularize()}DTO>
+               {{
+                   PageNumber = PageNumber,
+                   PageSize = PageSize,
+                   TotalCount = 0
+               }};
+       }}");
+            
+
+            return sb.ToString();
+        }
+
 
         public string AddSaveRowAsync(string _TableName)
         {
@@ -638,7 +662,7 @@ namespace BizDataLayerGen.GeneralClasses
 
             return sb.ToString();
         }
-
+        
         public string AddSearchDataAsync(string[] _Columns, string _TableName)
         {
             StringBuilder sb = new StringBuilder();
@@ -668,15 +692,57 @@ namespace BizDataLayerGen.GeneralClasses
             return sb.ToString();
         }
 
+        public string AddSearchPagginedAsyncMethod(string[] _Columns, string _TableName)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous)
+            {
+                // Add Enum for columns
+                sb.AppendLine(EnumForColumns(_Columns, _TableName));
+
+                // Add Enum for Search Modes
+                sb.AppendLine(EnumForSearchModes());
+            }
+
+            // Constructor signature with parameters
+            sb.AppendLine($@"
+        public static async Task<PagedResultDTO<cls{_TableName.Singularize()}DTO>> SearchDataPagedAsync({_TableName}Column ChosenColumn, string SearchValue, SearchMode Mode = SearchMode.Anywhere, int PageNumber = 1, int PageSize = 20, CancellationToken cancellationToken = default)
+        {{
+            if (string.IsNullOrWhiteSpace(SearchValue))
+            {{
+                return new PagedResultDTO<cls{_TableName.Singularize()}DTO>
+                {{
+                    PageNumber = PageNumber,
+                    PageSize = PageSize,
+                    TotalCount = 0
+                }};
+            }}
+
+            string modeValue = Mode.ToString(); // Get the mode as string for passing to the stored procedure
+
+            return await cls{_TableName}Data.SearchDataPagedAsync(ChosenColumn.ToString(), SearchValue, modeValue, PageNumber, PageSize, cancellationToken).ConfigureAwait(false) ?? new PagedResultDTO<cls{_TableName.Singularize()}DTO>
+            {{
+                PageNumber = PageNumber,
+                PageSize = PageSize,
+                TotalCount = 0
+            }};
+        }}        
+");
+
+            return sb.ToString();
+        }
 
 
         public async Task<clsGlobal.enTypeRaisons> CreateDTOBusinessLayerFile()
         {
             // Define the full path for the file
-            string fullPath = Path.Combine(_filePath, $"cls{_TableName}.cs");
+            string fullPath = Path.Combine(_filePath, $"cls{_TableName.Singularize()}.cs");
 
             bool isSync = (_ExuctionMethod == clsGlobal.enExuctionMethods.enSynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth);
             bool isAsync = (_ExuctionMethod == clsGlobal.enExuctionMethods.enAsynchronous || _ExuctionMethod == clsGlobal.enExuctionMethods.enBoth);
+
+         
 
             // Sync Methods String Generation
             string stringAddAddingNewRow = isSync ? AddAddingNewRow(_Columns, _TableName) : "";
@@ -696,14 +762,15 @@ namespace BizDataLayerGen.GeneralClasses
             string stringAddStaticUpdateRowAsync = (isAsync && _AddingStaticMethods) ? AddStaticUpdateRowAsync(_TableName) : "";
             string stringAddStaticFindAsync = (isAsync && _AddingStaticMethods) ? AddStaticFindAsync(_Columns, _DataTypes, _TableName) : "";
             string stringAddSaveRowAsync = isAsync ? AddSaveRowAsync(_TableName) : "";
-            string stringAddGetAllRowsAsync = (isAsync && _AddingStaticMethods) ? AddGetAllRowsAsync(_TableName) : "";
+            string stringAddGetAllRowsAsync = (isAsync && _AddingStaticMethods) ? _AddingPaggination ? AddGetAllRowsPagginedAsync(_TableName) :    AddGetAllRowsAsync(_TableName) : "";
             string stringAddDeleteRowAsync = (isAsync && _AddingStaticMethods) ? AddDeleteRowAsync(_Columns[0], _DataTypes[0], _TableName) : "";
-            string stringAddSearchDataAsync = (isAsync && _AddingStaticMethods) ? AddSearchDataAsync(_Columns, _TableName) : "";
+            string stringAddSearchDataAsync = (isAsync && _AddingStaticMethods) ? _AddingPaggination ? AddSearchPagginedAsyncMethod(_Columns, _TableName) : AddSearchDataAsync(_Columns, _TableName) : "";
             string code = @$"
 using System;
 using System.Data;
-using {clsGlobal.ProjectName}_DataLayer;
 using {clsGlobal.ProjectName}.DTO;
+using {clsGlobal.ProjectName}.DTO.Common;
+using {clsGlobal.ProjectName}_DataAccess;
 
 namespace {clsGlobal.ProjectName}_BusinessLayer{{
     public class cls{_TableName}
@@ -723,26 +790,26 @@ namespace {clsGlobal.ProjectName}_BusinessLayer{{
 {InitLazyLoaders(_Columns, _DataTypes, _NullibietyColumns, _ColumnNamesHasFK, _TablesNameHasFK, _TableName)}
 
         // ---------- Sync Methods ----------
-{stringAddAddingNewRow}
-{stringAddStaticAddingNewRow}
-{stringAddUpdateRow}
-{stringAddStaticUpdateRow}
-{stringAddStaticFind}
-{stringAddSaveRow}
-{stringAddGetAllRows}
-{stringAddDeleteRow}
-{stringAddSearchData}
+        {stringAddAddingNewRow}
+        {stringAddStaticAddingNewRow}
+        {stringAddUpdateRow}
+        {stringAddStaticUpdateRow}
+        {stringAddStaticFind}
+        {stringAddSaveRow}
+        {stringAddGetAllRows}
+        {stringAddDeleteRow}
+        {stringAddSearchData}
 
         // ---------- Async Methods ----------
-{stringAddAddingNewRowAsync}
-{stringAddStaticAddingNewRowAsync}
-{stringAddUpdateRowAsync}
-{stringAddStaticUpdateRowAsync}
-{stringAddStaticFindAsync}
-{stringAddSaveRowAsync}
-{stringAddGetAllRowsAsync}
-{stringAddDeleteRowAsync}
-{stringAddSearchDataAsync}
+        {stringAddAddingNewRowAsync}
+        {stringAddStaticAddingNewRowAsync}
+        {stringAddUpdateRowAsync}
+        {stringAddStaticUpdateRowAsync}
+        {stringAddStaticFindAsync}
+        {stringAddSaveRowAsync}
+        {stringAddGetAllRowsAsync}
+        {stringAddDeleteRowAsync}
+        {stringAddSearchDataAsync}
 
     }}
 }}
@@ -757,11 +824,11 @@ namespace {clsGlobal.ProjectName}_BusinessLayer{{
 
 
         public static Task<clsGlobal.enTypeRaisons> CreateDTOBusinessLayerFile(string filePath, string TableName, string[] Columns,
-            string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] ReferencedColumn, bool AddingStaticMethods, clsGlobal.enExuctionMethods ExuctionMethod)
+            string[] DataTypes, bool[] NullibietyColumns, string[] ColumnNamesHasFK, string[] TablesNameHasFK, string[] ReferencedColumn, bool AddingStaticMethods,bool AddingPaggination, clsGlobal.enExuctionMethods ExuctionMethod)
         {
             clsCreateDTOBusinessLayerFile Files = new clsCreateDTOBusinessLayerFile(filePath, TableName, Columns, DataTypes,
                                                                         NullibietyColumns, ColumnNamesHasFK, TablesNameHasFK,
-                                                                        ReferencedColumn,AddingStaticMethods, ExuctionMethod);
+                                                                        ReferencedColumn,AddingStaticMethods, AddingPaggination, ExuctionMethod);
 
             return Files.CreateDTOBusinessLayerFile();
         }

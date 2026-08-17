@@ -61,7 +61,7 @@
             this.guna2HtmlLabel1.Location = new System.Drawing.Point(370, 26);
             this.guna2HtmlLabel1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel1.Name = "guna2HtmlLabel1";
-            this.guna2HtmlLabel1.Size = new System.Drawing.Size(373, 71);
+            this.guna2HtmlLabel1.Size = new System.Drawing.Size(300, 59);
             this.guna2HtmlLabel1.TabIndex = 0;
             this.guna2HtmlLabel1.Text = "Code Generator";
             // 
@@ -73,7 +73,7 @@
             this.guna2HtmlLabel2.Location = new System.Drawing.Point(16, 204);
             this.guna2HtmlLabel2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel2.Name = "guna2HtmlLabel2";
-            this.guna2HtmlLabel2.Size = new System.Drawing.Size(189, 33);
+            this.guna2HtmlLabel2.Size = new System.Drawing.Size(146, 25);
             this.guna2HtmlLabel2.TabIndex = 1;
             this.guna2HtmlLabel2.Text = "DataBase Name:";
             // 
@@ -85,7 +85,7 @@
             this.guna2HtmlLabel3.Location = new System.Drawing.Point(16, 296);
             this.guna2HtmlLabel3.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel3.Name = "guna2HtmlLabel3";
-            this.guna2HtmlLabel3.Size = new System.Drawing.Size(264, 33);
+            this.guna2HtmlLabel3.Size = new System.Drawing.Size(205, 25);
             this.guna2HtmlLabel3.TabIndex = 2;
             this.guna2HtmlLabel3.Text = "Path Files To Generate:";
             // 
@@ -110,7 +110,7 @@
             this.guna2HtmlLabel4.Location = new System.Drawing.Point(825, 412);
             this.guna2HtmlLabel4.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel4.Name = "guna2HtmlLabel4";
-            this.guna2HtmlLabel4.Size = new System.Drawing.Size(109, 33);
+            this.guna2HtmlLabel4.Size = new System.Drawing.Size(85, 25);
             this.guna2HtmlLabel4.TabIndex = 8;
             this.guna2HtmlLabel4.Text = "Made By:";
             // 
@@ -122,7 +122,7 @@
             this.guna2HtmlLabel5.Location = new System.Drawing.Point(898, 444);
             this.guna2HtmlLabel5.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel5.Name = "guna2HtmlLabel5";
-            this.guna2HtmlLabel5.Size = new System.Drawing.Size(154, 33);
+            this.guna2HtmlLabel5.Size = new System.Drawing.Size(121, 25);
             this.guna2HtmlLabel5.TabIndex = 9;
             this.guna2HtmlLabel5.Text = "Zakaria Skalli";
             // 
@@ -189,7 +189,7 @@
             this.guna2HtmlLabel6.Location = new System.Drawing.Point(863, 203);
             this.guna2HtmlLabel6.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel6.Name = "guna2HtmlLabel6";
-            this.guna2HtmlLabel6.Size = new System.Drawing.Size(31, 33);
+            this.guna2HtmlLabel6.Size = new System.Drawing.Size(25, 25);
             this.guna2HtmlLabel6.TabIndex = 14;
             this.guna2HtmlLabel6.Text = "Or";
             // 
@@ -270,7 +270,7 @@
             this.guna2HtmlLabel7.Location = new System.Drawing.Point(15, 357);
             this.guna2HtmlLabel7.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.guna2HtmlLabel7.Name = "guna2HtmlLabel7";
-            this.guna2HtmlLabel7.Size = new System.Drawing.Size(165, 33);
+            this.guna2HtmlLabel7.Size = new System.Drawing.Size(128, 25);
             this.guna2HtmlLabel7.TabIndex = 22;
             this.guna2HtmlLabel7.Text = "ProjectName : ";
             this.guna2HtmlLabel7.Click += new System.EventHandler(this.guna2HtmlLabel7_Click);
@@ -314,7 +314,7 @@
             // 
             // CodeGenratorForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 23F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
             this.ClientSize = new System.Drawing.Size(1155, 527);
