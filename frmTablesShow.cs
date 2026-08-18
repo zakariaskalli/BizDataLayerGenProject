@@ -127,8 +127,24 @@ namespace BizDataLayerGen
          
          */
 
+        private static string GetDotnetVersionNumber()
+        {
+            switch (clsGlobal.DotnetCoreVersion)
+            {
+                case ".NET 8.0":
+                    return "8.0";
+                case ".NET 7.0":
+                    return "7.0";
+                case ".NET 9.0":
+                    return "9.0";
+                default:
+                    return "8.0"; // Default to .NET 8.0 if not specified
+            }
+        }
+
         private async  void btnGenerate_Click(object sender, EventArgs e)
         {
+            clsGlobal.DotnetCoreVersion = GetDotnetVersionNumber();
 
             bool SelectItem = false;
 
@@ -299,7 +315,7 @@ namespace BizDataLayerGen
                 IncludeDataAccess = true,
                 IncludeDto = UseDTO,
                 IncludeMigrations = true,
-                DotNetVersion = "net8.0",
+                DotNetVersion = decimal.Parse(clsGlobal.DotnetCoreVersion),
                 OutputDirectory = clsGlobal.PathFilesToGenerate,
 
 
@@ -307,6 +323,9 @@ namespace BizDataLayerGen
 
 
         }
+
+
+
         private void rbAddingStaticMethodsNo_CheckedChanged(object sender, EventArgs e)
         {
             // In Button Ok Less rbNo And Cancel Checked RbYes
@@ -435,5 +454,19 @@ namespace BizDataLayerGen
             }
         }
 
+        private void guna2HtmlLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox3_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel1_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

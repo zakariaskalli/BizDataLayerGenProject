@@ -86,11 +86,6 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
                     "Output directory cannot be empty.",
                     nameof(configuration));
 
-            if (string.IsNullOrWhiteSpace(configuration.DotNetVersion))
-                throw new ArgumentException(
-                    ".NET version cannot be empty.",
-                    nameof(configuration));
-
             progress?.Report( new ProjectStructureGenerationProgress
             {
                 CurrentStep = "Configuration validated successfully.",

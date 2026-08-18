@@ -1,13 +1,18 @@
 ﻿using BizDataLayerGen.Project_Structure_Generation__Principale_.DotNet;
 using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
+using BizDataLayerGen.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
-using BizDataLayerGen.Utils;
 using System.Threading.Tasks;
+using System.IO.Compression;
+using System.Text.Json;
+using System.Globalization;
+using NuGet.Frameworks;
 
 namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 {
@@ -35,6 +40,8 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
         private static async Task InstallApiPackagesAsync(
     SolutionConfiguration configuration)
         {
+
+           
             var projectPath = clsProjectPathHelper.GetProjectPath(
                 configuration.SolutionName,
                 "API",configuration.OutputDirectory);
@@ -43,18 +50,18 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             {
                 await AddPackageAsync(
                     $"{projectPath}\\{configuration.SolutionName}_API.csproj",
-                    "Swashbuckle.AspNetCore", "8.1.0");
+                     "Swashbuckle.AspNetCore", $"net{configuration.DotNetVersion}");
             }
 
             if (configuration.EnableApiVersioning)
             {
                 await AddPackageAsync(
                     $"{projectPath}\\{configuration.SolutionName}_API.csproj",
-                    "Asp.Versioning.Mvc", "8.1.0");
+                    "Asp.Versioning.Mvc", $"net{configuration.DotNetVersion}");
 
                 await AddPackageAsync(
                     $"{projectPath}\\{configuration.SolutionName}_API.csproj",
-                    "Asp.Versioning.Mvc.ApiExplorer", "8.1.0");
+                    "Asp.Versioning.Mvc.ApiExplorer", $"net{configuration.DotNetVersion}");
             }
         }
 
@@ -67,10 +74,10 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                 );
             await AddPackageAsync(
                 $"{projectPath}\\{configuration.SolutionName}_DataAccess.csproj",
-                "Microsoft.Data.SqlClient", "7.0.2");
+                "Microsoft.Data.SqlClient", $"net{configuration.DotNetVersion}");
             await AddPackageAsync(
                $"{projectPath}\\{configuration.SolutionName}_DataAccess.csproj",
-               "Newtonsoft.Json", null);
+               "Newtonsoft.Json", $"net{configuration.DotNetVersion}");
         }
 
         private static async Task InstallMigrationPackagesAsync(SolutionConfiguration configuration)
@@ -82,12 +89,12 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 
             await AddPackageAsync(
                 $"{projectPath}\\{configuration.SolutionName}_Migrations.csproj",
-                "DbUp", "5.0.40");
+                "DbUp",$"net{configuration.DotNetVersion}");
 
 
             await AddPackageAsync(
                 $"{projectPath}\\{configuration.SolutionName}_Migrations.csproj",
-                "Microsoft.Data.SqlClient", "7.0.2");
+                "Microsoft.Data.SqlClient", $"net{configuration.DotNetVersion}");
 
 
         }
@@ -96,7 +103,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 
         private static async Task AddPackageAsync(
             string projectFilePath,
-            string packageName,string version = null)
+            string packageName,string targetFrameworkversion)
         {
             if (!File.Exists(projectFilePath))
             {
@@ -106,12 +113,12 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 
             string command =
             $"add \"{projectFilePath}\" package {packageName}" +
-            $"{(!string.IsNullOrWhiteSpace(version) ? $" --version {version}" : "")}";
+            $" --version {await NuGetVersionResolver.GetBestCompatibleVersionAsync(packageName,targetFrameworkversion)}";
+
 
             await clsDotNetCli.ExecuteAsync(
                 command,
                 Path.GetDirectoryName(projectFilePath));
         }
-
     }
 }
