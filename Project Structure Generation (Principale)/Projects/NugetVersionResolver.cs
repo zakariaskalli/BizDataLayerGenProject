@@ -19,7 +19,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
         /// <param name="packageId">e.g. "Newtonsoft.Json"</param>
         /// <param name="targetFrameworkMoniker">e.g. "net8.0", "net472", "netstandard2.0"</param>
         /// <param name="includePrerelease">whether to consider prerelease versions</param>
-        public static async Task<decimal> GetBestCompatibleVersionAsync(
+        public static async Task<string> GetBestCompatibleVersionAsync(
             string packageId,
             string targetFrameworkMoniker,
             bool includePrerelease = false)
@@ -43,6 +43,10 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             var reducer = new FrameworkReducer();
 
             NuGetVersion? best = null;
+            best = allVersions
+                .Select(p => (NuGetVersion)p.Identity.Version)
+                .OrderByDescending(v => v)
+                .FirstOrDefault();
 
             foreach (var package in allVersions)
             {
@@ -63,22 +67,9 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                     best = version;
             }
 
-            // NuGetVersion is semver-shaped (Major.Minor.Patch.Revision + optional prerelease
-            // label, e.g. 8.2.1-preview.3). decimal can only hold two segments cleanly, so we
-            // collapse to Major.Minor here. Patch/revision/prerelease info is lost — if you need
-            // it, keep returning NuGetVersion instead and convert at the call site as needed.
-            return best is null ? 0 : ToDecimal(best);
-        }
-
-        private static decimal ToDecimal(NuGetVersion version)
-        {
-            // e.g. 8.2.1 -> 8.2m
-            return decimal.Parse($"{version.Major}.{version.Minor}");
+            
+            return best.ToString();
         }
     }
-
-    // Example usage:
-    // var version = await NuGetVersionResolver.GetBestCompatibleVersionAsync("Serilog.AspNetCore", "net8.0");
-    // Console.WriteLine(version is null ? "No compatible version found" : $"Best version: {version}");
 
 }
