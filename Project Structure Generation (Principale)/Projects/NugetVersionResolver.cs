@@ -4,6 +4,7 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -14,10 +15,14 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 {
     public static class NuGetVersionResolver
     {
+        // Session-level cache: key = "packageId|targetFramework|includePrerelease"
+        private static readonly ConcurrentDictionary<string, string> VersionCache =
+            new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Finds the highest package version compatible with the target framework.
         /// If NuGet.org is unavailable, a predefined fallback version is returned.
+        /// Results are cached in-memory for the duration of the application session.
         /// </summary>
         public static async Task<string> GetBestCompatibleVersionAsync(
             string packageId,
@@ -34,6 +39,13 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                     "Target framework cannot be empty.",
                     nameof(targetFrameworkMoniker));
 
+            var cacheKey = $"{packageId}|{targetFrameworkMoniker}|{includePrerelease}";
+
+            if (VersionCache.TryGetValue(cacheKey, out var cachedVersion))
+            {
+                return cachedVersion;
+            }
+
             var targetFramework =
                 NuGetFramework.ParseFolder(targetFrameworkMoniker);
 
@@ -45,6 +57,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             }
 
             IEnumerable<IPackageSearchMetadata> allVersions;
+            string resolvedVersion;
 
             try
             {
@@ -96,38 +109,35 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                     }
                 }
 
-                if (best != null)
-                {
-                    return best.ToString();
-                }
-
-                // Package exists, but no compatible version was found.
-                return FallbackVersions[packageId];
+                resolvedVersion = best != null
+                    ? best.ToString()
+                    : FallbackVersions[packageId];
             }
             catch (HttpRequestException)
             {
                 // Internet unavailable / NuGet.org unreachable.
-                return FallbackVersions[packageId];
+                resolvedVersion = FallbackVersions[packageId];
             }
             catch (TaskCanceledException)
             {
                 // Timeout while trying to reach NuGet.org.
-                return FallbackVersions[packageId];
+                resolvedVersion = FallbackVersions[packageId];
             }
+
+            VersionCache.TryAdd(cacheKey, resolvedVersion);
+            return resolvedVersion;
         }
 
         private static readonly Dictionary<string, string> FallbackVersions =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-        { "Newtonsoft.Json", "12.0.3" },
-        { "Swashbuckle.AspNetCore", "6.5.0" },
-        { "Asp.Versioning.Mvc", "8.0.0" },
-        { "Asp.Versioning.Mvc.ApiExplorer", "8.0.0" },
-        { "Microsoft.Extensions.Configuration", "2.0.0" },
-        { "Microsoft.Data.SqlClient", "4.0.0" },
-        { "DbUp", "5.0.0" }
-        };
-
-
-        }
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Newtonsoft.Json", "12.0.3" },
+                { "Swashbuckle.AspNetCore", "6.5.0" },
+                { "Asp.Versioning.Mvc", "8.0.0" },
+                { "Asp.Versioning.Mvc.ApiExplorer", "8.0.0" },
+                { "Microsoft.Extensions.Configuration", "2.0.0" },
+                { "Microsoft.Data.SqlClient", "4.0.0" },
+                { "DbUp", "5.0.0" }
+            };
+    }
 }
