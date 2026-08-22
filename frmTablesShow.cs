@@ -142,9 +142,15 @@ namespace BizDataLayerGen
             }
         }
 
+
+        
         private async  void btnGenerate_Click(object sender, EventArgs e)
         {
-            clsGlobal.DotnetCoreVersion = GetDotnetVersionNumber();
+
+            if (!clsGeneraleThings.HasInternetConnection())
+            {
+               MessageBox.Show("No internet connection detected.Run this command when you have an internet connection Available to Restore the required packages. (dotnet restore)", "Internet Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 
             bool SelectItem = false;
 
@@ -315,7 +321,7 @@ namespace BizDataLayerGen
                 IncludeDataAccess = true,
                 IncludeDto = UseDTO,
                 IncludeMigrations = true,
-                DotNetVersion = decimal.Parse(clsGlobal.DotnetCoreVersion),
+                DotNetVersion = clsGlobal.DotnetCoreVersion,
                 OutputDirectory = clsGlobal.PathFilesToGenerate,
 
 
@@ -323,8 +329,7 @@ namespace BizDataLayerGen
 
 
         }
-
-
+        
 
         private void rbAddingStaticMethodsNo_CheckedChanged(object sender, EventArgs e)
         {

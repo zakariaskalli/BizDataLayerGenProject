@@ -1,75 +1,133 @@
-﻿// dotnet add package NuGet.Protocol
-// dotnet add package NuGet.Frameworks   (usually pulled in transitively by NuGet.Protocol)
+﻿using NuGet.Common;
 using NuGet.Frameworks;
 using NuGet.Protocol;
-using NuGet.Common;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
+
 namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 {
     public static class NuGetVersionResolver
     {
-        // <summary>
-        /// Finds the highest package version that is compatible with the given target framework,
-        /// using the same framework-compatibility engine NuGet/dotnet restore uses internally.
+
+        /// <summary>
+        /// Finds the highest package version compatible with the target framework.
+        /// If NuGet.org is unavailable, a predefined fallback version is returned.
         /// </summary>
-        /// <param name="packageId">e.g. "Newtonsoft.Json"</param>
-        /// <param name="targetFrameworkMoniker">e.g. "net8.0", "net472", "netstandard2.0"</param>
-        /// <param name="includePrerelease">whether to consider prerelease versions</param>
         public static async Task<string> GetBestCompatibleVersionAsync(
             string packageId,
             string targetFrameworkMoniker,
             bool includePrerelease = false)
         {
-            var targetFramework = NuGetFramework.ParseFolder(targetFrameworkMoniker);
-            var logger = NullLogger.Instance;
-            var cache = new SourceCacheContext();
+            if (string.IsNullOrWhiteSpace(packageId))
+                throw new ArgumentException(
+                    "Package ID cannot be empty.",
+                    nameof(packageId));
 
-            // Official nuget.org v3 feed. Swap for a private feed URL if DealPart uses one.
-            var repository = Repository.CreateSource(Repository.Provider.GetCoreV3(), "https://api.nuget.org/v3/index.json");
-            var metadataResource = await repository.GetResourceAsync<PackageMetadataResource>();
+            if (string.IsNullOrWhiteSpace(targetFrameworkMoniker))
+                throw new ArgumentException(
+                    "Target framework cannot be empty.",
+                    nameof(targetFrameworkMoniker));
 
-            var allVersions = await metadataResource.GetMetadataAsync(
-                packageId,
-                includePrerelease: includePrerelease,
-                includeUnlisted: false,
-                cache,
-                logger,
-                CancellationToken.None);
+            var targetFramework =
+                NuGetFramework.ParseFolder(targetFrameworkMoniker);
 
-            var reducer = new FrameworkReducer();
-
-            NuGetVersion? best = null;
-            best = allVersions
-                .Select(p => (NuGetVersion)p.Identity.Version)
-                .OrderByDescending(v => v)
-                .FirstOrDefault();
-
-            foreach (var package in allVersions)
+            if (targetFramework.IsUnsupported)
             {
-                // Each package version exposes the frameworks its dependency groups target.
-                var supportedFrameworks = package.DependencySets
-                    .Select(ds => ds.TargetFramework)
-                    .Where(f => f != null)
-                    .ToList();
-
-                // No dependency groups usually means the package is framework-agnostic (e.g. content-only).
-                var isCompatible = !supportedFrameworks.Any()
-                    || reducer.GetNearest(targetFramework, supportedFrameworks) != null;
-
-                if (!isCompatible) continue;
-
-                var version = (NuGetVersion)package.Identity.Version;
-                if (best is null || version > best)
-                    best = version;
+                throw new ArgumentException(
+                    $"Unsupported target framework: '{targetFrameworkMoniker}'.",
+                    nameof(targetFrameworkMoniker));
             }
 
-            
-            return best.ToString();
-        }
-    }
+            IEnumerable<IPackageSearchMetadata> allVersions;
 
+            try
+            {
+                var logger = NullLogger.Instance;
+
+                using var cache = new SourceCacheContext();
+
+                var repository = Repository.CreateSource(
+                    Repository.Provider.GetCoreV3(),
+                    "https://api.nuget.org/v3/index.json");
+
+                var metadataResource =
+                    await repository.GetResourceAsync<PackageMetadataResource>();
+
+                allVersions = await metadataResource.GetMetadataAsync(
+                    packageId,
+                    includePrerelease: includePrerelease,
+                    includeUnlisted: false,
+                    cache,
+                    logger,
+                    CancellationToken.None);
+
+                var reducer = new FrameworkReducer();
+
+                NuGetVersion? best = null;
+
+                foreach (var package in allVersions)
+                {
+                    var supportedFrameworks = package.DependencySets
+                        .Select(ds => ds.TargetFramework)
+                        .Where(f => f != null)
+                        .ToList();
+
+                    var isCompatible =
+                        !supportedFrameworks.Any()
+                        || reducer.GetNearest(
+                            targetFramework,
+                            supportedFrameworks) != null;
+
+                    if (!isCompatible)
+                        continue;
+
+                    var version =
+                        (NuGetVersion)package.Identity.Version;
+
+                    if (best == null || version > best)
+                    {
+                        best = version;
+                    }
+                }
+
+                if (best != null)
+                {
+                    return best.ToString();
+                }
+
+                // Package exists, but no compatible version was found.
+                return FallbackVersions[packageId];
+            }
+            catch (HttpRequestException)
+            {
+                // Internet unavailable / NuGet.org unreachable.
+                return FallbackVersions[packageId];
+            }
+            catch (TaskCanceledException)
+            {
+                // Timeout while trying to reach NuGet.org.
+                return FallbackVersions[packageId];
+            }
+        }
+
+        private static readonly Dictionary<string, string> FallbackVersions =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+        { "Newtonsoft.Json", "12.0.3" },
+        { "Swashbuckle.AspNetCore", "6.5.0" },
+        { "Asp.Versioning.Mvc", "8.0.0" },
+        { "Asp.Versioning.Mvc.ApiExplorer", "8.0.0" },
+        { "Microsoft.Extensions.Configuration", "2.0.0" },
+        { "Microsoft.Data.SqlClient", "4.0.0" },
+        { "DbUp", "5.0.0" }
+        };
+
+
+        }
 }

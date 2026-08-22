@@ -1,18 +1,19 @@
 ﻿using BizDataLayerGen.Project_Structure_Generation__Principale_.DotNet;
 using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
 using BizDataLayerGen.Utils;
+using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO.Compression;
-using System.Text.Json;
-using System.Globalization;
-using NuGet.Frameworks;
+using System.Xml.Linq;
 
 namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 {
@@ -100,6 +101,41 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
         }
 
 
+        public static void AddPackageReference(string csprojPath, string packageName, string version)
+        {
+            var doc = XDocument.Load(csprojPath);
+
+            // Find an existing ItemGroup that already contains PackageReference elements,
+            // or create a new one if none exists
+            var itemGroup = doc.Root
+                .Elements("ItemGroup")
+                .FirstOrDefault(ig => ig.Elements("PackageReference").Any());
+
+            if (itemGroup == null)
+            {
+                itemGroup = new XElement("ItemGroup");
+                doc.Root.Add(itemGroup);
+            }
+
+            // Avoid adding a duplicate reference for the same package
+            var existing = itemGroup.Elements("PackageReference")
+                .FirstOrDefault(pr => (string)pr.Attribute("Include") == packageName);
+
+            if (existing != null)
+            {
+                existing.SetAttributeValue("Version", version);
+            }
+            else
+            {
+                itemGroup.Add(new XElement("PackageReference",
+                    new XAttribute("Include", packageName),
+                    new XAttribute("Version", version)));
+            }
+
+            doc.Save(csprojPath);
+        }
+
+      
 
         private static async Task AddPackageAsync(
             string projectFilePath,
@@ -111,14 +147,28 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
                     $"Project file not found: {projectFilePath}");
             }
 
-            string command =
+           string packageVersion = await NuGetVersionResolver.GetBestCompatibleVersionAsync(packageName, targetFrameworkversion);
+           string versionArg = string.IsNullOrEmpty(packageVersion)
+           ? string.Empty
+           : $"--version {packageVersion}";
+
+           
+           string command =
             $"add \"{projectFilePath}\" package {packageName}" +
-            $" --version {await NuGetVersionResolver.GetBestCompatibleVersionAsync(packageName,targetFrameworkversion)}";
+            $"{versionArg}";
 
 
-            await clsDotNetCli.ExecuteAsync(
-                command,
-                Path.GetDirectoryName(projectFilePath));
+            try
+            {
+               await clsDotNetCli.ExecuteAsync(
+               command,
+               Path.GetDirectoryName(projectFilePath));
+            }
+            catch
+            {
+                 AddPackageReference(projectFilePath, packageName, packageVersion);
+            }
+           
         }
     }
 }

@@ -14,7 +14,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
 
             public string OutputDirectory { get; set; }
 
-            public decimal DotNetVersion { get; set; }
+            public string DotNetVersion { get; set; }
         public bool IncludeApi { get; set; } = true;
 
             public bool IncludeBusiness { get; set; } = true;
@@ -32,7 +32,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             public SolutionConfiguration() { }
 
             
-            public SolutionConfiguration(string solutionName, string outputDirectory, decimal dotNetVersion)
+            public SolutionConfiguration(string solutionName, string outputDirectory, string dotNetVersion)
             {
                 SolutionName = solutionName;
                 OutputDirectory = outputDirectory;

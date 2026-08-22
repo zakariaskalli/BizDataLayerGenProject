@@ -61,6 +61,6 @@ namespace BizDataLayerGen
 
         public static bool EnablePagination { get; set; } = true;
 
-        public static string DotnetCoreVersion { get; set; } = "net8.0";
+        public static string DotnetCoreVersion { get; set; } = "8.0";
     }
 }
