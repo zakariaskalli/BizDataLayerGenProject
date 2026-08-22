@@ -127,16 +127,16 @@ namespace BizDataLayerGen
          
          */
 
-        private static string GetDotnetVersionNumber()
+        private static string GetDotnetVersionNumber(int cbSelectedIndex)
         {
-            switch (clsGlobal.DotnetCoreVersion)
+            switch (cbSelectedIndex)
             {
-                case ".NET 8.0":
+                case 0:
                     return "8.0";
-                case ".NET 7.0":
-                    return "7.0";
-                case ".NET 9.0":
+                case 1:
                     return "9.0";
+                case 2:
+                    return "10.0";
                 default:
                     return "8.0"; // Default to .NET 8.0 if not specified
             }
@@ -146,6 +146,7 @@ namespace BizDataLayerGen
         
         private async  void btnGenerate_Click(object sender, EventArgs e)
         {
+            clsGlobal.DotnetCoreVersion = GetDotnetVersionNumber(cbDotNetVersion.SelectedIndex);
 
             if (!clsGeneraleThings.HasInternetConnection())
             {

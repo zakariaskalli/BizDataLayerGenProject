@@ -56,8 +56,8 @@
             this.rbBoth = new Guna.UI2.WinForms.Guna2RadioButton();
             this.rbAsynchronous = new Guna.UI2.WinForms.Guna2RadioButton();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.guna2HtmlLabel1 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.cbDotNetVersion = new Guna.UI2.WinForms.Guna2ComboBox();
+            this.guna2HtmlLabel1 = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -397,7 +397,7 @@
             this.rbBoth.CheckedState.InnerColor = System.Drawing.Color.White;
             this.rbBoth.CheckedState.InnerOffset = -4;
             this.rbBoth.Location = new System.Drawing.Point(23, 44);
-            this.rbBoth.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbBoth.Margin = new System.Windows.Forms.Padding(2);
             this.rbBoth.Name = "rbBoth";
             this.rbBoth.Size = new System.Drawing.Size(144, 25);
             this.rbBoth.TabIndex = 40;
@@ -418,7 +418,7 @@
             this.rbAsynchronous.CheckedState.InnerColor = System.Drawing.Color.White;
             this.rbAsynchronous.CheckedState.InnerOffset = -4;
             this.rbAsynchronous.Location = new System.Drawing.Point(23, 73);
-            this.rbAsynchronous.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbAsynchronous.Margin = new System.Windows.Forms.Padding(2);
             this.rbAsynchronous.Name = "rbAsynchronous";
             this.rbAsynchronous.Size = new System.Drawing.Size(106, 25);
             this.rbAsynchronous.TabIndex = 35;
@@ -441,6 +441,28 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = ".NET Version";
             // 
+            // cbDotNetVersion
+            // 
+            this.cbDotNetVersion.AutoRoundedCorners = true;
+            this.cbDotNetVersion.BackColor = System.Drawing.Color.Transparent;
+            this.cbDotNetVersion.BorderRadius = 17;
+            this.cbDotNetVersion.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cbDotNetVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbDotNetVersion.FocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.cbDotNetVersion.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.cbDotNetVersion.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.cbDotNetVersion.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
+            this.cbDotNetVersion.ItemHeight = 30;
+            this.cbDotNetVersion.Items.AddRange(new object[] {
+            ".NET 8.0",
+            ".NET 9.0",
+            ".NET 10.0"});
+            this.cbDotNetVersion.Location = new System.Drawing.Point(6, 61);
+            this.cbDotNetVersion.Name = "cbDotNetVersion";
+            this.cbDotNetVersion.Size = new System.Drawing.Size(187, 36);
+            this.cbDotNetVersion.StartIndex = 0;
+            this.cbDotNetVersion.TabIndex = 42;
+            // 
             // guna2HtmlLabel1
             // 
             this.guna2HtmlLabel1.BackColor = System.Drawing.Color.Transparent;
@@ -451,28 +473,6 @@
             this.guna2HtmlLabel1.TabIndex = 41;
             this.guna2HtmlLabel1.Text = "Select .NET Version:";
             this.guna2HtmlLabel1.Click += new System.EventHandler(this.guna2HtmlLabel1_Click_1);
-            // 
-            // cbDotNetVersion
-            // 
-            this.cbDotNetVersion.AutoRoundedCorners = true;
-            this.cbDotNetVersion.BackColor = System.Drawing.Color.Transparent;
-            this.cbDotNetVersion.BorderRadius = 17;
-            this.cbDotNetVersion.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.cbDotNetVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbDotNetVersion.FocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.cbDotNetVersion.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.cbDotNetVersion.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbDotNetVersion.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
-            this.cbDotNetVersion.ItemHeight = 30;
-            this.cbDotNetVersion.Items.AddRange(new object[] {
-            ".NET 8.0 (LTS)",
-            ".NET 9.0",
-            ".NET 10.0"});
-            this.cbDotNetVersion.Location = new System.Drawing.Point(6, 61);
-            this.cbDotNetVersion.Name = "cbDotNetVersion";
-            this.cbDotNetVersion.Size = new System.Drawing.Size(187, 36);
-            this.cbDotNetVersion.StartIndex = 0;
-            this.cbDotNetVersion.TabIndex = 42;
             // 
             // frmTablesShow
             // 
