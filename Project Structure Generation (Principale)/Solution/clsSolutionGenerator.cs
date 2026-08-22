@@ -19,7 +19,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
         public static async Task GenerateSolutionAsync(SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress = null)
         {
             int CurrentStep = 0;
-            int TotalSteps = 9;
+            int TotalSteps =  9;
 
             async Task ReportAsync(string description)
             {
@@ -54,13 +54,15 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             CurrentStep++;
             await ReportAsync("Project references added.");
 
-            await clsNuGetPackageManager.InstallRequiredPackagesAsync(configuration, progress);
-            CurrentStep++;
-            await ReportAsync("Required NuGet packages installed.");
 
             await Files.clsTemplateFileCleaner.RemoveTemplateFilesAsync(configuration, progress);
             CurrentStep++;
             await ReportAsync("Template files removed.");
+
+
+            await clsNuGetPackageManager.InstallRequiredPackagesAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("NuGet packages installed.");
 
             await RestorePackagesAsync(configuration, progress);
             CurrentStep++;
@@ -70,6 +72,8 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             CurrentStep++;
             await ReportAsync("Solution built successfully.");
         }
+
+
         private static void ValidateConfiguration(SolutionConfiguration configuration,IProgress<ProjectStructureGenerationProgress> progress = null)
         {
 
@@ -84,11 +88,6 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             if (string.IsNullOrWhiteSpace(configuration.OutputDirectory))
                 throw new ArgumentException(
                     "Output directory cannot be empty.",
-                    nameof(configuration));
-
-            if (string.IsNullOrWhiteSpace(configuration.DotNetVersion))
-                throw new ArgumentException(
-                    ".NET version cannot be empty.",
                     nameof(configuration));
 
             progress?.Report( new ProjectStructureGenerationProgress
@@ -135,6 +134,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
 
         }
 
+        
 
         private static async Task RestorePackagesAsync(
         SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress=null)

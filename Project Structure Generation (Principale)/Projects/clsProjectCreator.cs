@@ -60,7 +60,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             var projectName = $"{configuration.SolutionName}_API";
 
             await clsDotNetCli.ExecuteAsync(
-                $"new webapi -n \"{projectName}\" -f {configuration.DotNetVersion}",
+                $"new webapi -n \"{projectName}\" -f net{configuration.DotNetVersion}",
                 configuration.OutputDirectory);
 
         }
@@ -71,7 +71,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             var projectName = $"{configuration.SolutionName}_Business";
 
             await clsDotNetCli.ExecuteAsync(
-                $"new classlib -n \"{projectName}\" -f {configuration.DotNetVersion}",
+                $"new classlib -n \"{projectName}\" -f net{configuration.DotNetVersion}",
                 configuration.OutputDirectory);
         }
 
@@ -81,7 +81,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             var projectName = $"{configuration.SolutionName}_DataAccess";
 
             await clsDotNetCli.ExecuteAsync(
-                $"new classlib -n \"{projectName}\" -f {configuration.DotNetVersion}",
+                $"new classlib -n \"{projectName}\" -f net{configuration.DotNetVersion}",
                 configuration.OutputDirectory);
         }
 
@@ -92,7 +92,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             var projectName = $"{configuration.SolutionName}_DTO";
 
             await clsDotNetCli.ExecuteAsync(
-                $"new classlib -n \"{projectName}\" -f {configuration.DotNetVersion}",
+                $"new classlib -n \"{projectName}\" -f net{configuration.DotNetVersion}",
                 configuration.OutputDirectory
                 );
         }
@@ -104,7 +104,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
             var projectName = $"{configuration.SolutionName}_Migrations";
 
             await clsDotNetCli.ExecuteAsync(
-                $"new classlib -n \"{projectName}\" -f {configuration.DotNetVersion}",
+                $"new classlib -n \"{projectName}\" -f net{configuration.DotNetVersion}",
                 configuration.OutputDirectory);
         }
 
