@@ -2,6 +2,7 @@
 using BizDataLayerGen.DataAccessLayer;
 using BizDataLayerGen.DocumentationGenerator;
 using BizDataLayerGen.GeneralClasses;
+using BizDataLayerGen.Project_Structure_Generation__Principale_.DotNet;
 using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
 using Guna.UI2.WinForms;
 using Guna.UI2.WinForms.Suite;
@@ -142,11 +143,22 @@ namespace BizDataLayerGen
             }
         }
 
+        
 
         
         private async  void btnGenerate_Click(object sender, EventArgs e)
         {
-            clsGlobal.DotnetCoreVersion = GetDotnetVersionNumber(cbDotNetVersion.SelectedIndex);
+            string selectedDotnetVersion = GetDotnetVersionNumber(cbDotNetVersion.SelectedIndex);
+
+            if (!clsDotNetCli.IsDotNetSdkInstalled("net" + selectedDotnetVersion))
+            {
+                MessageBox.Show($"The required .NET SDK version (net{clsGlobal.DotnetCoreVersion}) is not installed. Please install it to proceed.", "SDK Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+
+            clsGlobal.DotnetCoreVersion = selectedDotnetVersion;
+
 
             if (!clsGeneraleThings.HasInternetConnection())
             {
