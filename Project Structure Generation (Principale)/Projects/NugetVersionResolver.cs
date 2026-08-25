@@ -111,33 +111,76 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 
                 resolvedVersion = best != null
                     ? best.ToString()
-                    : FallbackVersions[packageId];
+                    : FallbackVersions[targetFrameworkMoniker][packageId];
             }
             catch (HttpRequestException)
             {
                 // Internet unavailable / NuGet.org unreachable.
-                resolvedVersion = FallbackVersions[packageId];
+                resolvedVersion = FallbackVersions[targetFrameworkMoniker][packageId];
             }
             catch (TaskCanceledException)
             {
                 // Timeout while trying to reach NuGet.org.
-                resolvedVersion = FallbackVersions[packageId];
+                resolvedVersion = FallbackVersions[targetFrameworkMoniker][packageId];
             }
 
             VersionCache.TryAdd(cacheKey, resolvedVersion);
             return resolvedVersion;
         }
 
-        private static readonly Dictionary<string, string> FallbackVersions =
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, Dictionary<string, string>> FallbackVersions =
+            new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase)
             {
-                { "Newtonsoft.Json", "12.0.3" },
-                { "Swashbuckle.AspNetCore", "6.5.0" },
-                { "Asp.Versioning.Mvc", "8.0.0" },
-                { "Asp.Versioning.Mvc.ApiExplorer", "8.0.0" },
-                { "Microsoft.Extensions.Configuration", "2.0.0" },
-                { "Microsoft.Data.SqlClient", "4.0.0" },
-                { "DbUp", "5.0.0" }
+                {
+                    "net8.0",
+                    new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "Newtonsoft.Json", "13.0.4" },
+                        { "Swashbuckle.AspNetCore", "10.2.3" },
+                        { "Asp.Versioning.Mvc", "8.1.1" },
+                        { "Asp.Versioning.Mvc.ApiExplorer", "8.1.1" },
+                        { "Microsoft.Extensions.Configuration", "8.0.0" },
+                        { "Microsoft.Data.SqlClient", "7.0.2" },
+                        { "DbUp", "6.1.1" },
+                        { "Microsoft.AspNetCore.OpenApi", "8.0.30" }
+                    }
+                },
+                {
+                    "net9.0",
+                    new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "Newtonsoft.Json", "13.0.4" },
+                        { "Swashbuckle.AspNetCore", "10.2.3" },
+                        { "Asp.Versioning.Mvc", "8.1.1" },
+                        { "Asp.Versioning.Mvc.ApiExplorer", "8.1.1" },
+                        { "Microsoft.Extensions.Configuration", "9.0.19" },
+                        { "Microsoft.Data.SqlClient", "7.0.2" },
+                        { "DbUp", "6.1.1" },
+                        { "Microsoft.AspNetCore.OpenApi", "9.0.19" }
+                    }
+
+                },
+                {
+                 "net10.0" ,
+                    new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "Newtonsoft.Json",  "13.0.4" },
+                        { "Swashbuckle.AspNetCore", "10.2.3" },
+                        { "Asp.Versioning.Mvc", "8.1.1" },
+                        { "Asp.Versioning.Mvc.ApiExplorer", "8.1.1" },
+                        { "Microsoft.Extensions.Configuration", "10.0.11" },
+                        { "Microsoft.Data.SqlClient", "7.0.2" },
+                        { "DbUp", "6.1.1" },
+                        { "Microsoft.AspNetCore.OpenApi", "10.0.11" }
+                    }
+                }
+
             };
+
+
+
     }
+               
+          
+    
 }
