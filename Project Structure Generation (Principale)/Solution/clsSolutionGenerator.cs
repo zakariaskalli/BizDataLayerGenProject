@@ -102,7 +102,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
         SolutionConfiguration configuration)
         {
             await clsDotNetCli.ExecuteAsync(
-                $"new sln --name \"{configuration.SolutionName}\" --format sln",
+                $"new sln --name \"{configuration.SolutionName}\" --output \"{configuration.OutputDirectory}\"",
                 configuration.OutputDirectory);
             
         }
@@ -110,11 +110,25 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
         public static string GetSolutionPath(
         SolutionConfiguration configuration)
         {
-            return Path.Combine(
+            var slnPath = Path.Combine(
                 configuration.OutputDirectory,
                 $"{configuration.SolutionName}.sln");
-        }
 
+            if (File.Exists(slnPath))
+                return slnPath;
+
+            var slnxPath = Path.Combine(
+                configuration.OutputDirectory,
+                $"{configuration.SolutionName}.slnx");
+
+            if (File.Exists(slnxPath))
+                return slnxPath;
+
+            throw new FileNotFoundException(
+                $"Solution file '{configuration.SolutionName}.sln' " +
+                $"or '{configuration.SolutionName}.slnx' was not found.",
+                configuration.OutputDirectory);
+        }
 
         private static async Task BuildSolutionAsync(
         SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress=null)
