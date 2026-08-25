@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Humanizer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Humanizer;
 
 namespace BizDataLayerGen
 {
@@ -16,6 +17,21 @@ namespace BizDataLayerGen
         {
             // check if the database name is not null or empty and contains only letters, numbers, and underscores
             return System.Text.RegularExpressions.Regex.IsMatch(dbName, @"^[a-zA-Z0-9_]+$");
+        }
+
+
+        public static bool HasInternetConnection()
+        {
+            try
+            {
+                using var ping = new Ping();
+                var reply = ping.Send("8.8.8.8", 3000); // 3-second timeout
+                return reply != null && reply.Status == IPStatus.Success;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public static string CleanDatabaseName(string dbName)
@@ -83,5 +99,7 @@ namespace BizDataLayerGen
             }
             return PluralWords;
         }
+
+        
     }
 }

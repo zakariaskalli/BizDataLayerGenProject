@@ -19,7 +19,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
         public static async Task GenerateSolutionAsync(SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress = null)
         {
             int CurrentStep = 0;
-            int TotalSteps = 9;
+            int TotalSteps =  9;
 
             async Task ReportAsync(string description)
             {
@@ -54,13 +54,15 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             CurrentStep++;
             await ReportAsync("Project references added.");
 
-            await clsNuGetPackageManager.InstallRequiredPackagesAsync(configuration, progress);
-            CurrentStep++;
-            await ReportAsync("Required NuGet packages installed.");
 
             await Files.clsTemplateFileCleaner.RemoveTemplateFilesAsync(configuration, progress);
             CurrentStep++;
             await ReportAsync("Template files removed.");
+
+
+            await clsNuGetPackageManager.InstallRequiredPackagesAsync(configuration, progress);
+            CurrentStep++;
+            await ReportAsync("NuGet packages installed.");
 
             await RestorePackagesAsync(configuration, progress);
             CurrentStep++;
@@ -70,6 +72,8 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             CurrentStep++;
             await ReportAsync("Solution built successfully.");
         }
+
+
         private static void ValidateConfiguration(SolutionConfiguration configuration,IProgress<ProjectStructureGenerationProgress> progress = null)
         {
 
@@ -86,11 +90,6 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
                     "Output directory cannot be empty.",
                     nameof(configuration));
 
-            if (string.IsNullOrWhiteSpace(configuration.DotNetVersion))
-                throw new ArgumentException(
-                    ".NET version cannot be empty.",
-                    nameof(configuration));
-
             progress?.Report( new ProjectStructureGenerationProgress
             {
                 CurrentStep = "Configuration validated successfully.",
@@ -103,7 +102,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
         SolutionConfiguration configuration)
         {
             await clsDotNetCli.ExecuteAsync(
-                $"new sln --name \"{configuration.SolutionName}\" --format sln",
+                $"new sln --name \"{configuration.SolutionName}\" --output \"{configuration.OutputDirectory}\"",
                 configuration.OutputDirectory);
             
         }
@@ -111,11 +110,25 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
         public static string GetSolutionPath(
         SolutionConfiguration configuration)
         {
-            return Path.Combine(
+            var slnPath = Path.Combine(
                 configuration.OutputDirectory,
                 $"{configuration.SolutionName}.sln");
-        }
 
+            if (File.Exists(slnPath))
+                return slnPath;
+
+            var slnxPath = Path.Combine(
+                configuration.OutputDirectory,
+                $"{configuration.SolutionName}.slnx");
+
+            if (File.Exists(slnxPath))
+                return slnxPath;
+
+            throw new FileNotFoundException(
+                $"Solution file '{configuration.SolutionName}.sln' " +
+                $"or '{configuration.SolutionName}.slnx' was not found.",
+                configuration.OutputDirectory);
+        }
 
         private static async Task BuildSolutionAsync(
         SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress=null)
@@ -135,6 +148,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
 
         }
 
+        
 
         private static async Task RestorePackagesAsync(
         SolutionConfiguration configuration, IProgress<ProjectStructureGenerationProgress> progress=null)

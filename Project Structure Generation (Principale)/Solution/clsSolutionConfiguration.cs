@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,8 +15,7 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Solution
             public string OutputDirectory { get; set; }
 
             public string DotNetVersion { get; set; }
-
-            public bool IncludeApi { get; set; } = true;
+        public bool IncludeApi { get; set; } = true;
 
             public bool IncludeBusiness { get; set; } = true;
 

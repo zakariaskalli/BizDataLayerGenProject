@@ -2,6 +2,7 @@
 using BizDataLayerGen.DataAccessLayer;
 using BizDataLayerGen.DocumentationGenerator;
 using BizDataLayerGen.GeneralClasses;
+using BizDataLayerGen.Project_Structure_Generation__Principale_.DotNet;
 using BizDataLayerGen.Project_Structure_Generation__Principale_.Solution;
 using Guna.UI2.WinForms;
 using Guna.UI2.WinForms.Suite;
@@ -127,8 +128,42 @@ namespace BizDataLayerGen
          
          */
 
+        private static string GetDotnetVersionNumber(int cbSelectedIndex)
+        {
+            switch (cbSelectedIndex)
+            {
+                case 0:
+                    return "8.0";
+                case 1:
+                    return "9.0";
+                case 2:
+                    return "10.0";
+                default:
+                    return "8.0"; // Default to .NET 8.0 if not specified
+            }
+        }
+
+        
+
+        
         private async  void btnGenerate_Click(object sender, EventArgs e)
         {
+            string selectedDotnetVersion = GetDotnetVersionNumber(cbDotNetVersion.SelectedIndex);
+
+            if (!clsDotNetCli.IsDotNetSdkInstalled("net" + selectedDotnetVersion))
+            {
+                MessageBox.Show($"The required .NET SDK version (net{clsGlobal.DotnetCoreVersion}) is not installed. Please install it to proceed.", "SDK Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+
+            clsGlobal.DotnetCoreVersion = selectedDotnetVersion;
+
+
+            if (!clsGeneraleThings.HasInternetConnection())
+            {
+               MessageBox.Show("No internet connection detected.Run this command when you have an internet connection Available to Restore the required packages. (dotnet restore)", "Internet Connection Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 
             bool SelectItem = false;
 
@@ -299,7 +334,7 @@ namespace BizDataLayerGen
                 IncludeDataAccess = true,
                 IncludeDto = UseDTO,
                 IncludeMigrations = true,
-                DotNetVersion = "net8.0",
+                DotNetVersion = clsGlobal.DotnetCoreVersion,
                 OutputDirectory = clsGlobal.PathFilesToGenerate,
 
 
@@ -307,6 +342,8 @@ namespace BizDataLayerGen
 
 
         }
+        
+
         private void rbAddingStaticMethodsNo_CheckedChanged(object sender, EventArgs e)
         {
             // In Button Ok Less rbNo And Cancel Checked RbYes
@@ -435,5 +472,19 @@ namespace BizDataLayerGen
             }
         }
 
+        private void guna2HtmlLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox3_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2HtmlLabel1_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

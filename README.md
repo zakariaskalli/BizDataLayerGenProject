@@ -75,11 +75,17 @@ For example, generating the full data stack (DAL + BL + DTO + API + SPs) for 20 
 - **Standardized Response Envelope (`PagedResultDTO<T>`):** Wraps returned data along with complete pagination metadata (`PageNumber`, `PageSize`, `TotalCount`, and `TotalPages`).
 - **Zero-Boilerplate Generation:** Automatically builds the query DTOs, Business Layer validation, Data Access data streams, and REST API query-string bindings out of the box.
 
+- **Selectable .NET Version (New)**  
+  Choose the target **.NET version (8.0 LTS, 9.0, or 10.0)** directly from the UI before generating. All generated projects (API, Business, DataAccess, DTO, Migrations) are scaffolded against the selected framework via `dotnet new ... -f net{version}`.
+
+- **Automatic NuGet Version Resolution (New)**  
+  No more guessing package versions. The generator queries **nuget.org** at generation time and automatically detects the **best version of each NuGet package that is compatible with the selected target framework** (using the same framework-compatibility engine NuGet uses internally). This ensures packages like Swashbuckle.AspNetCore, Asp.Versioning.Mvc, Microsoft.Data.SqlClient, DbUp, and Newtonsoft.Json are installed with a version that builds cleanly against the chosen .NET version.
+
 - **User-Friendly UI**  
   Simple and clean interface for:
   - Connecting to SQL Server by entering credentials
   - Selecting target database and tables for code generation (select all or specific tables)
-  - Choosing options like generating static methods, object relations, DTOs, an API layer, auto-executing SPs, and AI documentation.
+  - Choosing options like generating static methods, object relations, DTOs, an API layer, auto-executing SPs, AI documentation, and the target .NET version.
 
 ## Technologies Used
 
@@ -113,7 +119,7 @@ For example, generating the full data stack (DAL + BL + DTO + API + SPs) for 20 
 3. Enter a **Project Name** and choose the folder where the code should be generated.  
 4. Select the target database.  
 5. Choose tables to generate code for (you can select all or specific tables).  
-6. Configure generation options (static methods, object relations, DTO layer, API layer, auto execute SP, AI documentation).  
+6. Configure generation options (static methods, object relations, DTO layer, API layer, auto execute SP, AI documentation, and the target .NET version — 8.0, 9.0, or 10.0). NuGet packages are automatically resolved to versions compatible with the selected framework.  
 7. Generate the code and integrate it into your projects.
 
 ---

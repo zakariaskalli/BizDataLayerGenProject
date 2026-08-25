@@ -60,5 +60,7 @@ namespace BizDataLayerGen
         public static bool AICodeDocsEnabled = false;
 
         public static bool EnablePagination { get; set; } = true;
+
+        public static string DotnetCoreVersion { get; set; } = "8.0";
     }
 }

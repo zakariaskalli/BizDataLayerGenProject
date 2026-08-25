@@ -118,3 +118,5 @@ namespace BizDataLayerGen.Project_Structure_Generation__Principale_.Projects
 
     }
 }
+
+
